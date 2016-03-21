@@ -15,6 +15,7 @@ public class Team {
     private List<Player> players;
     private List<Unit> units;
     private Map<Item, Integer> items; // The integer represents the ammo remaining
+    private int activeUnitIndex;
 
     public Team(String name, Color color) {
         this.name = name;
@@ -69,5 +70,24 @@ public class Team {
         units.remove(unit);
 
         // TODO: Logic for killing units?
+    }
+    
+    public void endTurn() {
+        // TODO: Weten we nog steeds niet
+    }
+    
+    public void increaseItemAmount(Item item, int amount) {
+        items.put(item, amount);
+    }
+    
+    public void decreaseItemAmount(Item item, int amount) {
+        if(items.containsKey(item)) {
+            // TODO: Decrease item amount.
+        }
+    }
+    
+    public Item containsItemAmount(Item item) {
+        // TODO: Dit mag Jip ook doen.
+        return new Item();
     }
 }
