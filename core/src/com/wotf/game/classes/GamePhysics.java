@@ -16,6 +16,7 @@ public class GamePhysics {
     
     public GamePhysics() {
         // TODO: initialize wind
+        wind = new Vector2(0, 0);
     }
     
     public Vector2 getWind() {

@@ -5,7 +5,7 @@
  */
 package com.wotf.game.classes;
 
-import java.awt.*;
+import com.badlogic.gdx.graphics.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,6 +84,11 @@ public class GameSettings {
     
     public void addTeam(String name, Color color) {
         teams.add(new Team(name, color));
+    }
+    
+    public void addTeam(Team team) {
+        // Temporary overload for the default debug game instance
+        teams.add(team);
     }
 
     public void removeTeam(Team t) {
