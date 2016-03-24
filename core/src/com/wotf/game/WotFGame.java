@@ -5,11 +5,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.wotf.game.classes.Game;
 import com.wotf.game.classes.GameSettings;
+import com.wotf.game.classes.Map;
 import com.wotf.game.classes.Player;
 import com.wotf.game.classes.Team;
 import java.util.ArrayList;
@@ -27,7 +29,7 @@ public class WotFGame extends ApplicationAdapter {
 
         // Creates new GameSettings instance
         GameSettings settings = new GameSettings();
-        Team teamRed = new Team("Red Team", Color.VIOLET);
+        Team teamRed = new Team("Red Team", Color.RED);
         teamRed.addPlayer(players.get(0));
         teamRed.addUnit("Steve", 100);
         teamRed.addUnit("Henk", 1000000);
@@ -38,16 +40,37 @@ public class WotFGame extends ApplicationAdapter {
 
         settings.addTeam(teamRed);
         settings.addTeam(teamBlue);
+        
+        Map map = new Map("tempMap");
+        map.setWaterLevel(30);
+        map.setWidth(2560);
+        map.setHeight(720);
+        
+        // Creates a new terrain mask and assigns a flat rectangle as terrain
+        boolean[][] terrain = new boolean[map.getWidth()][map.getHeight()];
+        for(int x = 100; x < map.getWidth() - 100; x++) {
+            for(int y = 0; y < 80; y++) {
+                terrain[x][y] = true;
+            }
+        }
+        
+        map.setTerrain(terrain);
+        
+        // Initializes a viewport and a camera object
+        StretchViewport viewport = new StretchViewport(2560, 720);
+        viewport.setCamera(new OrthographicCamera(1280, 720));
+        viewport.getCamera().position.set(viewport.getWorldWidth()/2, viewport.getWorldHeight()/2, 0);
 
         // Initializes game object using game settings
-        Game game = new Game(settings, players);
+        Game game = new Game(settings, map, players);
 
-        // Initializes the stage object
+        // Initializes the stage object and sets the viewport
         stage = new GameStage(game);
         stage.init();
+        stage.setViewport(viewport);
 
         stage.setKeyboardFocus(stage.getActors().first());
-
+        
         Gdx.input.setInputProcessor(stage);
 
         // Debug function: If tab is pressed, toggle between actor 1 and actor 2
@@ -66,11 +89,10 @@ public class WotFGame extends ApplicationAdapter {
     }
 
     @Override
-
     public void render() {
         Gdx.gl.glClearColor(0.9f, 0.9f, 0.9f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
+        
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
     }

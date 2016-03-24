@@ -27,6 +27,7 @@ public class Unit extends Actor {
     private Vector2 position;
     private Vector2 velocity;
     
+    // Font is used for displaying name and health
     private static BitmapFont font = new BitmapFont();
 
     public Unit(String name, int health) {
@@ -35,6 +36,7 @@ public class Unit extends Actor {
         
         font.setColor(Color.BLACK);
         
+        // TODO: Replace badlogic.jpg with spritesheet
         sprite = new Sprite(new Texture(Gdx.files.internal("badlogic.jpg")));
         this.setBounds(getX(), getY(), sprite.getWidth(), sprite.getHeight());
         this.setWidth(sprite.getWidth());
@@ -103,6 +105,7 @@ public class Unit extends Actor {
 
     public void move(Vector2 direction) {
         // logic for moving
+        // Temporary movement logic
         MoveByAction mba = new MoveByAction();
         mba.setAmount(direction.x, direction.y);
         mba.setDuration(3f);
@@ -125,7 +128,7 @@ public class Unit extends Actor {
     public void draw(Batch batch, float parentAlpha) {
         sprite.draw(batch);
         
-        // Draws the name of the unit above its sprite
+        // Draws the name and current health of the unit above its sprite
         font.draw(batch, String.format("%s (%d)", name, health), getX(), getY() + getHeight() + 20);
     }
     
