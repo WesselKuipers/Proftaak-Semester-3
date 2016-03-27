@@ -7,6 +7,11 @@ public class Player {
     private String ip;
     private String name;
 
+    public Player(String ip, String name) {
+        this.ip = ip;
+        this.name = name;
+    }
+    
     public String getIp() {
         return ip;
     }
