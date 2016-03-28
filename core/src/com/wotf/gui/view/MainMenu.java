@@ -100,7 +100,7 @@ public class MainMenu implements Screen {
     }
 
     @Override
-    public void resize(int i, int i1) {
+    public void resize(int w, int h) {
     }
 
     @Override

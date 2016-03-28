@@ -19,6 +19,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.wotf.game.GameStage;
 import com.wotf.game.classes.Game;
@@ -64,7 +66,7 @@ public class GameEngine implements Screen{
         
         // Creates a new terrain mask and assigns a flat rectangle as terrain
         boolean[][] terrain = new boolean[map.getWidth()][map.getHeight()];
-        for(int x = 100; x < map.getWidth() - 100; x++) {
+        for(int x = 100; x < (map.getWidth() - 100); x++) {
             for(int y = 0; y < 80; y++) {
                 terrain[x][y] = true;
             }
@@ -73,10 +75,11 @@ public class GameEngine implements Screen{
         map.setTerrain(terrain);
         
         // Initializes a viewport and a camera object
-        StretchViewport viewport = new StretchViewport(2560, 720);
-        viewport.setCamera(new OrthographicCamera(1280, 720));
+        ScreenViewport viewport = new ScreenViewport(new OrthographicCamera(1280, 720));
+        viewport.setWorldSize(2560, 720);
         viewport.getCamera().position.set(viewport.getWorldWidth()/2, viewport.getWorldHeight()/2, 0);
-
+        viewport.apply();
+        
         // Initializes game object using game settings
         Game game = new Game(settings, map, players);
 
@@ -88,20 +91,6 @@ public class GameEngine implements Screen{
         stage.setKeyboardFocus(stage.getActors().first());
         
         Gdx.input.setInputProcessor(stage);
-
-        // Debug function: If tab is pressed, toggle between actor 1 and actor 2
-        stage.addListener(new InputListener() {
-            public boolean keyDown(InputEvent event, int keycode) {
-                if (keycode == Input.Keys.TAB) {
-                    if (stage.getKeyboardFocus() == stage.getActors().get(0)) {
-                        stage.setKeyboardFocus(stage.getActors().get(1));
-                    } else {
-                        stage.setKeyboardFocus(stage.getActors().get(0));
-                    }
-                }
-                return true;
-            }
-        });
     }
 
     @Override
@@ -119,6 +108,8 @@ public class GameEngine implements Screen{
 
     @Override
     public void resize(int width, int height) {
+        // Passes the new width and height to the viewport
+        stage.getViewport().update(width, height);
     }
 
     @Override
