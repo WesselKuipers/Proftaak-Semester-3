@@ -21,6 +21,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.wotf.game.classes.Game;
+import com.wotf.game.classes.Projectile;
 import com.wotf.game.classes.Team;
 import com.wotf.game.classes.Unit;
 
@@ -141,7 +142,23 @@ public class GameStage extends Stage {
         cam.update();
         return super.keyDown(keyCode);
     }
+    
+    /**
+     * @Author  Jip Boesenkool
+     * Function which handles the bullets on button click.
+     * @return 
+     */
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        if( button == Input.Buttons.LEFT ){
+            Vector3 rel = getCamera().unproject( new Vector3(screenX, screenY, 0) );
+            bulletLogic( (int)rel.x, (int)rel.y);      
+        }
+        return true;
+    }
 
+    /**
+     * Sorry wessel uitgecomment voor bullet functionaliteit.
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         // Since the stage is using a camera, we don't want the cursor's X and Y
@@ -161,6 +178,7 @@ public class GameStage extends Stage {
         
         return true;
     }
+    */
     
     
 
@@ -246,5 +264,36 @@ public class GameStage extends Stage {
         
         game.getMap().setTerrain(terrain);
         updateTerrain();
+    }
+    
+    /**
+     * @author Jip Boesenkool
+     * Function which handles the logic to fire a bullet, Get's called by mouseClick event.
+     * Trigger MUST BE inside game stage, else mouse Click wont get the right coordinates.
+     * @param screenX Unprojected mouse position.x
+     * @param screenY Unprojected mouse position.y
+     */
+    private void bulletLogic( int screenX, int screenY ){
+        //TODO: Fix this! data should be from data structure not from actor.
+        // Jip Boesenkool - 29-030'16
+        Vector2 unitPosition = new Vector2( 
+                this.getKeyboardFocus().getX(), 
+                this.getKeyboardFocus().getY() 
+        );
+
+        //TODO: Get correct force from weapon
+        // Jip Boesenkool - 29-030'16
+        float force = 20f;
+
+        //TODO: get wind from turnLogic, Generate wind each turn.
+        // Jip Boesenkool - 29-030'16
+        Vector2 wind = new Vector2(0f, 0f);
+
+        double gravity = game.getMap().getGravityModifier();
+
+        //spawn bullet and add to scene
+        Projectile bullet = new Projectile( unitPosition, screenX, screenY, force, wind, gravity );
+        bullet.updateShot( );
+        this.addActor(bullet); 
     }
 }
