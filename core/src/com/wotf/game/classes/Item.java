@@ -4,9 +4,23 @@ package com.wotf.game.classes;
  * Created by wesse on 14/03/2016.
  */
 public class Item {
+
     private String name;
     private int power;
     private int blastRadius;
+    
+
+    public Item(String nm, int pw, int rad) {
+        this.name = nm;
+        this.power = pw;
+        this.blastRadius = rad;
+    }
+
+    public Item(String nm, int pw) {
+        this.name = nm;
+        this.power = pw;
+        this.blastRadius = 1;
+    }
 
     public String getName() {
         return name;
