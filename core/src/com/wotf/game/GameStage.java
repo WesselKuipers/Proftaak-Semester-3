@@ -143,6 +143,28 @@ public class GameStage extends Stage {
     }
 
     @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        // Since the stage is using a camera, we don't want the cursor's X and Y
+        // relative to the screen, but relative to the position of the camera
+        Vector3 rel = getCamera().unproject(new Vector3(screenX, screenY, 0));
+
+        System.out.println(String.format("Touchdown event (%d, %d) button %d", screenX, screenY, button));
+        System.out.println(String.format("Relative Touchdown event (%f, %f) button %d", rel.x, rel.y, button));
+
+        // button = 0 left mouse button
+        // button = 1 right mouse button
+        if (button == 0) {
+            explode((int) rel.x, (int) rel.y, 30);
+        } else if (button == 1) {
+            explode((int) rel.x, (int) rel.y, 100);
+        }
+        
+        return true;
+    }
+    
+    
+
+    @Override
     public void draw() {        
         batch.begin();
         
@@ -173,7 +195,7 @@ public class GameStage extends Stage {
                               this.getKeyboardFocus().getY()),
                 0,
                 this.getHeight() - 40);
-        font.draw(guiBatch, String.format("Mouse position: screen [%d, %d], viewport %s", Gdx.input.getX(), 720 - Gdx.input.getY(), getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0))), 0, this.getHeight() - 60);
+        font.draw(guiBatch, String.format("Mouse position: screen [%d, %d], viewport %s", Gdx.input.getX(), game.getMap().getHeight() - Gdx.input.getY(), getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0))), 0, this.getHeight() - 60);
         font.draw(guiBatch, String.format("Camera coords [%s], zoom %f", getCamera().position.toString(), ((OrthographicCamera)getCamera()).zoom), 0, this.getHeight() - 80);
         
         guiBatch.end();
@@ -198,5 +220,31 @@ public class GameStage extends Stage {
         
         terrainTexture = new Texture(pixmap);
         pixmap.dispose();
+    }
+    
+    public void explode(int x, int y, int radius) {
+        boolean[][] terrain = game.getMap().getTerrain();
+        
+        for(int xPos = x - radius; xPos <= x + radius; xPos++) {
+            for(int yPos = y - radius; yPos <= y + radius; yPos++) {
+                // scan square area around radius to determine which pixels to destroy
+                if(Math.pow(xPos - x, 2) + Math.pow(yPos - y, 2) < radius * radius) {
+                    // Check if the position is in bounds of the array, if not, skip this iteration
+                    if(!(xPos >= 0 && yPos >= 0 && xPos < terrain.length && yPos < terrain[0].length)) {
+                        continue;
+                    }
+                    
+                    // if the pixel at (xPos, yPos) is solid, set it to false
+                    if(terrain[xPos][yPos]) {
+                    // Additional checks can be done here
+                    terrain[xPos][yPos] = false;
+                    // TODO: Spawn cool explosion effect here
+                    }
+                }
+            }
+        }
+        
+        game.getMap().setTerrain(terrain);
+        updateTerrain();
     }
 }
