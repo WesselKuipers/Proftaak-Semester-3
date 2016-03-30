@@ -1,5 +1,6 @@
 package com.wotf.game.classes;
 
+import com.wotf.game.classes.Items.Item;
 import com.badlogic.gdx.graphics.Color;
 import java.util.ArrayList;
 import java.util.Collections;

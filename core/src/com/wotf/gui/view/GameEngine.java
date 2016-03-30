@@ -3,8 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
-
 /**
  *
  * @author DinoS
@@ -34,7 +32,7 @@ import java.util.List;
 public class GameEngine implements Screen{
     private com.badlogic.gdx.Game game;
     GameStage stage;
-    
+
     public GameEngine(com.badlogic.gdx.Game game) {
         this.game = game;
     }
@@ -58,12 +56,12 @@ public class GameEngine implements Screen{
 
         settings.addTeam(teamRed);
         settings.addTeam(teamBlue);
-        
+
         Map map = new Map("tempMap");
         map.setWaterLevel(30);
         map.setWidth(2560);
         map.setHeight(720);
-        
+
         // Creates a new terrain mask and assigns a flat rectangle as terrain
         boolean[][] terrain = new boolean[map.getWidth()][map.getHeight()];
         for(int x = 100; x < (map.getWidth() - 100); x++) {
@@ -71,15 +69,15 @@ public class GameEngine implements Screen{
                 terrain[x][y] = true;
             }
         }
-        
+
         map.setTerrain(terrain);
-        
+
         // Initializes a viewport and a camera object
         ScreenViewport viewport = new ScreenViewport(new OrthographicCamera(1280, 720));
         viewport.setWorldSize(2560, 720);
         viewport.getCamera().position.set(viewport.getWorldWidth()/2, viewport.getWorldHeight()/2, 0);
         viewport.apply();
-        
+
         // Initializes game object using game settings
         Game game = new Game(settings, map, players);
 
@@ -89,7 +87,7 @@ public class GameEngine implements Screen{
         stage.setViewport(viewport);
 
         stage.setKeyboardFocus(stage.getActors().first());
-        
+
         Gdx.input.setInputProcessor(stage);
     }
 
@@ -97,7 +95,7 @@ public class GameEngine implements Screen{
     public void render(float delta) {
         Gdx.gl.glClearColor(0.9f, 0.9f, 0.9f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        
+
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
     }
