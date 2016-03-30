@@ -5,11 +5,12 @@ import java.util.Collections;
 import java.util.List;
 
 public class Game {
+
     private Player host;
     private List<Player> players;
     private List<Team> teams;
     private Map map;
-    
+
     private GamePhysics gamePhysics;
     private GameSettings gameSettings;
     private TurnLogic turnLogic;
@@ -51,23 +52,23 @@ public class Game {
     public Team getTeam(int index) {
         return teams.get(index);
     }
-    
+
     public Team getActiveTeam() {
         return teams.get(turnLogic.getActiveTeamIndex());
     }
-    
+
     public Map getMap() {
         return map;
     }
-    
+
     public void endTurn() {
         // TODO: Weet jip niet
     }
-    
+
     public GameSettings getGameSettings() {
         return gameSettings;
     }
-    
+
     public TurnLogic getTurnLogic() {
         return turnLogic;
     }

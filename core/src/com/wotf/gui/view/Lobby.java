@@ -53,7 +53,7 @@ public class Lobby implements Screen {
         playerlist[1] = "Dino";
         playerlist[2] = "Lars";
         playerlist[3] = "Rens";
-        
+
         Label wotflabel = new Label("War of the Figures", skin);
         wotflabel.setPosition(Gdx.graphics.getWidth() / 2 - wotflabel.getWidth() / 2, 740);
         stage.addActor(wotflabel);
@@ -75,7 +75,7 @@ public class Lobby implements Screen {
         playerstable.setPosition(500, 460);
         playerstable.setWidth(300);
         stage.addActor(playerstable);
-        
+
         TextButton exit = new TextButton("Exit", skin); // Use the initialized skin
         exit.setColor(Color.BLACK);
         exit.setWidth(300);

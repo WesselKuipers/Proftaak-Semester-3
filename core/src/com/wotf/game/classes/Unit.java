@@ -20,6 +20,7 @@ import com.wotf.game.GameStage;
  * Created by Wessel on 14/03/2016.
  */
 public class Unit extends Actor {
+
     private int health;
     private String name;
 
@@ -27,45 +28,45 @@ public class Unit extends Actor {
 
     private Vector2 position;
     private Vector2 velocity;
-    
+
     // Font is used for displaying name and health
     private static BitmapFont font = new BitmapFont();
 
     public Unit(String name, int health) {
         this.name = name;
         this.health = health;
-        
+
         font.setColor(Color.BLACK);
-        
+
         // TODO: Replace badlogic.jpg with spritesheet
         sprite = new Sprite(new Texture(Gdx.files.internal("badlogic.jpg")));
         this.setBounds(getX(), getY(), sprite.getWidth(), sprite.getHeight());
         this.setWidth(sprite.getWidth());
         this.setHeight(sprite.getHeight());
-        
+
         // Temporary input listener
         addListener(new InputListener() {
-           @Override 
-           public boolean keyDown(InputEvent event, int keycode) {
-               if(keycode == Keys.RIGHT) {
-                   move(new Vector2(50f, 0));
-               }
-               
-               if(keycode == Keys.LEFT) {
-                   move(new Vector2(-50f, 0));
-               }
-               
-               if(keycode == Keys.UP) {
-                   move(new Vector2(0, 50f));
-               }
-               
-               if(keycode == Keys.DOWN) {
-                   move(new Vector2(0, -50f));
-               }
-               
-               return true;
-           }
-           
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                if (keycode == Keys.RIGHT) {
+                    move(new Vector2(50f, 0));
+                }
+
+                if (keycode == Keys.LEFT) {
+                    move(new Vector2(-50f, 0));
+                }
+
+                if (keycode == Keys.UP) {
+                    move(new Vector2(0, 50f));
+                }
+
+                if (keycode == Keys.DOWN) {
+                    move(new Vector2(0, -50f));
+                }
+
+                return true;
+            }
+
         });
     }
 
@@ -118,21 +119,21 @@ public class Unit extends Actor {
         this.setPosition(position.x, position.y);
         positionChanged();
     }
-    
+
     @Override
     public void positionChanged() {
         sprite.setPosition(getX(), getY());
         super.positionChanged();
     }
-    
+
     @Override
     public void draw(Batch batch, float parentAlpha) {
         sprite.draw(batch);
-        
+
         // Draws the name and current health of the unit above its sprite
         font.draw(batch, String.format("%s (%d)", name, health), getX(), getY() + getHeight() + 20);
     }
-    
+
     @Override
     public void act(float delta) {
         super.act(delta);

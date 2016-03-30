@@ -8,6 +8,7 @@
  * @author DinoS
  */
 package com.wotf.gui.view;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -29,7 +30,8 @@ import com.wotf.game.classes.Team;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameEngine implements Screen{
+public class GameEngine implements Screen {
+
     private com.badlogic.gdx.Game game;
     GameStage stage;
 
@@ -64,8 +66,8 @@ public class GameEngine implements Screen{
 
         // Creates a new terrain mask and assigns a flat rectangle as terrain
         boolean[][] terrain = new boolean[map.getWidth()][map.getHeight()];
-        for(int x = 100; x < (map.getWidth() - 100); x++) {
-            for(int y = 0; y < 80; y++) {
+        for (int x = 100; x < (map.getWidth() - 100); x++) {
+            for (int y = 0; y < 80; y++) {
                 terrain[x][y] = true;
             }
         }
@@ -75,7 +77,7 @@ public class GameEngine implements Screen{
         // Initializes a viewport and a camera object
         ScreenViewport viewport = new ScreenViewport(new OrthographicCamera(1280, 720));
         viewport.setWorldSize(2560, 720);
-        viewport.getCamera().position.set(viewport.getWorldWidth()/2, viewport.getWorldHeight()/2, 0);
+        viewport.getCamera().position.set(viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2, 0);
         viewport.apply();
 
         // Initializes game object using game settings

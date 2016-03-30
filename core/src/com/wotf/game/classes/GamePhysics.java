@@ -12,13 +12,14 @@ import com.badlogic.gdx.math.Vector2;
  * @author rensphilipsen
  */
 public class GamePhysics {
+
     private Vector2 wind;
-    
+
     public GamePhysics() {
         // TODO: initialize wind
         wind = new Vector2(0, 0);
     }
-    
+
     public Vector2 getWind() {
         return wind;
     }

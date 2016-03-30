@@ -73,7 +73,7 @@ public class Team {
     }
 
     public void removeUnit(Unit unit) {
-        
+
         units.remove(unit);
 
         // TODO: Logic for killing units?

@@ -48,7 +48,7 @@ public class MainMenu implements Screen {
         Label wotflabel = new Label("War of the Figures", skin);
         wotflabel.setPosition(Gdx.graphics.getWidth() / 2 - wotflabel.getWidth() / 2, 740);
         stage.addActor(wotflabel);
-        
+
         TextButton local = new TextButton("Local", skin); // Use the initialized skin
         local.setColor(Color.BLACK);
         local.setWidth(300);
