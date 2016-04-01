@@ -4,8 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
 public class Map {
-
-    private double gravityModifier;
+    private double gravityModifier = 9.8;
     private int waterLevel;
     private int width;
     private int height;

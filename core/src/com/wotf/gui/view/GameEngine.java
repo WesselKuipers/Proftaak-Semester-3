@@ -58,14 +58,27 @@ public class GameEngine implements Screen {
         Team teamRed = new Team("Red Team", Color.RED);
         teamRed.addPlayer(players.get(0));
         teamRed.addUnit("Steve", 100);
-        teamRed.addUnit("Henk", 1000000);
+        teamRed.addUnit("Henk", 100);
 
         Team teamBlue = new Team("Blue Team", Color.BLUE);
         teamBlue.addPlayer(players.get(0));
-        teamBlue.addUnit("Bob", 1000);
+        teamBlue.addUnit("Bob", 100);
+        teamBlue.addUnit("Appel", 100);
+        
+        Team teamGreen = new Team("Green Team", Color.GREEN);
+        teamGreen.addPlayer(players.get(0));
+        teamGreen.addUnit("Groentesoep", 100);
+        teamGreen.addUnit("Banaan", 100);
+        
+        Team teamYellow = new Team("Yellow Team", Color.YELLOW);
+        teamYellow.addPlayer(players.get(0));
+        teamYellow.addUnit("Appelflap", 100);
+        teamYellow.addUnit("Pannekoek", 100);
 
         settings.addTeam(teamRed);
         settings.addTeam(teamBlue);
+        settings.addTeam(teamGreen);
+        settings.addTeam(teamYellow);
 
         Map map = new Map("tempMap");
         map.setWaterLevel(30);
@@ -106,7 +119,7 @@ public class GameEngine implements Screen {
         Gdx.gl.glClearColor(0.9f, 0.9f, 0.9f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        stage.act(Gdx.graphics.getDeltaTime());
+        stage.act();
         stage.draw();
     }
 

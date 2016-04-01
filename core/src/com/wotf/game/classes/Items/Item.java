@@ -3,7 +3,7 @@ package com.wotf.game.classes.Items;
 /**
  * Created by wesse on 14/03/2016.
  */
-public class Item {
+public abstract class Item {
 
     /*
     NOTES: create weapons and items accordingly
@@ -51,7 +51,6 @@ public class Item {
         this.blastRadius = blastRadius;
     }
 
-    public void activate() {
-        // logic for item activation
+    public void activate() {        
     }
 }
