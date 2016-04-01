@@ -31,6 +31,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.wotf.game.classes.Game;
+import com.wotf.game.classes.Projectile;
 import com.wotf.game.classes.Team;
 import com.wotf.game.classes.Unit;
 
