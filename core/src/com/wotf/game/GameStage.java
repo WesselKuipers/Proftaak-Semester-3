@@ -182,28 +182,6 @@ public class GameStage extends Stage {
                 }
                 break;
 
-            //switching between weapons
-            case Keys.NUM_1:
-                //TODO: switch weapon A
-                /* Get Team's weaponlist
-                        choose weapon cooresponding to numbers
-                        make weapon activated
-                        create trigger button
-                        initiate projectile funtion
-                 */
-                System.out.println("weapon A");
-                break;
-            case Keys.NUM_2:
-                //TODO: switch weapon B
-                /* Get Team's weaponlist
-                        choose weapon cooresponding to numbers
-                        make weapon activated
-                        create trigger button
-                        initiate projectile funtion
-                 */
-                System.out.println("Weapon B");
-                break;
-
         }
 
         // Retrains the camera from leaving the bounds of the map
