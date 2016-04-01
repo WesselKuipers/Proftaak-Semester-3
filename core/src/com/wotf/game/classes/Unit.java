@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
 import com.wotf.game.GameStage;
+import com.wotf.game.classes.Items.Item;
 
 /**
  * Created by Wessel on 14/03/2016.
@@ -29,12 +30,16 @@ public class Unit extends Actor {
     private Vector2 position;
     private Vector2 velocity;
 
+    private Item weapon;
+    private Team team;
+
     // Font is used for displaying name and health
     private static BitmapFont font = new BitmapFont();
 
-    public Unit(String name, int health) {
+    public Unit(String name, int health, Team team) {
         this.name = name;
         this.health = health;
+        this.team = team;
 
         font.setColor(Color.BLACK);
 
@@ -64,14 +69,48 @@ public class Unit extends Actor {
                     move(new Vector2(0, -50f));
                 }
 
+                //switching between weapons
+                if (keycode == Keys.NUM_1) {
+                    // TODO: switch weapon A
+                    // In Team's weaponlist choose weapon cooresponding to numbers & make weapon activated
+                      Item i = team.selectItem(0);
+                    if (i != null) {
+                        weapon = i;
+                        //TODO: WHAT BUTTON PRESSED TO FIRE WEAPON???????
+                        //FIRE & USE LOGIC + initiate projectile funtion --> TODO JIP z'n PROJECTIEL FUNCTIE
+                        useItem();
+                    
+                    System.out.println("GRENADE");
+                    } else {
+                        System.out.println("Selected weapon not found");  
+                    }
+                }
+                if (keycode == Keys.NUM_2) {
+                     // TODO: switch weapon B
+                    // In Team's weaponlist choose weapon cooresponding to numbers
+                    // make weapon activated
+                    Item i = team.selectItem(1);
+                    if (i != null) {
+                        weapon = i;
+                        //TODO: WHAT BUTTON PRESSED TO FIRE WEAPON???????
+                        //FIRE & USE LOGIC + initiate projectile funtion --> TODO JIP z'n PROJECTIEL FUNCTIE
+                        useItem();
+                        
+                    System.out.println("BAZOOKA");                    
+                    } else {
+                        System.out.println("Selected weapon not found");  
+                    }
+
+                }
+
                 return true;
             }
 
         });
     }
 
-    public Unit(String name, int health, Vector2 position) {
-        this(name, health);
+    public Unit(String name, int health, Team team, Vector2 position) {
+        this(name, health, team);
         this.position = position;
         this.velocity = new Vector2(0, 0);
     }
@@ -137,5 +176,12 @@ public class Unit extends Actor {
     @Override
     public void act(float delta) {
         super.act(delta);
+    }
+    
+    public void useItem(){
+        //TODO: Jip projectiel functie koppelen aan impact en daarmee de activate aanroepen
+        //wapens ontploffen nu bij activate (suicide bombers)
+        weapon.activate();
+        team.decreaseItemAmount(weapon, 1);
     }
 }
