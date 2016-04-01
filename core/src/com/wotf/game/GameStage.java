@@ -346,7 +346,6 @@ public class GameStage extends Stage {
         game.getMap().setTerrain(terrain);
         updateTerrain();
     }
-}
 
     public World getWorld() {
         return world;
