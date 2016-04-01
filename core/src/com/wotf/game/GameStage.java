@@ -25,6 +25,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.wotf.game.classes.Game;
 import com.wotf.game.classes.Team;
 import com.wotf.game.classes.Unit;
+import java.util.List;
 
 /**
  * Extension of Stage that contains a game session
@@ -33,8 +34,8 @@ import com.wotf.game.classes.Unit;
  */
 public class GameStage extends Stage {
 
-    private Game game;
-
+    private Game gameclass;
+    //private WotFGame game;
     private SpriteBatch batch;
     private SpriteBatch guiBatch;
     private BitmapFont font;
@@ -43,9 +44,9 @@ public class GameStage extends Stage {
     private Texture backgroundTexture;
     private Pixmap pixmap;
 
-    public GameStage(Game game) {
+    public GameStage(Game gameclass) {
         super(new ScreenViewport());
-        this.game = game;
+        this.gameclass = gameclass;
 
         batch = new SpriteBatch();
         guiBatch = new SpriteBatch();
@@ -55,8 +56,8 @@ public class GameStage extends Stage {
 
         Pixmap.setFilter(Pixmap.Filter.NearestNeighbour);
         Pixmap.setBlending(Pixmap.Blending.SourceOver);
-        Pixmap bgPixmap = new Pixmap(game.getMap().getWidth(), game.getMap().getHeight(), Pixmap.Format.RGBA8888);
-        System.out.println(game.getMap().getWidth() + "" + game.getMap().getHeight() + "");
+        Pixmap bgPixmap = new Pixmap(gameclass.getMap().getWidth(), gameclass.getMap().getHeight(), Pixmap.Format.RGBA8888);
+        System.out.println(gameclass.getMap().getWidth() + "" + gameclass.getMap().getHeight() + "");
         bgPixmap.setColor(Color.PURPLE);
         bgPixmap.fill();
         backgroundTexture = new Texture(bgPixmap);
@@ -67,7 +68,7 @@ public class GameStage extends Stage {
 
     public void init() {
         // Adds every unit as an actor to this stage
-        for (Team team : game.getTeams()) {
+        for (Team team : gameclass.getTeams()) {
             for (Unit unit : team.getUnits()) {
                 // Retrieves the currently attached sprite of this unit,
                 // adds a color tint to it and assigns it back to the unit
@@ -76,7 +77,7 @@ public class GameStage extends Stage {
                 unit.setSprite(unitSprite);
 
                 // Spawns a unit in a random location (X axis)
-                unit.spawn(new Vector2(MathUtils.random(0, game.getMap().getWidth() - unit.getWidth()), 80));
+                unit.spawn(new Vector2(MathUtils.random(0, gameclass.getMap().getWidth() - unit.getWidth()), 80));
 
                 this.addActor(unit);
             }
@@ -84,7 +85,7 @@ public class GameStage extends Stage {
     }
 
     public Game getGame() {
-        return this.game;
+        return this.gameclass;
     }
 
     @Override
@@ -156,13 +157,13 @@ public class GameStage extends Stage {
         // Uncomment this if you want an unrestrained camera
         /* TODO: Determine what to do when the map is smaller than the viewport
                  currently acts weirdly when zooming out too much. */
-        cam.zoom = MathUtils.clamp(cam.zoom, 0.1f, game.getMap().getWidth() / cam.viewportWidth);
+        cam.zoom = MathUtils.clamp(cam.zoom, 0.1f, gameclass.getMap().getWidth() / cam.viewportWidth);
 
         float effectiveViewportWidth = cam.viewportWidth * cam.zoom;
         float effectiveViewportHeight = cam.viewportHeight * cam.zoom;
 
-        cam.position.x = MathUtils.clamp(cam.position.x, effectiveViewportWidth / 2f, game.getMap().getWidth() - effectiveViewportWidth / 2f);
-        cam.position.y = MathUtils.clamp(cam.position.y, effectiveViewportHeight / 2f, game.getMap().getHeight() - effectiveViewportHeight / 2f);
+        cam.position.x = MathUtils.clamp(cam.position.x, effectiveViewportWidth / 2f, gameclass.getMap().getWidth() - effectiveViewportWidth / 2f);
+        cam.position.y = MathUtils.clamp(cam.position.y, effectiveViewportHeight / 2f, gameclass.getMap().getHeight() - effectiveViewportHeight / 2f);
 
         cam.update();
         return super.keyDown(keyCode);
@@ -219,7 +220,7 @@ public class GameStage extends Stage {
                         this.getKeyboardFocus().getY()),
                 0,
                 this.getHeight() - 40);
-        font.draw(guiBatch, String.format("Mouse position: screen [%d, %d], viewport %s", Gdx.input.getX(), game.getMap().getHeight() - Gdx.input.getY(), getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0))), 0, this.getHeight() - 60);
+        font.draw(guiBatch, String.format("Mouse position: screen [%d, %d], viewport %s", Gdx.input.getX(), gameclass.getMap().getHeight() - Gdx.input.getY(), getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0))), 0, this.getHeight() - 60);
         font.draw(guiBatch, String.format("Camera coords [%s], zoom %f", getCamera().position.toString(), ((OrthographicCamera) getCamera()).zoom), 0, this.getHeight() - 80);
 
         guiBatch.end();
@@ -229,7 +230,7 @@ public class GameStage extends Stage {
      * Updates the terrain texture based on the terrain array in game map
      */
     public void updateTerrain() {
-        boolean terrain[][] = game.getMap().getTerrain();
+        boolean terrain[][] = gameclass.getMap().getTerrain();
         pixmap = new Pixmap(terrain.length, terrain[0].length, Pixmap.Format.RGBA4444);
         pixmap.setColor(Color.BLACK); // Set this and the format to CLEAR
         // when using an actual stage image
@@ -247,7 +248,7 @@ public class GameStage extends Stage {
     }
 
     public void explode(int x, int y, int radius) {
-        boolean[][] terrain = game.getMap().getTerrain();
+        boolean[][] terrain = gameclass.getMap().getTerrain();
 
         for (int xPos = x - radius; xPos <= x + radius; xPos++) {
             for (int yPos = y - radius; yPos <= y + radius; yPos++) {
@@ -268,7 +269,7 @@ public class GameStage extends Stage {
             }
         }
 
-        game.getMap().setTerrain(terrain);
+        gameclass.getMap().setTerrain(terrain);
         updateTerrain();
     }
 }

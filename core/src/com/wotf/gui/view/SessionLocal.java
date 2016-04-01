@@ -5,26 +5,33 @@
  */
 package com.wotf.gui.view;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.wotf.game.GameStage;
+import com.wotf.game.WotFGame;
+import com.wotf.game.classes.GameSettings;
+import com.wotf.game.classes.Player;
+import com.wotf.game.classes.Team;
 import java.util.ArrayList;
 
 /**
@@ -34,12 +41,29 @@ import java.util.ArrayList;
 public class SessionLocal implements Screen {
 
     private List teams;
-    private Game game;
+    private WotFGame game;
     private Stage stage;
     private Skin skin;
+    private ArrayList<Team> teamlist;
+    private GameSettings gamesettings;
 
-    public SessionLocal(Game game) {
+    public SessionLocal(WotFGame game) {
         this.game = game;
+        gamesettings = new GameSettings();
+        teamlist = new ArrayList<>();
+    }
+
+    private NinePatch getNinePatch(String fname, int left, int right, int bottom, int top) {
+
+        // Get the image
+        final Texture t = new Texture(Gdx.files.internal(fname));
+
+        // create a new texture region, otherwise black pixels will show up too, we are simply cropping the image
+        // last 4 numbers respresent the length of how much each corner can draw,
+        // for example if your image is 50px and you set the numbers 50, your whole image will be drawn in each corner
+        // so what number should be good?, well a little less than half would be nice
+        // get the variables for each corner, because there can be a difference for each different table.
+        return new NinePatch(new TextureRegion(t, 1, 1, t.getWidth() - 2, t.getHeight() - 2), left, right, bottom, top);
     }
 
     @Override
@@ -48,10 +72,74 @@ public class SessionLocal implements Screen {
         Gdx.input.setInputProcessor(stage);// Make the stage consume events
         //System.out.println(Gdx.files.internal("maps"));
         skin = new Skin(Gdx.files.internal("uiskin.json"));
+        teams = new List(skin);
+
         // Alle teams en labels hiervoor.
         Table teamstable = new Table();
         Table mapstable = new Table();
         Table settingstable = new Table();
+        Table teamselecttable = new Table();
+        teamstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 150, 150, 160, 160)));
+        mapstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 220, 220, 160, 160)));
+        teamselecttable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 100, 100, 160, 160)));
+
+        Label selectteamlabel = new Label("Team selection", skin);
+        teamselecttable.add(selectteamlabel).padBottom(15);
+        teamselecttable.row();
+        TextButton teamalpha = new TextButton("Alpha", skin); // Use the initialized skin
+        teamalpha.setColor(Color.BLUE);
+        teamalpha.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Team teamalpha = new Team("Alpha", Color.BLUE);
+                teamalpha.addUnit(teamalpha.getName(), 100);
+                //Mogelijk voor als iedere player in online een eigen team heeft.
+                //teamalpha.addPlayer(new Player("127.0.0.1", "AlphaPlayer"));
+                teamlist.add(teamalpha);
+                gamesettings.addTeam(teamalpha);
+                teams.clear();
+                teams.setItems(teamlist);
+                teams.invalidateHierarchy();
+            }
+        });
+
+        teamselecttable.add(teamalpha).padBottom(10).width(150).height(50);
+        teamselecttable.row();
+        TextButton teambeta = new TextButton("Beta", skin); // Use the initialized skin
+        teambeta.setColor(Color.CORAL);
+        teambeta.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Team teambeta = new Team("Beta", Color.CORAL);
+                teambeta.addUnit(teambeta.getName(), 100);
+                //Mogelijk voor als iedere player in online een eigen team heeft.
+                //teambeta.addPlayer(new Player("127.0.0.1", "BetaPlayer"));
+                teamlist.add(teambeta);
+                gamesettings.addTeam(teambeta);
+                teams.setItems(teamlist);
+            }
+        });
+        teamselecttable.add(teambeta).padBottom(10).width(150).height(50);
+        teamselecttable.row();
+        TextButton teamgamma = new TextButton("Gamma", skin); // Use the initialized skin
+        teamgamma.setColor(Color.GREEN);
+        teamgamma.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Team teamgamma = new Team("Gamma", Color.GREEN);
+                teamgamma.addUnit(teamgamma.getName(), 100);
+                //Mogelijk voor als iedere player in online een eigen team heeft.
+                //teamgamma.addPlayer(new Player("127.0.0.1", "GammaPlayer"));
+                teamlist.add(teamgamma);
+                gamesettings.addTeam(teamgamma);
+                teams.setItems(teamlist);
+            }
+        });
+        teamselecttable.add(teamgamma).width(150).height(50);
+        teamselecttable.setWidth(200);
+        teamselecttable.setHeight(320);
+        teamselecttable.setPosition(500, 360);
+        stage.addActor(teamselecttable);
 
         Label wotflabel = new Label("War of the Figures", skin);
         wotflabel.setPosition(Gdx.graphics.getWidth() / 2 - wotflabel.getWidth() / 2, 740);
@@ -60,95 +148,112 @@ public class SessionLocal implements Screen {
         Label iplabel = new Label("IP :", skin);
         settingstable.add(iplabel).width(120);
         Label ipvallabel = new Label("127.0.0.1", skin);
-        settingstable.add(ipvallabel).width(120);
+        settingstable.add(ipvallabel).width(180);
         settingstable.row();
 
-        Label gamelabel = new Label("Game :", skin);
-        settingstable.add(gamelabel).width(120);
-        Label gamevallabel = new Label("Deathmatch", skin);
-        settingstable.add(gamevallabel).width(120);
+        String[] turntimevals = new String[6];
+        turntimevals[0] = "10";
+        turntimevals[1] = "20";
+        turntimevals[2] = "30";
+        turntimevals[3] = "40";
+        turntimevals[4] = "50";
+        turntimevals[5] = "60";
+        Label turntimelabel = new Label("Turn Time :", skin);
+        settingstable.add(turntimelabel).width(120);
+        SelectBox turntimebox = new SelectBox(skin);
+        turntimebox.setItems(turntimevals);
+        settingstable.add(turntimebox).width(180);
         settingstable.row();
 
         Label playerslabel = new Label("Players :", skin);
         settingstable.add(playerslabel).width(120);
         Label playersvallabel = new Label("2/10", skin);
-        settingstable.add(playersvallabel).width(120);
+        settingstable.add(playersvallabel).width(180);
         settingstable.row();
 
         Label speedslabel = new Label("Speeds :", skin);
         settingstable.add(speedslabel).width(120);
-        Label speedsvallabel = new Label("Speedval", skin);
-        settingstable.add(speedsvallabel).width(120);
+        Label speedsvallabel = new Label("Marathon", skin);
+        settingstable.add(speedsvallabel).width(180);
         settingstable.row();
 
+        String[] physicsvals = new String[2];
+        physicsvals[0] = "True";
+        physicsvals[1] = "False";
         Label physicslabel = new Label("Physics :", skin);
         settingstable.add(physicslabel).width(120);
-        Label physicsvallabel = new Label("True", skin);
-        settingstable.add(physicsvallabel).width(120);
+        SelectBox physicsbox = new SelectBox(skin);
+        physicsbox.setItems(physicsvals);
+        settingstable.add(physicsbox).width(180);
         settingstable.row();
 
+        String[] weaponsvals = new String[3];
+        weaponsvals[0] = "All Weapons";
+        weaponsvals[1] = "Non-Explosive";
+        weaponsvals[2] = "Grenades Only";
         Label weaponslabel = new Label("Weapons :", skin);
         settingstable.add(weaponslabel).width(120);
-        Label weaponsvallabel = new Label("All Weapons", skin);
-        settingstable.add(weaponsvallabel).width(120);
+        SelectBox weaponsbox = new SelectBox(skin);
+        weaponsbox.setItems(weaponsvals);
+        settingstable.add(weaponsbox).width(180);
         settingstable.row();
 
+        String[] timervals = new String[3];
+        timervals[0] = "60";
+        timervals[1] = "30";
+        timervals[2] = "10";
         Label timerlabel = new Label("Timer :", skin);
         settingstable.add(timerlabel).width(120);
-        Label timervallabel = new Label("1 Hour", skin);
-        settingstable.add(timervallabel).width(120);
-        settingstable.setWidth(300);
-        settingstable.setPosition(280, 210);
+        SelectBox timerbox = new SelectBox(skin);
+        timerbox.setItems(timervals);
+        settingstable.add(timerbox).width(180);
 
+        settingstable.setWidth(300);
+        settingstable.setHeight(200);
+        settingstable.setPosition(30, 110);
         stage.addActor(settingstable);
 
-        String[] teamlist = new String[6];
-        teamlist[0] = "Dino  -  Alpha";
-        teamlist[1] = "Wessel  -  Beta";
-        teamlist[2] = "Lars  -  Gamma";
-        teamlist[3] = "Jip  -  Delta";
-        teamlist[4] = "Rens  -  Epsi";
-        teamlist[5] = "Remco  -  GUI";
-
+        ArrayList<String> mapslist = new ArrayList<>();
+        FileHandle dirHandle = Gdx.files.internal("maps");
+        for (FileHandle entry : dirHandle.list()) {
+            mapslist.add(entry.toString());
+        }
         Image map1 = new Image(new Texture("maps/map1.jpg"));
-        mapstable.add(map1).width(350).height(200).padBottom(5);
+        mapstable.add(map1).width(400).height(200).padBottom(5);
         mapstable.row();
         SelectBox chooseMap = new SelectBox(skin);
-        chooseMap.setItems(teamlist);
-        mapstable.setPosition(220, 500);
-        mapstable.add(chooseMap).width(350);
+        chooseMap.setItems(mapslist);
+        mapstable.add(chooseMap).width(400);
+        mapstable.setPosition(30, 360);
+        mapstable.setHeight(320);
+        mapstable.setWidth(440);
         stage.addActor(mapstable);
 
-        teams = new List(skin);
-        teams.setItems(teamlist);
-
         Label teamslabel = new Label("Teams", skin);
-        teamstable.setPosition(590, 560);
+        teamstable.setPosition(730, 360);
         teamstable.add(teamslabel);
         teamstable.row();
         teamstable.add(teams).width(200);
         teamstable.setWidth(300);
+        teamstable.setHeight(320);
         stage.addActor(teamstable);
 
         TextButton start = new TextButton("Start", skin); // Use the initialized skin
         start.setColor(Color.BLACK);
         start.setWidth(300);
         start.setHeight(60);
-        start.setPosition(590, 250);
+        start.setPosition(590, 180);
         stage.addActor(start);
         start.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new GameEngine(game));
+                // Selected MaxTime to an integer.
+                gamesettings.setMaxTime(Integer.parseInt(timerbox.getSelected().toString()));
+                // Selected TurnTime to an integer.
+                gamesettings.setTurnTime(Integer.parseInt(turntimebox.getSelected().toString()));
+                game.setScreen(new GameEngine(game, gamesettings));
             }
         });
-
-        TextButton settings = new TextButton("Settings", skin); // Use the initialized skin
-        settings.setColor(Color.BLACK);
-        settings.setWidth(300);
-        settings.setHeight(60);
-        settings.setPosition(590, 180);
-        stage.addActor(settings);
 
         TextButton exit = new TextButton("Exit", skin); // Use the initialized skin
         exit.setColor(Color.BLACK);
@@ -156,6 +261,13 @@ public class SessionLocal implements Screen {
         exit.setHeight(60);
         exit.setPosition(590, 110);
         stage.addActor(exit);
+        exit.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new MainMenu(game));
+            }
+        });
+
     }
 
     @Override
@@ -168,7 +280,9 @@ public class SessionLocal implements Screen {
     }
 
     @Override
-    public void resize(int i, int i1) {
+    public void resize(int width, int height) {
+        // Passes the new width and height to the viewport
+        stage.getViewport().update(width, height);
     }
 
     @Override
