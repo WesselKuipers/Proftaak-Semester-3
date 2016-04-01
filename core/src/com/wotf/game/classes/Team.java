@@ -1,6 +1,9 @@
 package com.wotf.game.classes;
 
+import com.wotf.game.classes.Items.Item;
 import com.badlogic.gdx.graphics.Color;
+import com.wotf.game.classes.Items.*;
+import static com.wotf.game.classes.Items.EnumItems.Grenade;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -68,11 +71,11 @@ public class Team {
     }
 
     public void addUnit(String name, int health) {
-        units.add(new Unit(name, health));
+        units.add(new Unit(name, health, this));
     }
 
     public void removeUnit(Unit unit) {
-        
+
         units.remove(unit);
 
         // TODO: Logic for killing units?
@@ -80,6 +83,19 @@ public class Team {
 
     public void endTurn() {
         // TODO: Weten we nog steeds niet
+    }
+
+    public void setActiveUnit(Unit u) {
+        //TODO
+    }
+
+    public Item selectItem(int item) {
+        for (Map.Entry<Item, Integer> entry : items.entrySet()) {
+            if (entry.getKey().getName().toLowerCase().equals((EnumItems.values()[item]).toString().toLowerCase())) {
+                return (Item) entry.getKey();
+            }
+        }
+        return null;
     }
 
     public void increaseItemAmount(Item item, int amount) {
@@ -93,6 +109,7 @@ public class Team {
             }
             if (items.get(item) == 0 || items.get(item) < 0) {
                 //TODO: handle what happens when unlimited ammo (-1) or out of ammo
+               
             }
         }
     }
@@ -103,4 +120,5 @@ public class Team {
         }
         return 0;
     }
+
 }

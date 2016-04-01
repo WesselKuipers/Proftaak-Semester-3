@@ -1,14 +1,19 @@
-package com.wotf.game.classes;
+package com.wotf.game.classes.Items;
 
 /**
  * Created by wesse on 14/03/2016.
  */
-public class Item {
+public abstract class Item {
 
+    /*
+    NOTES: create weapons and items accordingly
+    Weapons extend item and implement e.g. IExplosion \/ IReplace \/ IHeal \/ IHeal \/ ICluster
+    weapons/items have own implementation of these interfaces 
+    
+     */
     private String name;
     private int power;
     private int blastRadius;
-    
 
     public Item(String nm, int pw, int rad) {
         this.name = nm;
@@ -46,7 +51,6 @@ public class Item {
         this.blastRadius = blastRadius;
     }
 
-    public void activate() {
-        // logic for item activation
+    public void activate() {        
     }
 }

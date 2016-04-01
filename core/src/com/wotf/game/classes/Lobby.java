@@ -10,6 +10,7 @@ import java.util.List;
  * Created by Wessel on 14/03/2016.
  */
 public class Lobby {
+
     private String serverIp;
     private List<Session> sessions;
 
@@ -24,8 +25,7 @@ public class Lobby {
     public Lobby() {
         try {
             this.serverIp = InetAddress.getLocalHost().toString();
-        }
-        catch (UnknownHostException e) {
+        } catch (UnknownHostException e) {
             e.printStackTrace();
         }
     }
@@ -58,6 +58,5 @@ public class Lobby {
         // logic for joining sessions
         // TODO: Database calls
     }
-
 
 }

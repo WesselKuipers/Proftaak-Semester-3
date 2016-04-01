@@ -4,6 +4,7 @@ package com.wotf.game.classes;
  * Created by Wessel on 14/03/2016.
  */
 public class Player {
+
     private String ip;
     private String name;
 
@@ -11,7 +12,7 @@ public class Player {
         this.ip = ip;
         this.name = name;
     }
-    
+
     public String getIp() {
         return ip;
     }

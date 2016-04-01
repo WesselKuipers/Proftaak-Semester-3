@@ -8,6 +8,7 @@ import java.util.List;
  * Created by Wessel on 1-2-2016.
  */
 public class DBCon {
+
     private static Connection connection;
 
     // TODO: 6-3-2016 Refactor this so that the username and password are loaded from a file instead of being hard-coded
@@ -27,9 +28,7 @@ public class DBCon {
             e.printStackTrace();
         }
     }*/
-
-    public static Connection getConnection()
-    {
+    public static Connection getConnection() {
         try {
             connection = DriverManager.getConnection(connectionPath, username, password);
         } catch (SQLException e) {
@@ -40,7 +39,10 @@ public class DBCon {
         return connection;
     }
 
-    public static int ExecuteUpdate(String query) { return ExecuteUpdate(query, null); }
+    public static int ExecuteUpdate(String query) {
+        return ExecuteUpdate(query, null);
+    }
+
     public static int ExecuteUpdate(String query, List<Object> parameters) {
         Connection con = getConnection();
         PreparedStatement ps;
@@ -56,11 +58,10 @@ public class DBCon {
             }
 
             int result = ps.executeUpdate();
-            if(result != 0) {
+            if (result != 0) {
                 return result;
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
@@ -68,13 +69,11 @@ public class DBCon {
         return -1;
     }
 
-    public static ResultSet ExecuteResultSet(String query)
-    {
+    public static ResultSet ExecuteResultSet(String query) {
         return ExecuteResultSet(query, null);
     }
 
-    public static ResultSet ExecuteResultSet(String query, List<Object> parameters)
-    {
+    public static ResultSet ExecuteResultSet(String query, List<Object> parameters) {
         Connection con = getConnection();
         PreparedStatement ps;
 
@@ -82,15 +81,14 @@ public class DBCon {
             ps = con.prepareCall(query);
 
             // If the list of parameters isn't empty, adds them to the prepared statement
-            if(parameters != null)
-            {
-                for(int i = 1; i <= parameters.size(); i++) {
+            if (parameters != null) {
+                for (int i = 1; i <= parameters.size(); i++) {
                     ps.setObject(i, parameters.get(i - 1));
                 }
             }
 
             // If the query returned a ResultSet, we can safely return it (or at least the first one)
-            if(ps.execute()) {
+            if (ps.execute()) {
                 return ps.getResultSet();
             }
         } catch (SQLException e) {
@@ -101,12 +99,11 @@ public class DBCon {
         return null;
     }
 
-    public static List<String[]> ExecuteResultSetAsList(String query)
-    {
+    public static List<String[]> ExecuteResultSetAsList(String query) {
         return ExecuteResultSetAsList(query, null);
     }
-    public static List<String[]> ExecuteResultSetAsList(String query, List<Object> parameters)
-    {
+
+    public static List<String[]> ExecuteResultSetAsList(String query, List<Object> parameters) {
         Connection con = getConnection();
         PreparedStatement ps;
 
@@ -114,15 +111,14 @@ public class DBCon {
             ps = con.prepareCall(query);
 
             // If the list of parameters isn't empty, adds them to the prepared statement
-            if(parameters != null)
-            {
-                for(int i = 1; i <= parameters.size(); i++) {
+            if (parameters != null) {
+                for (int i = 1; i <= parameters.size(); i++) {
                     ps.setObject(i, parameters.get(i - 1));
                 }
             }
 
             // If the query returned a ResultSet, we can start parsing it
-            if(ps.execute()) {
+            if (ps.execute()) {
                 ResultSet rs = ps.getResultSet();
                 ResultSetMetaData metaData = ps.getMetaData();
                 int columnCount = metaData.getColumnCount();
@@ -143,14 +139,13 @@ public class DBCon {
                                 case Types.FLOAT:
                                 case Types.NUMERIC:
                                 case Types.SMALLINT:
-                                    record[i-1] = numericDefault;
+                                    record[i - 1] = numericDefault;
                                     continue;
                             }
 
-                            record[i-1] = "";
-                        }
-                        else {
-                            record[i-1] = value.toString();
+                            record[i - 1] = "";
+                        } else {
+                            record[i - 1] = value.toString();
                         }
                     }
 

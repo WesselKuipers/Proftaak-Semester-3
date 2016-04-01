@@ -7,19 +7,19 @@ import com.wotf.gui.view.GameEngine;
 import com.wotf.gui.view.MainMenu;
 
 public class WotFGame extends Game {
-	SpriteBatch batch;
-	Texture img;
-        Game game;
-        
-        public WotFGame()
-        {
-            game = this;
-        }
-	
-	@Override
-	public void create () {
-            //setScreen(new MainMenu(game));
-            game.setScreen(new GameEngine(game));
-	}
+
+    SpriteBatch batch;
+    Texture img;
+    Game game;
+
+    public WotFGame() {
+        game = this;
+    }
+
+    @Override
+    public void create() {
+        //setScreen(new MainMenu(game));
+        game.setScreen(new GameEngine(game));
+    }
 
 }

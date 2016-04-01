@@ -9,6 +9,7 @@ import java.util.List;
  * Created by Wessel on 14/03/2016.
  */
 public class Session {
+
     private GameSettings gameSettings;
     private Player host;
     private List<Player> players;
