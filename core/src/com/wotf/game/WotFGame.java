@@ -1,6 +1,7 @@
 package com.wotf.game;
 
 import com.badlogic.gdx.Game;
+import com.wotf.game.WotFGame;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.wotf.gui.view.GameEngine;
@@ -10,7 +11,7 @@ public class WotFGame extends Game {
 
     SpriteBatch batch;
     Texture img;
-    Game game;
+    WotFGame game;
 
     public WotFGame() {
         game = this;
@@ -19,7 +20,7 @@ public class WotFGame extends Game {
     @Override
     public void create() {
         //setScreen(new MainMenu(game));
-        game.setScreen(new GameEngine(game));
+        game.setScreen(new MainMenu(game));
     }
 
 }

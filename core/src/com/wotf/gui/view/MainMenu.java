@@ -6,7 +6,6 @@
 package com.wotf.gui.view;
 
 import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -14,13 +13,16 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.wotf.game.WotFGame;
 
 /**
  *
@@ -31,10 +33,22 @@ public class MainMenu implements Screen {
     private Skin skin;
     private Stage stage;
     private SpriteBatch batch;
-    private Game game;
+    private WotFGame game;
 
-    public MainMenu(Game game) {
+    public MainMenu(WotFGame game) {
         this.game = game;
+    }
+
+    private NinePatch getNinePatch(String fname) {
+
+        // Get the image
+        final Texture t = new Texture(Gdx.files.internal(fname));
+
+        // create a new texture region, otherwise black pixels will show up too, we are simply cropping the image
+        // last 4 numbers respresent the length of how much each corner can draw,
+        // for example if your image is 50px and you set the numbers 50, your whole image will be drawn in each corner
+        // so what number should be good?, well a little less than half would be nice
+        return new NinePatch(new TextureRegion(t, 1, 1, t.getWidth() - 2, t.getHeight() - 2), 200, 200, 200, 200);
     }
 
     @Override
@@ -70,7 +84,7 @@ public class MainMenu implements Screen {
         online.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new Lobby(game));
+                game.setScreen(new LobbyGUI(game));
             }
         });
         stage.addActor(online);
@@ -100,7 +114,9 @@ public class MainMenu implements Screen {
     }
 
     @Override
-    public void resize(int w, int h) {
+    public void resize(int width, int height) {
+        // Passes the new width and height to the viewport
+        stage.getViewport().update(width, height);
     }
 
     @Override

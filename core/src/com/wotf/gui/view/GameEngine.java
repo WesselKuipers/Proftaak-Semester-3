@@ -29,14 +29,22 @@ import com.wotf.game.classes.Player;
 import com.wotf.game.classes.Team;
 import java.util.ArrayList;
 import java.util.List;
+import com.wotf.game.WotFGame;
 
 public class GameEngine implements Screen {
 
-    private com.badlogic.gdx.Game game;
-    GameStage stage;
+    private WotFGame game;
+    private GameStage stage;
+    private List<Team> teams;
+    private GameSettings gamesettings;
 
-    public GameEngine(com.badlogic.gdx.Game game) {
+    public GameEngine(WotFGame game) {
         this.game = game;
+    }
+
+    public GameEngine(WotFGame game, GameSettings gamesettings) {
+        this.game = game;
+        this.gamesettings = gamesettings;
     }
 
     @Override
@@ -94,10 +102,10 @@ public class GameEngine implements Screen {
         viewport.apply();
 
         // Initializes game object using game settings
-        Game game = new Game(settings, map, players);
+        Game gameclass = new Game(gamesettings, map, players);
 
         // Initializes the stage object and sets the viewport
-        stage = new GameStage(game);
+        stage = new GameStage(gameclass);
         stage.init();
         stage.setViewport(viewport);
 

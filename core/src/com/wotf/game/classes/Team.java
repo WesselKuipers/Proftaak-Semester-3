@@ -136,4 +136,8 @@ public class Team {
         return 0;
     }
 
+    @Override
+    public String toString() {
+        return getName() + " - " + getColor();
+    }
 }

@@ -35,6 +35,7 @@ import com.wotf.game.classes.Game;
 import com.wotf.game.classes.Projectile;
 import com.wotf.game.classes.Team;
 import com.wotf.game.classes.Unit;
+import java.util.List;
 
 /**
  * Extension of Stage that contains a game session
@@ -43,6 +44,7 @@ import com.wotf.game.classes.Unit;
  */
 public class GameStage extends Stage {
 
+    //private WotFGame game;
     private Game game;
     private World world;
     private Box2DDebugRenderer b2dr;
@@ -79,7 +81,10 @@ public class GameStage extends Stage {
 
         Pixmap.setFilter(Pixmap.Filter.NearestNeighbour);
         Pixmap.setBlending(Pixmap.Blending.SourceOver);
-        Pixmap bgPixmap = new Pixmap(game.getMap().getWidth(), game.getMap().getHeight(), Pixmap.Format.RGBA8888);
+
+        Pixmap bgPixmap = new Pixmap(this.game.getMap().getWidth(), this.game.getMap().getHeight(), Pixmap.Format.RGBA8888);
+        System.out.println(game.getMap().getWidth() + "" + game.getMap().getHeight() + "");
+        //Pixmap bgPixmap = new Pixmap(this.game.getMap().getWidth(), game.getMap().getHeight(), Pixmap.Format.RGBA8888);
         //System.out.println(game.getMap().getWidth() + "" + game.getMap().getHeight() + "");
         bgPixmap.setColor(Color.PURPLE);
         bgPixmap.fill();
@@ -90,6 +95,7 @@ public class GameStage extends Stage {
 
     public void init() {
         // Adds every unit as an actor to this stage
+
         int count = 1;
         for (Team team : game.getTeams()) {
             for (Unit unit : team.getUnits()) {

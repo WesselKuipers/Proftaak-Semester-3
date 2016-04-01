@@ -263,7 +263,8 @@ public class Unit extends Actor {
     }
 
     public void jump() {
-        b2body.applyLinearImpulse(new Vector2(0, 10), b2body.getLocalCenter(), true);
+        if(b2body != null)
+            b2body.applyLinearImpulse(new Vector2(0, 10), b2body.getLocalCenter(), true);
     }
 
     public void setWorld(World world) {
