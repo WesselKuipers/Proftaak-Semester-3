@@ -2,6 +2,8 @@ package com.wotf.game.classes;
 
 import com.wotf.game.classes.Items.Item;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.wotf.game.GameStage;
 import com.wotf.game.classes.Items.*;
 import static com.wotf.game.classes.Items.EnumItems.Grenade;
 import java.util.ArrayList;
@@ -31,6 +33,10 @@ public class Team {
         items = new HashMap<>();
         players = new ArrayList<>();
         units = new ArrayList<>();
+        
+        // Select first unit of team as active unit
+        this.activeUnitIndex = 0;
+        
     }
 
     public List<Player> getPlayers() {
@@ -80,9 +86,18 @@ public class Team {
 
         // TODO: Logic for killing units?
     }
+    
+    public int getActiveUnitIndex() {
+        return activeUnitIndex;
+    }
 
     public void endTurn() {
-        // TODO: Weten we nog steeds niet
+        // Change the active unit index if its not at the end of the list
+        if (activeUnitIndex < (units.size() - 1)) {
+            activeUnitIndex++;
+        } else {
+            activeUnitIndex = 0;
+        }
     }
 
     public void setActiveUnit(Unit u) {

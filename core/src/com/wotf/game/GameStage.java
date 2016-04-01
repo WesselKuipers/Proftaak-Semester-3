@@ -21,6 +21,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -119,11 +120,15 @@ public class GameStage extends Stage {
         return this.game;
     }
 
-    @Override
     public void act() {
         super.act();
         float delta = Gdx.graphics.getDeltaTime();
 
+        game.getTurnLogic().update(delta);
+        if (game.getTurnLogic().getElapsedTime() >= game.getGameSettings().getTurnTime()) {
+            game.endTurn();
+         }
+		
         getCamera().update();
         if (activeUnit.b2body != null) {
             activeUnit.setPosition(activeUnit.b2body.getPosition().x * 95f, activeUnit.b2body.getPosition().y  * 50f);
@@ -146,7 +151,7 @@ public class GameStage extends Stage {
         }
 
     }
-
+    
     @Override
     public boolean keyDown(int keyCode) {
 
@@ -176,10 +181,24 @@ public class GameStage extends Stage {
                 cam.zoom = 1;
                 break;
             case Keys.TAB:
-                if (this.getKeyboardFocus() == this.getActors().get(0)) {
-                    this.setKeyboardFocus(this.getActors().get(1));
-                } else {
-                    this.setKeyboardFocus(this.getActors().get(0));
+                int selectedPlayerIndex = 0;
+                int i = 0;
+                
+                Team activeTeam = game.getActiveTeam();
+                
+                for (Unit u : activeTeam.getUnits()) {
+                    if(u == this.getKeyboardFocus()) {
+                        selectedPlayerIndex = i + 1;
+                    }
+                    i++;
+                }
+                
+                selectedPlayerIndex = (selectedPlayerIndex >= activeTeam.getUnits().size()) ? 0 : selectedPlayerIndex;
+                
+                for (Actor a : this.getActors()) {
+                    if(activeTeam.getUnit(selectedPlayerIndex) == a) {
+                        this.setKeyboardFocus(a);
+                    }
                 }
                 break;
 
@@ -270,12 +289,14 @@ public class GameStage extends Stage {
                 this.getHeight() - 40);
         font.draw(guiBatch, String.format("Mouse position: screen [%d, %d], viewport %s", Gdx.input.getX(), game.getMap().getHeight() - Gdx.input.getY(), getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0))), 0, this.getHeight() - 60);
         font.draw(guiBatch, String.format("Camera coords [%s], zoom %f", getCamera().position.toString(), ((OrthographicCamera) getCamera()).zoom), 0, this.getHeight() - 80);
+        font.draw(guiBatch, "Time remaining: " + (game.getGameSettings().getTurnTime() - (int)game.getTurnLogic().getElapsedTime()), 0, this.getHeight() - 100);
+
         font.draw(guiBatch, String.format("Active body: %s XY[%f, %f]",
                 this.getKeyboardFocus().getName(),
                 activeUnit.b2body.getPosition().x,
                 activeUnit.b2body.getPosition().y),
                 0,
-                this.getHeight() - 100);
+                this.getHeight() - 120);
         guiBatch.end();
     }
 
@@ -325,6 +346,7 @@ public class GameStage extends Stage {
         game.getMap().setTerrain(terrain);
         updateTerrain();
     }
+}
 
     public World getWorld() {
         return world;
