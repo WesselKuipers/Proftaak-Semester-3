@@ -18,6 +18,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -88,10 +89,14 @@ public class GameStage extends Stage {
     }
 
     @Override
-    public void act() {
-        super.act();
+    public void act(float deltaTime) {
+        super.act(deltaTime);
+        game.getTurnLogic().update(deltaTime);
+        if (game.getTurnLogic().getElapsedTime() >= game.getGameSettings().getTurnTime()) {
+            game.endTurn();
+        }
     }
-
+    
     @Override
     public boolean keyDown(int keyCode) {
 
@@ -121,10 +126,24 @@ public class GameStage extends Stage {
                 cam.zoom = 1;
                 break;
             case Keys.TAB:
-                if (this.getKeyboardFocus() == this.getActors().get(0)) {
-                    this.setKeyboardFocus(this.getActors().get(1));
-                } else {
-                    this.setKeyboardFocus(this.getActors().get(0));
+                int selectedPlayerIndex = 0;
+                int i = 0;
+                
+                Team activeTeam = game.getActiveTeam();
+                
+                for (Unit u : activeTeam.getUnits()) {
+                    if(u == this.getKeyboardFocus()) {
+                        selectedPlayerIndex = i + 1;
+                    }
+                    i++;
+                }
+                
+                selectedPlayerIndex = (selectedPlayerIndex >= activeTeam.getUnits().size()) ? 0 : selectedPlayerIndex;
+                
+                for (Actor a : this.getActors()) {
+                    if(activeTeam.getUnit(selectedPlayerIndex) == a) {
+                        this.setKeyboardFocus(a);
+                    }
                 }
                 break;
 
@@ -221,6 +240,7 @@ public class GameStage extends Stage {
                 this.getHeight() - 40);
         font.draw(guiBatch, String.format("Mouse position: screen [%d, %d], viewport %s", Gdx.input.getX(), game.getMap().getHeight() - Gdx.input.getY(), getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0))), 0, this.getHeight() - 60);
         font.draw(guiBatch, String.format("Camera coords [%s], zoom %f", getCamera().position.toString(), ((OrthographicCamera) getCamera()).zoom), 0, this.getHeight() - 80);
+        font.draw(guiBatch, "Time remaining: " + (game.getGameSettings().getTurnTime() - (int)game.getTurnLogic().getElapsedTime()), 0, this.getHeight() - 100);
 
         guiBatch.end();
     }

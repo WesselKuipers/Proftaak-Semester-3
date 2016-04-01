@@ -1,6 +1,8 @@
 package com.wotf.game.classes;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.Array;
 import java.util.Collections;
 import java.util.List;
 
@@ -62,7 +64,19 @@ public class Game {
     }
 
     public void endTurn() {
-        // TODO: Weet jip niet
+        Team activeTeam = getActiveTeam();
+        activeTeam.endTurn();
+        turnLogic.endTurn();
+        activeTeam = getActiveTeam();
+        int count = 0;
+        for(Actor a : activeTeam.getUnit(0).getStage().getActors()) {
+            if(activeTeam.getUnits().contains(a)) {
+                if(activeTeam.getActiveUnitIndex() == count) {
+                    a.getStage().setKeyboardFocus(a);
+                }
+                count++;
+            }
+        }
     }
 
     public GameSettings getGameSettings() {
@@ -72,5 +86,4 @@ public class Game {
     public TurnLogic getTurnLogic() {
         return turnLogic;
     }
-    // TODO: Function for handling new/next turn
 }
