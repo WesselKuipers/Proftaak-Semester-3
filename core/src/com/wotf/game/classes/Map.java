@@ -2,6 +2,7 @@ package com.wotf.game.classes;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Rectangle;
 
 public class Map {
     private double gravityModifier = 9.8;
@@ -62,5 +63,9 @@ public class Map {
 
     public Sprite getBackgroundSprite() {
         return backgroundSprite;
+    }
+    
+    public Rectangle getBounds() {
+        return new Rectangle(0, 0, getWidth(), getHeight());
     }
 }

@@ -51,6 +51,7 @@ public abstract class Item {
         this.blastRadius = blastRadius;
     }
 
-    public void activate() {        
+    public void activate() {
+        
     }
 }

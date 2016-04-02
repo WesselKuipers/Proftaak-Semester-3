@@ -9,16 +9,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.TimeUtils;
-import static java.lang.Math.atan2;
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
+import com.wotf.game.GameStage;
 
 /**
  *
@@ -152,7 +145,32 @@ public class Projectile extends Actor {
     
     @Override
     public void act(float delta) {
-        updateShot( );
+        updateShot();
         super.act(delta);
+        
+        Map gameMap = ((GameStage)getStage()).getGame().getMap();
+        boolean[][] terrain = gameMap.getTerrain();
+        
+        // if projectile is out of bounds, remove it from the stage
+        if(this.getX() - this.getWidth() > gameMap.getWidth()
+            || this.getX() + this.getWidth() < 0
+            || this.getY() + this.getHeight() < 0) {
+            this.remove();
+        }
+        
+        // Terrain collision
+        if (!(this.getX() >= 0 && this.getY() >= 0 && this.getX() < terrain.length && this.getY() < terrain[0].length)) {
+            return;
+        }
+        
+        // TODO: Determine how the location of the projectile gets calculated
+        if(terrain[(int) getX()][(int) getY()]) {
+            // Projectile collided with terrain
+            System.out.println("Bullet collided at " + this.getX() + " " + this.getY());
+            
+            // TODO: call GameStage.explode() with appropriate values
+            ((GameStage)getStage()).explode((int) getX(), (int) getY(), 50);
+            this.remove();
+        }
     }
 }

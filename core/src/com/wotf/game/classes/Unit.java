@@ -5,6 +5,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -74,7 +75,7 @@ public class Unit extends Actor {
             frames[i] = tmpFrames[0][i];
         }
 
-        Array<TextureRegion> framesRun = new Array<TextureRegion>();
+        Array<TextureRegion> framesRun = new Array<>();
 
         for (int i = 1; i < 4; i++) {
             framesRun.add(frames[i]);
@@ -122,6 +123,7 @@ public class Unit extends Actor {
                     if (i != null) {
                         weapon = i;
                         //TODO: WHAT BUTTON PRESSED TO FIRE WEAPON???????
+                        // Wessel: Probably the spacebar button, like in worms
                         //FIRE & USE LOGIC + initiate projectile funtion --> TODO JIP z'n PROJECTIEL FUNCTIE
                         useItem();
                     
@@ -130,6 +132,7 @@ public class Unit extends Actor {
                         System.out.println("Selected weapon not found");  
                     }
                 }
+                
                 if (keycode == Keys.NUM_2) {
                      // TODO: switch weapon B
                     // In Team's weaponlist choose weapon cooresponding to numbers
@@ -145,12 +148,17 @@ public class Unit extends Actor {
                     } else {
                         System.out.println("Selected weapon not found");  
                     }
-
                 }
-
+                
+                if (keycode == Keys.SPACE) {
+                    // TODO: Logic for firing weapon
+                    // should be moved when shooting logic requires more than a single button down event
+                    System.out.println("Firing " + weapon.getName());
+                    useItem();
+                }
+                
                 return true;
             }
-
         });
     }
 
@@ -226,6 +234,9 @@ public class Unit extends Actor {
         return name;
     }
 
+    public Rectangle getBounds() {
+        return this.sprite.getBoundingRectangle();
+    }
 //    public void move(Vector2 direction) {
 //        // logic for moving
 //        // Temporary movement logic
@@ -263,6 +274,9 @@ public class Unit extends Actor {
     }
 
     public void jump() {
+        // Only allow jumping when you're standing on the ground
+        //if (this.getState() != State.STANDING) { return; }
+        
         if(b2body != null)
             b2body.applyLinearImpulse(new Vector2(0, 10), b2body.getLocalCenter(), true);
     }
@@ -317,18 +331,26 @@ public class Unit extends Actor {
     }
 
     public State getState() {
-        //if unit is going positive in Y-Axis he is jumping... or if he just jumped and is falling remain in jump state
+        // if unit is going positive in Y-Axis he is jumping...
+        // or if he just jumped and is falling remain in jump state
         
         if ((b2body.getLinearVelocity().y > 0 && currentState == State.JUMPING) || (b2body.getLinearVelocity().y < 0 && previousState == State.JUMPING)) {
             return State.JUMPING;
-        } //if negative in Y-Axis unit is falling
+        } // if negative in Y-Axis unit is falling
         else if (b2body.getLinearVelocity().y < 0) {
             return State.FALLING;
-        } //if unit is positive or negative in the X axis he is running
+        } // if unit is positive or negative in the X axis he is running
         else if (b2body.getLinearVelocity().x != 0) {
             return State.RUNNING;
-        } //if none of these return then he must be standing
+        } // if none of these return then he must be standing
         else {
+            // TODO: Check collision with stage
+            /* The following can be used to determine if a unit is standing
+            int x = (int) (getOriginX() + getWidth() / 2);
+            int y = (int) getOriginY();
+            boolean isOnGround = ((GameStage)getStage()).isPixelSolid(x, y);
+            */
+            
             return State.STANDING;
         }
     }

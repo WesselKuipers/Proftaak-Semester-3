@@ -92,6 +92,13 @@ public class GameEngine implements Screen {
                 terrain[x][y] = true;
             }
         }
+        
+        // Creates a platform on the debug map
+        for(int x = (map.getWidth() / 2); x < (map.getWidth() / 2 + 50); x++) {
+            for(int y = 80; y < 120; y++) {
+                terrain[x][y] = true;
+            }
+        }
 
         map.setTerrain(terrain);
 

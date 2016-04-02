@@ -35,6 +35,7 @@ import com.wotf.game.classes.Game;
 import com.wotf.game.classes.Projectile;
 import com.wotf.game.classes.Team;
 import com.wotf.game.classes.Unit;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -63,19 +64,22 @@ public class GameStage extends Stage {
 
     public final float PIXELS_TO_METERS = 100;
     private final float TIME_STEP = 1 / 300f;
+    private Actor focusedActor; // if this is set to an actor
+                                // have the camera follow it automatically, otherwise set it to null
 
     public GameStage(Game game) {
         super(new ScreenViewport());
         this.game = game;
         this.world = new World(new Vector2(0, -10f), true);
         this.b2dr = new Box2DDebugRenderer();
+        this.focusedActor = null;
 
         batch = new SpriteBatch();
         guiBatch = new SpriteBatch();
 
         font = new BitmapFont();
         font.setColor(Color.BLACK);
-
+        
         //floor
         createGroundFloor(world);
 
@@ -84,8 +88,6 @@ public class GameStage extends Stage {
 
         Pixmap bgPixmap = new Pixmap(this.game.getMap().getWidth(), this.game.getMap().getHeight(), Pixmap.Format.RGBA8888);
         System.out.println(game.getMap().getWidth() + "" + game.getMap().getHeight() + "");
-        //Pixmap bgPixmap = new Pixmap(this.game.getMap().getWidth(), game.getMap().getHeight(), Pixmap.Format.RGBA8888);
-        //System.out.println(game.getMap().getWidth() + "" + game.getMap().getHeight() + "");
         bgPixmap.setColor(Color.PURPLE);
         bgPixmap.fill();
         backgroundTexture = new Texture(bgPixmap);
@@ -101,9 +103,9 @@ public class GameStage extends Stage {
             for (Unit unit : team.getUnits()) {
                 // Retrieves the currently attached sprite of this unit,
                 // adds a color tint to it and assigns it back to the unit
-                Sprite unitSprite = unit.getSprite();
+                //Sprite unitSprite = unit.getSprite();
                 //unitSprite.setColor(team.getColor());
-                unit.setSprite(unitSprite);
+                //unit.setSprite(unitSprite);
 
                 // Spawns a unit in a random location (X axis)
                 Vector2 ranLocation = new Vector2(MathUtils.random(0, game.getMap().getWidth() - unit.getWidth()), 80);
@@ -119,6 +121,7 @@ public class GameStage extends Stage {
                 count++;
             }
         }
+        
         getCamera().update();
     }
 
@@ -126,6 +129,7 @@ public class GameStage extends Stage {
         return this.game;
     }
 
+    @Override
     public void act() {
         super.act();
         float delta = Gdx.graphics.getDeltaTime();
@@ -134,17 +138,30 @@ public class GameStage extends Stage {
         if (game.getTurnLogic().getElapsedTime() >= game.getGameSettings().getTurnTime()) {
             game.endTurn();
          }
-		
-        getCamera().update();
+	
+        if(focusedActor != null) {
+            setCameraFocusToActor(focusedActor, false);
+        } else {
+            getCamera().update();
+        }
+        
         if (activeUnit.b2body != null) {
             activeUnit.setPosition(activeUnit.b2body.getPosition().x * 95f, activeUnit.b2body.getPosition().y  * 50f);
             activeUnit.sprite.setPosition(activeUnit.b2body.getPosition().x * 95f, activeUnit.b2body.getPosition().y * 50f);
         }
         
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && activeUnit.b2body.getLinearVelocity().x <= 2) {
-            activeUnit. b2body.setLinearVelocity(0.5f, 0f);
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)
+            && (activeUnit.getState() == Unit.State.STANDING || activeUnit.getState() == Unit.State.RUNNING)
+            && activeUnit.b2body.getLinearVelocity().x <= 2) {
+            // TODO: Refactor using a speed or velocity field in activeUnit
+            // and move all unit controls to either GameStage or Unit
+            // so that they can all be accessed from the same place
+            activeUnit.b2body.setLinearVelocity(0.5f, 0f);
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && activeUnit.b2body.getLinearVelocity().x >= -2) {
+        
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)
+            && (activeUnit.getState() == Unit.State.STANDING || activeUnit.getState() == Unit.State.RUNNING)
+            && activeUnit.b2body.getLinearVelocity().x >= -2) {
             activeUnit.b2body.setLinearVelocity(-0.5f,0f);
         }
 
@@ -167,15 +184,19 @@ public class GameStage extends Stage {
         switch (keyCode) {
             case Keys.NUMPAD_2:
                 cam.translate(new Vector2(0, -50f));
+                focusedActor = null;
                 break;
             case Keys.NUMPAD_4:
                 cam.translate(new Vector2(-50f, 0));
+                focusedActor = null;
                 break;
             case Keys.NUMPAD_8:
                 cam.translate(new Vector2(0, 50f));
+                focusedActor = null;
                 break;
             case Keys.NUMPAD_6:
                 cam.translate(new Vector2(50f, 0));
+                focusedActor = null;
                 break;
             case Keys.PLUS:
                 cam.zoom -= 0.05f;
@@ -204,61 +225,38 @@ public class GameStage extends Stage {
                 for (Actor a : this.getActors()) {
                     if(activeTeam.getUnit(selectedPlayerIndex) == a) {
                         this.setKeyboardFocus(a);
+                        setCameraFocusToActor(a, true);
                     }
                 }
                 break;
-
         }
 
-        // Retrains the camera from leaving the bounds of the map
-        // Uncomment this if you want an unrestrained camera
-        /* TODO: Determine what to do when the map is smaller than the viewport
-                 currently acts weirdly when zooming out too much. */
-        cam.zoom = MathUtils.clamp(cam.zoom, 0.1f, game.getMap().getWidth() / cam.viewportWidth);
-
-        float effectiveViewportWidth = cam.viewportWidth * cam.zoom;
-        float effectiveViewportHeight = cam.viewportHeight * cam.zoom;
-
-        cam.position.x = MathUtils.clamp(cam.position.x, effectiveViewportWidth / 2f, game.getMap().getWidth() - effectiveViewportWidth / 2f);
-        cam.position.y = MathUtils.clamp(cam.position.y, effectiveViewportHeight / 2f, game.getMap().getHeight() - effectiveViewportHeight / 2f);
-
+        clampCamera();
         cam.update();
         return super.keyDown(keyCode);
     }
+    
     /**
-     * @Author  Jip Boesenkool
-     * Function which handles the bullets on button click.
-     * @return
-     */
-     @Override
-     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if( button == Input.Buttons.LEFT ){
-            Vector3 rel = getCamera().unproject( new Vector3(screenX, screenY, 0) );
-            bulletLogic( (int)rel.x, (int)rel.y);
-       }
-       return true;
-    }
-
-    /**
-     * Sorry wessel uitgecomment voor bullet functionaliteit.
-     @Override
-     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-     // Since the stage is using a camera, we don't want the cursor's X and Y
-     // relative to the screen, but relative to the position of the camera
-     Vector3 rel = getCamera().unproject(new Vector3(screenX, screenY, 0));
-     System.out.println(String.format("Touchdown event (%d, %d) button %d", screenX, screenY, button));
-     System.out.println(String.format("Relative Touchdown event (%f, %f) button %d", rel.x, rel.y, button));
-    // button = 0 left mouse button
-    // button = 1 right mouse button
-    if (button == 0) {
-	    explode((int) rel.x, (int) rel.y, 30);
-    } else if (button == 1) {
-           explode((int) rel.x, (int) rel.y, 100);
-    }
-    return true;
-    }
+    * @Author  Jip Boesenkool
+    * Function which handles the bullets on button click.
+    * @return
     */
-
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        Vector3 rel = getCamera().unproject( new Vector3(screenX, screenY, 0) );
+        System.out.println(String.format("Touchdown event (%d, %d) button %d", screenX, screenY, button));
+        System.out.println(String.format("Relative Touchdown event (%f, %f) button %d", rel.x, rel.y, button));
+        
+        if(button == Input.Buttons.LEFT) {
+            System.out.println("Firing bullet");
+            bulletLogic((int)rel.x, (int)rel.y);
+        } else if (button == Input.Buttons.RIGHT) {
+            explode((int) rel.x, (int) rel.y, 30);
+        }
+        
+        return true;
+    }
+    
     @Override
     public void draw() {
         batch.setProjectionMatrix(getCamera().combined);
@@ -311,6 +309,7 @@ public class GameStage extends Stage {
      */
     public void updateTerrain() {
         boolean terrain[][] = game.getMap().getTerrain();
+        
         pixmap = new Pixmap(terrain.length, terrain[0].length, Pixmap.Format.RGBA4444);
         pixmap.setColor(Color.BLACK); // Set this and the format to CLEAR
         // when using an actual stage image
@@ -329,7 +328,8 @@ public class GameStage extends Stage {
 
     public void explode(int x, int y, int radius) {
         boolean[][] terrain = game.getMap().getTerrain();
-
+        List<Unit> collidedUnits = new ArrayList<>();
+        
         for (int xPos = x - radius; xPos <= x + radius; xPos++) {
             for (int yPos = y - radius; yPos <= y + radius; yPos++) {
                 // scan square area around radius to determine which pixels to destroy
@@ -337,6 +337,19 @@ public class GameStage extends Stage {
                     // Check if the position is in bounds of the array, if not, skip this iteration
                     if (!(xPos >= 0 && yPos >= 0 && xPos < terrain.length && yPos < terrain[0].length)) {
                         continue;
+                    }
+                    
+                    // Iterate through every team and unit
+                    // and add it to the list of collided Units if its bounding box contains explosion Xs and Ys
+                    for(Team t : game.getTeams()) {
+                        for(Unit u : t.getUnits()) {
+                            if(!collidedUnits.contains(u)) {
+                                if(u.getBounds().contains(x, y)) {
+                                    collidedUnits.add(u);
+                                    System.out.println("Collided with unit: " + u.getName());
+                                }
+                            }
+                        }
                     }
 
                     // if the pixel at (xPos, yPos) is solid, set it to false
@@ -348,6 +361,8 @@ public class GameStage extends Stage {
                 }
             }
         }
+        
+        // TODO: Iterate through collided units and call its damage/hit method
 
         game.getMap().setTerrain(terrain);
         updateTerrain();
@@ -355,6 +370,29 @@ public class GameStage extends Stage {
 
     public World getWorld() {
         return world;
+    }
+    
+    /**
+     * Checks if a pixel at a given coordinate is set to solid or not
+     * @param x X-coordinate in world map
+     * @param y Y-coordinate in world map
+     * @return True if pixel is solid, false if not
+     */
+    public boolean isPixelSolid(int x, int y) {
+        return this.game.getMap().getTerrain()[x][y];
+    }
+    
+    public void setCameraFocusToActor(Actor actor, boolean keepFollowing) {
+        OrthographicCamera cam = (OrthographicCamera) this.getCamera();
+        
+        cam.position.x = actor.getX() + actor.getWidth() / 2;
+        //if(followVertically) { cam.position.y = actor.getY() + actor.getHeight() / 2; }
+        clampCamera();
+        cam.update();
+        
+        if(keepFollowing) {
+            focusedActor = actor;
+        }
     }
 
     public void createGroundFloor(World world) {
@@ -376,30 +414,46 @@ public class GameStage extends Stage {
     }
 
     /**
-     * @author Jip Boesenkool
-     * Function which handles the logic to fire a bullet, Get's called by mouseClick event.
-     * Trigger MUST BE inside game stage, else mouse Click wont get the right coordinates.
-     * @param screenX Unprojected mouse position.x
-     * @param screenY Unprojected mouse position.y
-     */
-     private void bulletLogic( int screenX, int screenY ){
-     //TODO: Fix this! data should be from data structure not from actor.
-     // Jip Boesenkool - 29-030'16
-     Vector2 unitPosition = new Vector2(
-     this.getKeyboardFocus().getX(),
-     this.getKeyboardFocus().getY()
-     );
-
-     //TODO: Get correct force from weapon
-    // Jip Boesenkool - 29-030'16
-     float force = 20f;
-    //TODO: get wind from turnLogic, Generate wind each turn.
-    // Jip Boesenkool - 29-030'16
-     Vector2 wind = new Vector2(0f, 0f);
-     double gravity = game.getMap().getGravityModifier();
-    //spawn bullet and add to scene
-    Projectile bullet = new Projectile( unitPosition, screenX, screenY, force, wind, gravity );
-    bullet.updateShot( );
-    this.addActor(bullet);
+    * @author Jip Boesenkool
+    * Function which handles the logic to fire a bullet, Get's called by mouseClick event.
+    * Trigger MUST BE inside game stage, else mouse Click wont get the right coordinates.
+    * @param screenX Unprojected mouse position.x
+    * @param screenY Unprojected mouse position.y
+    */
+    private void bulletLogic(int screenX, int screenY) {
+        // TODO: Fix this! data should be from data structure not from actor.
+        // Jip Boesenkool - 29-030'16
+        Vector2 unitPosition = new Vector2(
+           this.activeUnit.getX(),
+           this.activeUnit.getY()
+        );
+         // TODO: Get correct force from weapon
+        // Jip Boesenkool - 29-030'16
+        float force = 20f;
+        // TODO: get wind from turnLogic, Generate wind each turn.
+        // Jip Boesenkool - 29-030'16
+        Vector2 wind = new Vector2(0f, 0f);
+        double gravity = game.getMap().getGravityModifier();
+        //spawn bullet and add to scene
+        Projectile bullet = new Projectile(unitPosition, screenX, screenY, force, wind, gravity);
+        bullet.updateShot();
+        this.addActor(bullet);
     }
+    
+    private void clampCamera() {
+        // Retrains the camera from leaving the bounds of the map
+        // Uncomment this if you want an unrestrained camera
+        OrthographicCamera cam = (OrthographicCamera) getCamera();
+        
+        if (cam.zoom > 1f) cam.zoom = 1;
+        cam.zoom = MathUtils.clamp(cam.zoom, 0.1f, game.getMap().getWidth() / cam.viewportWidth);
+
+        float effectiveViewportWidth = cam.viewportWidth * cam.zoom;
+        float effectiveViewportHeight = cam.viewportHeight * cam.zoom;
+
+        cam.position.x = MathUtils.clamp(cam.position.x, effectiveViewportWidth / 2f, game.getMap().getWidth() - effectiveViewportWidth / 2f);
+        cam.position.y = MathUtils.clamp(cam.position.y, effectiveViewportHeight / 2f, game.getMap().getHeight() - effectiveViewportHeight / 2f);
+    }
+     
+     
 }
