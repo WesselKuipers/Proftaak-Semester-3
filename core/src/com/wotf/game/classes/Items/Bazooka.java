@@ -29,7 +29,7 @@ public class Bazooka extends Item implements IExplosion {
 
         // radius wordt bepaald door de radius functie hieronder
         int useMeAsRadius = radius();
-
+        
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
