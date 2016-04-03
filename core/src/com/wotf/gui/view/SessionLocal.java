@@ -249,8 +249,10 @@ public class SessionLocal implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 // Selected MaxTime to an integer.
                 gamesettings.setMaxTime(Integer.parseInt(timerbox.getSelected().toString()));
+                
                 // Selected TurnTime to an integer.
                 gamesettings.setTurnTime(Integer.parseInt(turntimebox.getSelected().toString()));
+                
                 game.setScreen(new GameEngine(game, gamesettings));
             }
         });

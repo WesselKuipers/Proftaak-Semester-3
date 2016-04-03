@@ -237,14 +237,7 @@ public class Unit extends Actor {
     public Rectangle getBounds() {
         return this.sprite.getBoundingRectangle();
     }
-//    public void move(Vector2 direction) {
-//        // logic for moving
-//        // Temporary movement logic
-//        MoveByAction mba = new MoveByAction();
-//        mba.setAmount(direction.x, direction.y);
-//        mba.setDuration(3f);
-//        this.addAction(mba);
-//    }
+
     public void spawn(Vector2 position) {
         // logic for spawning
         this.setPosition(position.x, position.y);

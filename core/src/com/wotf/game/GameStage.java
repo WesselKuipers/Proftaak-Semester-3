@@ -83,16 +83,15 @@ public class GameStage extends Stage {
         //floor
         createGroundFloor(world);
 
-        Pixmap.setFilter(Pixmap.Filter.NearestNeighbour);
-        Pixmap.setBlending(Pixmap.Blending.SourceOver);
-
         Pixmap bgPixmap = new Pixmap(this.game.getMap().getWidth(), this.game.getMap().getHeight(), Pixmap.Format.RGBA8888);
         System.out.println(game.getMap().getWidth() + "" + game.getMap().getHeight() + "");
         bgPixmap.setColor(Color.PURPLE);
         bgPixmap.fill();
         backgroundTexture = new Texture(bgPixmap);
         bgPixmap.dispose();
-        updateTerrain();
+        
+        terrainTexture = game.getMap().getLandscapeTexture();
+        //updateTerrain();
     }
 
     public void init() {
@@ -314,6 +313,7 @@ public class GameStage extends Stage {
         pixmap.setColor(Color.BLACK); // Set this and the format to CLEAR
         // when using an actual stage image
 
+        // TODO: Get colours from current texture
         for (int x = 0; x < terrain.length; x++) {
             for (int y = 0; y < terrain[1].length; y++) {
                 if (terrain[x][y]) {
@@ -321,7 +321,7 @@ public class GameStage extends Stage {
                 }
             }
         }
-
+        
         terrainTexture = new Texture(pixmap);
         pixmap.dispose();
     }
@@ -334,22 +334,22 @@ public class GameStage extends Stage {
             for (int yPos = y - radius; yPos <= y + radius; yPos++) {
                 // scan square area around radius to determine which pixels to destroy
                 if (Math.pow(xPos - x, 2) + Math.pow(yPos - y, 2) < radius * radius) {
-                    // Check if the position is in bounds of the array, if not, skip this iteration
-                    if (!(xPos >= 0 && yPos >= 0 && xPos < terrain.length && yPos < terrain[0].length)) {
-                        continue;
-                    }
-                    
                     // Iterate through every team and unit
                     // and add it to the list of collided Units if its bounding box contains explosion Xs and Ys
                     for(Team t : game.getTeams()) {
                         for(Unit u : t.getUnits()) {
                             if(!collidedUnits.contains(u)) {
-                                if(u.getBounds().contains(x, y)) {
+                                if(u.getBounds().contains(xPos, yPos)) {
                                     collidedUnits.add(u);
                                     System.out.println("Collided with unit: " + u.getName());
                                 }
                             }
                         }
+                    }
+
+                    // Check if the position is in bounds of the array, if not, skip this iteration
+                    if (!(xPos >= 0 && yPos >= 0 && xPos < terrain.length && yPos < terrain[0].length)) {
+                        continue;
                     }
 
                     // if the pixel at (xPos, yPos) is solid, set it to false

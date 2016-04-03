@@ -9,18 +9,12 @@
  */
 package com.wotf.gui.view;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.wotf.game.GameStage;
 import com.wotf.game.classes.Game;
 import com.wotf.game.classes.GameSettings;
@@ -53,38 +47,10 @@ public class GameEngine implements Screen {
         List<Player> players = new ArrayList<>();
         players.add(new Player("127.0.0.1", "DefaultPlayer"));
 
-        // Creates new GameSettings instance
-        GameSettings settings = new GameSettings();
-        Team teamRed = new Team("Red Team", Color.RED);
-        teamRed.addPlayer(players.get(0));
-        teamRed.addUnit("Steve", 100);
-        teamRed.addUnit("Henk", 100);
-
-        Team teamBlue = new Team("Blue Team", Color.BLUE);
-        teamBlue.addPlayer(players.get(0));
-        teamBlue.addUnit("Bob", 100);
-        teamBlue.addUnit("Appel", 100);
-        
-        Team teamGreen = new Team("Green Team", Color.GREEN);
-        teamGreen.addPlayer(players.get(0));
-        teamGreen.addUnit("Groentesoep", 100);
-        teamGreen.addUnit("Banaan", 100);
-        
-        Team teamYellow = new Team("Yellow Team", Color.YELLOW);
-        teamYellow.addPlayer(players.get(0));
-        teamYellow.addUnit("Appelflap", 100);
-        teamYellow.addUnit("Pannekoek", 100);
-
-        settings.addTeam(teamRed);
-        settings.addTeam(teamBlue);
-        settings.addTeam(teamGreen);
-        settings.addTeam(teamYellow);
-
-        Map map = new Map("tempMap");
+        Map map = new Map("maps/STONES.PNG");
         map.setWaterLevel(30);
-        map.setWidth(2560);
-        map.setHeight(720);
-
+        
+        /*
         // Creates a new terrain mask and assigns a flat rectangle as terrain
         boolean[][] terrain = new boolean[map.getWidth()][map.getHeight()];
         for (int x = 100; x < (map.getWidth() - 100); x++) {
@@ -101,10 +67,11 @@ public class GameEngine implements Screen {
         }
 
         map.setTerrain(terrain);
-
+        */
+        
         // Initializes a viewport and a camera object
         ScreenViewport viewport = new ScreenViewport(new OrthographicCamera(1280, 720));
-        viewport.setWorldSize(2560, 720);
+        viewport.setWorldSize(map.getWidth(), map.getHeight());
         viewport.getCamera().position.set(viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2, 0);
         viewport.apply();
 

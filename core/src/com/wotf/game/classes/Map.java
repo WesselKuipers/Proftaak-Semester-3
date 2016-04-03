@@ -1,5 +1,8 @@
 package com.wotf.game.classes;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Rectangle;
@@ -10,15 +13,46 @@ public class Map {
     private int width;
     private int height;
     private boolean[][] terrain;
-    private Sprite landscapeSprite;
-    private Sprite backgroundSprite;
+    private Texture landscapeTexture;
+    private Texture backgroundTexture;
 
     public Map(String filename) {
         // logic for loading
+        Pixmap.setBlending(Pixmap.Blending.None);
+        Pixmap pixmap = new Pixmap(Gdx.files.internal(filename));
+        
+        width = pixmap.getWidth();
+        height = pixmap.getHeight();
+        
+        Pixmap out = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+        
+        terrain = new boolean[width][height];
+        
+        pixmap.setColor(Color.CLEAR);
+        
+        for (int x = 0; x < terrain.length; x++) {
+            for (int y = 0; y < terrain[0].length; y++) {
+                int flippedY = height - y - 1;
+                
+                // 255 is the value of black
+                if (pixmap.getPixel(x, y) != 255) {
+                    // This pixel isn't black, so we mark it as solid
+                    terrain[x][flippedY] = true;
+                    out.drawPixel(x, flippedY, pixmap.getPixel(x, y));
+                } else {
+                    // Since this pixel is black, we want to make it transparent
+                    out.drawPixel(x, flippedY, Color.CLEAR.toIntBits());//Color.RED.toIntBits());
+                }
+            }
+        }
+        
+        landscapeTexture = new Texture(out);
+        pixmap.dispose();
     }
 
     public void readMap(String filename) {
         // logic for reading map
+        
     }
 
     public double getGravityModifier() {
@@ -57,12 +91,12 @@ public class Map {
         this.terrain = terrain;
     }
 
-    public Sprite getLandscapeSprite() {
-        return landscapeSprite;
+    public Texture getLandscapeTexture() {
+        return landscapeTexture;
     }
 
-    public Sprite getBackgroundSprite() {
-        return backgroundSprite;
+    public Texture getBackgroundTexture() {
+        return backgroundTexture;
     }
     
     public Rectangle getBounds() {
