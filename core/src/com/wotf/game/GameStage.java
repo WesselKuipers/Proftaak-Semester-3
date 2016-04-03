@@ -94,6 +94,10 @@ public class GameStage extends Stage {
         //updateTerrain();
     }
 
+    /**
+     * Initial setup for the map used to add all team members to the list of actors
+     * Spawns the units at random locations
+     */
     public void init() {
         // Adds every unit as an actor to this stage
 
@@ -106,6 +110,7 @@ public class GameStage extends Stage {
                 //unitSprite.setColor(team.getColor());
                 //unit.setSprite(unitSprite);
 
+                // TODO: Check if spot is actually free/usable
                 // Spawns a unit in a random location (X axis)
                 Vector2 ranLocation = new Vector2(MathUtils.random(0, game.getMap().getWidth() - unit.getWidth()), 80);
                 unit.spawn(ranLocation);
@@ -309,23 +314,34 @@ public class GameStage extends Stage {
     public void updateTerrain() {
         boolean terrain[][] = game.getMap().getTerrain();
         
-        pixmap = new Pixmap(terrain.length, terrain[0].length, Pixmap.Format.RGBA4444);
-        pixmap.setColor(Color.BLACK); // Set this and the format to CLEAR
-        // when using an actual stage image
+        pixmap = new Pixmap(terrain.length, terrain[0].length, Pixmap.Format.RGBA8888);
 
-        // TODO: Get colours from current texture
+        if(!terrainTexture.getTextureData().isPrepared()) {
+            terrainTexture.getTextureData().prepare();
+        }
+        
+        Pixmap oldPixmap = terrainTexture.getTextureData().consumePixmap();
+        
         for (int x = 0; x < terrain.length; x++) {
             for (int y = 0; y < terrain[1].length; y++) {
                 if (terrain[x][y]) {
-                    pixmap.drawPixel(x, y);
+                    pixmap.drawPixel(x, y, oldPixmap.getPixel(x,y));
                 }
             }
         }
         
         terrainTexture = new Texture(pixmap);
-        pixmap.dispose();
+        oldPixmap.dispose();
     }
 
+    /**
+     * Calculates an explosion at position X and Y using specified radius
+     * Sets all solid pixels that were detected within the radius to false and updates the terrain accordingly
+     * Iterates through all units that got hit (currently unused)
+     * @param x X-position of the explosion
+     * @param y Y-position of the explosion (0 = bottom)
+     * @param radius Length of the radius in pixels
+     */
     public void explode(int x, int y, int radius) {
         boolean[][] terrain = game.getMap().getTerrain();
         List<Unit> collidedUnits = new ArrayList<>();
@@ -382,6 +398,12 @@ public class GameStage extends Stage {
         return this.game.getMap().getTerrain()[x][y];
     }
     
+    /**
+     * Centers the camera on a specific Actor object
+     * @param actor Actor to center the camera on
+     * @param keepFollowing If set to true the camera will continue following
+     *                      the actor until a manual camera action gets called
+     */
     public void setCameraFocusToActor(Actor actor, boolean keepFollowing) {
         OrthographicCamera cam = (OrthographicCamera) this.getCamera();
         

@@ -14,7 +14,7 @@ public abstract class Item {
     private String name;
     private int power;
     private int blastRadius;
-
+    
     public Item(String nm, int pw, int rad) {
         this.name = nm;
         this.power = pw;
@@ -22,9 +22,7 @@ public abstract class Item {
     }
 
     public Item(String nm, int pw) {
-        this.name = nm;
-        this.power = pw;
-        this.blastRadius = 1;
+        this(nm, pw, 1);
     }
 
     public String getName() {

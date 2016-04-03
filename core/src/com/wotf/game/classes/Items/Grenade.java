@@ -18,7 +18,7 @@ public class Grenade extends Item implements ITimer, IThrowable, IExplosion{
         super(nm, pw, rad);
     }
     
-     @Override
+    @Override
     public void activate() {
         detonationTime();
         //other things?
@@ -43,7 +43,7 @@ public class Grenade extends Item implements ITimer, IThrowable, IExplosion{
         return (newRad + (int) (Math.random() * newPower));
     }
     
-      @Override
+    @Override
     public int blastControl(int distance) {
         //returns int with the power an object gets pushed backwards
         //direction is always from center of explosion through unit 
