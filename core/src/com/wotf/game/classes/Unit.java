@@ -10,15 +10,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
-import com.wotf.game.GameStage;
 import com.wotf.game.classes.Items.Item;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.World;
+import com.wotf.game.GameStage;
 
 /**
  * Created by Wessel on 14/03/2016.
@@ -30,24 +24,23 @@ public class Unit extends Actor {
     };
     public State currentState;
     public State previousState;
-    
-    private float stateTimer;
 
     private TextureRegion unitStand;
     private Animation unitRun;
     private TextureRegion unitJump;
+    
+    public float speed =  50 * 2;
+    public Vector2 velocity = new Vector2();
     
     private int health;
     private String name;
 
     public Sprite sprite;
     private Vector2 position;
-    public Vector2 velocity;
 
     private Item weapon;
     private Team team;
-
-    public final float PIXELS_TO_METERS = 100;
+    
     // Font is used for displaying name and health
     private static BitmapFont font = new BitmapFont();
 
@@ -92,17 +85,26 @@ public class Unit extends Actor {
         addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-//                if (keycode == Keys.RIGHT) {
-//                    //move(new Vector2(50f, 0));
-//                     //b2body.applyLinearImpulse(new Vector2(0.1f, 0), b2body.getLocalCenter(), true);
-//                     b2body.setLinearVelocity(0.5f, 0f);
-//                }
-//
-//                if (keycode == Keys.LEFT) {
-//                    //move(new Vector2(-50f, 0));
-//                    //b2body.applyLinearImpulse(new Vector2(-0.1f, 0), b2body.getLocalCenter(), true);
-//                    b2body.setLinearVelocity(-0.5f,0f);
-//                }
+                if (keycode == Keys.RIGHT) {
+                    //move(new Vector2(50f, 0));
+                    velocity.x = speed;
+                    float nextX = getX() + velocity.x * Gdx.graphics.getDeltaTime();
+                    float nextY = getY() + velocity.y * Gdx.graphics.getDeltaTime();
+                    boolean isSolid = ((GameStage)getStage()).isPixelSolid((int) nextX, (int)nextY);
+                    if(isSolid)
+                        setPosition(nextX, nextY);
+                }
+
+                if (keycode == Keys.LEFT) {
+                    //move(new Vector2(-50f, 0));
+                    velocity.x = -speed;
+                    float nextX = getX() + velocity.x * Gdx.graphics.getDeltaTime();
+                    float nextY = getY() + velocity.y * Gdx.graphics.getDeltaTime();
+                    boolean isSolid = ((GameStage)getStage()).isPixelSolid((int) nextX, (int)nextY);
+                    if(isSolid)
+                        setPosition(nextX, nextY);
+
+                }
 
                 if (keycode == Keys.UP) {
                     //move(new Vector2(0, 50f));
@@ -151,6 +153,21 @@ public class Unit extends Actor {
                     useItem();
                 }
                 
+                return true;
+            }
+            
+            public boolean keyUp(int keycode) {
+                switch (keycode) {
+
+                    case Keys.A:
+                    case Keys.D:
+                        velocity.x = 0;
+                        break;
+                    case Keys.W:
+                    case Keys.S:
+                        velocity.y = 0;
+                        break;
+                }
                 return true;
             }
         });

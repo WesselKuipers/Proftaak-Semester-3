@@ -130,12 +130,6 @@ public class GameStage extends Stage {
         } else {
             getCamera().update();
         }
-        
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
-        }
-        
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)){
-        }
     }
     
     @Override
