@@ -9,23 +9,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.EdgeShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
@@ -49,8 +44,6 @@ public class GameStage extends Stage {
 
     //private WotFGame game;
     private Game game;
-    private World world;
-    private Box2DDebugRenderer b2dr;
 
     private SpriteBatch batch;
     private SpriteBatch guiBatch;
@@ -59,21 +52,15 @@ public class GameStage extends Stage {
     private Texture terrainTexture;
     private Texture backgroundTexture;
     private Pixmap pixmap;
-    private Body floorBody;
     //private OrthographicCamera camera;
-    private float accumulator = 0f;
     private Unit activeUnit;
 
-    public final float PIXELS_TO_METERS = 100;
-    private final float TIME_STEP = 1 / 300f;
     private Actor focusedActor; // if this is set to an actor
                                 // have the camera follow it automatically, otherwise set it to null
 
     public GameStage(Game game) {
         super(new ScreenViewport());
         this.game = game;
-        this.world = new World(new Vector2(0, -10f), true);
-        this.b2dr = new Box2DDebugRenderer();
         this.focusedActor = null;
 
         batch = new SpriteBatch();
@@ -81,9 +68,6 @@ public class GameStage extends Stage {
 
         font = new BitmapFont();
         font.setColor(Color.BLACK);
-        
-        //floor
-        createGroundFloor(world);
 
         Pixmap bgPixmap = new Pixmap(this.game.getMap().getWidth(), this.game.getMap().getHeight(), Pixmap.Format.RGBA8888);
         System.out.println(game.getMap().getWidth() + "" + game.getMap().getHeight() + "");
@@ -98,27 +82,32 @@ public class GameStage extends Stage {
 
     /**
      * Initial setup for the map used to add all team members to the list of actors
-     * Spawns the units at random locations
+     * Spawns the units at random collision-free locations
      */
     public void init() {
+        boolean[][] terrain = game.getMap().getTerrain();
+        
         // Adds every unit as an actor to this stage
-
         int count = 1;
         for (Team team : game.getTeams()) {
             for (Unit unit : team.getUnits()) {
-                // Retrieves the currently attached sprite of this unit,
-                // adds a color tint to it and assigns it back to the unit
-                //Sprite unitSprite = unit.getSprite();
-                //unitSprite.setColor(team.getColor());
-                //unit.setSprite(unitSprite);
-
-                // TODO: Check if spot is actually free/usable
-                // Spawns a unit in a random location (X axis)
-                Vector2 ranLocation = new Vector2(MathUtils.random(0, game.getMap().getWidth() - unit.getWidth()), 80);
-                unit.spawn(ranLocation);
-                unit.setWorld(world);
+                // Generates a random X position and attempts to find the highest collision-free position
+                // and spawns the unit at that position, will continue looping until a position has been found
+                boolean spawned = false;
+                
+                while(!spawned) {
+                    int x = MathUtils.random(0 + (int) unit.getWidth(), (int) game.getMap().getWidth() - (int) unit.getWidth());
+                    
+                    for(int y = terrain[0].length - 1; y > 0; y--) {
+                        if(terrain[x][y]) {
+                            unit.spawn(new Vector2(x, y + 1));
+                            spawned = true;
+                            break;
+                        }
+                    }
+                }
+                
                 if (count == 1) {
-                    unit.defineBody(world);
                     //camera.position.set(unit.getPosition().x, unit.getPosition().y, 0);
                     //camera.update();
                     activeUnit = unit;
@@ -153,34 +142,11 @@ public class GameStage extends Stage {
             getCamera().update();
         }
         
-        if (activeUnit.b2body != null) {
-            activeUnit.setPosition(activeUnit.b2body.getPosition().x * 95f, activeUnit.b2body.getPosition().y  * 50f);
-            activeUnit.sprite.setPosition(activeUnit.b2body.getPosition().x * 95f, activeUnit.b2body.getPosition().y * 50f);
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
         }
         
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)
-            && (activeUnit.getState() == Unit.State.STANDING || activeUnit.getState() == Unit.State.RUNNING)
-            && activeUnit.b2body.getLinearVelocity().x <= 2) {
-            // TODO: Refactor using a speed or velocity field in activeUnit
-            // and move all unit controls to either GameStage or Unit
-            // so that they can all be accessed from the same place
-            activeUnit.b2body.setLinearVelocity(0.5f, 0f);
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)){
         }
-        
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)
-            && (activeUnit.getState() == Unit.State.STANDING || activeUnit.getState() == Unit.State.RUNNING)
-            && activeUnit.b2body.getLinearVelocity().x >= -2) {
-            activeUnit.b2body.setLinearVelocity(-0.5f,0f);
-        }
-
-        // Fixed timestep
-        accumulator += delta;
-
-        while (accumulator >= delta) {
-            world.step(TIME_STEP, 6, 2);
-            accumulator -= TIME_STEP;
-        }
-
     }
     
     @Override
@@ -284,10 +250,6 @@ public class GameStage extends Stage {
         batch.end();
 
         super.draw();
-        world.step(1f / 60f, 6, 2);
-        //batch.setProjectionMatrix(camera.combined);
-        b2dr.render(world, batch.getProjectionMatrix().cpy().scale(PIXELS_TO_METERS, PIXELS_TO_METERS, 0));
-
         guiBatch.begin();
 
         font.draw(guiBatch, "Debug variables:", 0, this.getHeight());
@@ -303,12 +265,6 @@ public class GameStage extends Stage {
         font.draw(guiBatch, String.format("Camera coords [%s], zoom %f", getCamera().position.toString(), ((OrthographicCamera) getCamera()).zoom), 0, this.getHeight() - 80);
         font.draw(guiBatch, "Time remaining: " + (game.getGameSettings().getTurnTime() - (int)game.getTurnLogic().getElapsedTime()), 0, this.getHeight() - 100);
 
-        font.draw(guiBatch, String.format("Active body: %s XY[%f, %f]",
-                this.getKeyboardFocus().getName(),
-                activeUnit.b2body.getPosition().x,
-                activeUnit.b2body.getPosition().y),
-                0,
-                this.getHeight() - 120);
         guiBatch.end();
     }
 
@@ -387,10 +343,6 @@ public class GameStage extends Stage {
         game.getMap().setTerrain(terrain);
         updateTerrain();
     }
-
-    public World getWorld() {
-        return world;
-    }
     
     /**
      * Checks if a pixel at a given coordinate is set to solid or not
@@ -419,24 +371,6 @@ public class GameStage extends Stage {
         if(keepFollowing) {
             focusedActor = actor;
         }
-    }
-
-    public void createGroundFloor(World world) {
-        BodyDef floorDef = new BodyDef();
-        floorDef.type = BodyDef.BodyType.StaticBody;
-        float w = Gdx.graphics.getWidth();
-        float h = Gdx.graphics.getHeight() / PIXELS_TO_METERS
-                / PIXELS_TO_METERS;
-        floorDef.position.set(10f, 0.84f);
-
-        FixtureDef FloorFixDeff = new FixtureDef();
-        EdgeShape FloorEdgeShape = new EdgeShape();
-
-        FloorEdgeShape.set(-w / 2, -h / 2, w / 2, -h / 2);
-        FloorFixDeff.shape = FloorEdgeShape;
-        floorBody = world.createBody(floorDef);
-        floorBody.createFixture(FloorFixDeff);
-        FloorEdgeShape.dispose();
     }
 
     /**

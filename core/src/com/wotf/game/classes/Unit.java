@@ -34,21 +34,17 @@ public class Unit extends Group {
     public State previousState;
 
     private float stateTimer;
-    private boolean runningRight;
-
-    public Body b2body;
-    public World world;
 
     private TextureRegion unitStand;
     private Animation unitRun;
     private TextureRegion unitJump;
-
+    
     private int health;
     private String name;
 
     public Sprite sprite;
     private Vector2 position;
-    private Vector2 velocity;
+    public Vector2 velocity;
 
     private Item weapon;
     private Team team;
@@ -64,9 +60,7 @@ public class Unit extends Group {
 
         currentState = State.STANDING;
         previousState = State.STANDING;
-        stateTimer = 0;
-        runningRight = true;
-
+        
         TextureRegion[] frames;
         frames = new TextureRegion[8];
 
@@ -100,18 +94,6 @@ public class Unit extends Group {
         addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-//                if (keycode == Keys.RIGHT) {
-//                    //move(new Vector2(50f, 0));
-//                     //b2body.applyLinearImpulse(new Vector2(0.1f, 0), b2body.getLocalCenter(), true);
-//                     b2body.setLinearVelocity(0.5f, 0f);
-//                }
-//
-//                if (keycode == Keys.LEFT) {
-//                    //move(new Vector2(-50f, 0));
-//                    //b2body.applyLinearImpulse(new Vector2(-0.1f, 0), b2body.getLocalCenter(), true);
-//                    b2body.setLinearVelocity(-0.5f,0f);
-//                }
-
                 if (keycode == Keys.UP) {
                     //move(new Vector2(0, 50f));
                     jump();
@@ -154,6 +136,7 @@ public class Unit extends Group {
         this.velocity = new Vector2(0, 0);
     }
 
+<<<<<<< HEAD
     public void selectWeapon(Item i) {
         destroyWeapon();
         weapon = i;
@@ -203,6 +186,8 @@ public class Unit extends Group {
         shape.dispose();
     }
 
+=======
+>>>>>>> refs/remotes/origin/master
     public int getHealth() {
         return health;
     }
@@ -228,14 +213,26 @@ public class Unit extends Group {
         return position;
     }
 
+    /**
+     * Returns the name associated with this unit
+     * @return String containing the name of this unit
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns a rectangle representing the bounds of unit
+     * @return Rectangle based on X, Y, Width and Height of unit
+     */
     public Rectangle getBounds() {
         return this.sprite.getBoundingRectangle();
     }
 
+    /**
+     * Spawns a unit at the specified location
+     * @param position Position to spawn the unit at
+     */
     public void spawn(Vector2 position) {
         // logic for spawning
         this.setPosition(position.x, position.y);
@@ -260,6 +257,7 @@ public class Unit extends Group {
     @Override
     public void act(float delta) {
         super.act(delta);
+<<<<<<< HEAD
         if (b2body != null) {
             sprite.setRegion(getFrame(delta));
         }
@@ -272,15 +270,18 @@ public class Unit extends Group {
         if (b2body != null) {
             b2body.applyLinearImpulse(new Vector2(0, 10), b2body.getLocalCenter(), true);
         }
+=======
     }
 
-    public void setWorld(World world) {
-        this.world = world;
+    public void jump() {
+>>>>>>> refs/remotes/origin/master
     }
+
 
     public void setPosition(Vector2 position) {
         this.position = position;
     }
+<<<<<<< HEAD
 
     public TextureRegion getFrame(float dt) {
         //get unit current state. ie. jumping, running, standing...
@@ -346,5 +347,13 @@ public class Unit extends Group {
 
             return State.STANDING;
         }
+=======
+    
+    public void useItem(){
+        //TODO: Jip projectiel functie koppelen aan impact en daarmee de activate aanroepen
+        //wapens ontploffen nu bij activate (suicide bombers)
+        weapon.activate();
+        team.decreaseItemAmount(weapon, 1);
+>>>>>>> refs/remotes/origin/master
     }
 }
