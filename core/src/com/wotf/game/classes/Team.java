@@ -1,9 +1,13 @@
 package com.wotf.game.classes;
 
+import com.badlogic.gdx.Gdx;
 import com.wotf.game.classes.Items.Item;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.wotf.game.GameStage;
+import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 import com.wotf.game.classes.Items.*;
 import static com.wotf.game.classes.Items.EnumItems.Grenade;
 import java.util.ArrayList;
@@ -26,6 +30,11 @@ public class Team {
     private int activeUnitIndex;
 
     public Team(String name, Color color) {
+        //blok voor testen van weapons
+        Sprite sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
+        items = new HashMap<Item, Integer>();
+        items.put(new Bazooka("Bazooka", 5, 5, sprite, sprite), 3);
+
         this.name = name;
         this.color = color;
 
@@ -33,10 +42,10 @@ public class Team {
         items = new HashMap<>();
         players = new ArrayList<>();
         units = new ArrayList<>();
-        
+
         // Select first unit of team as active unit
         this.activeUnitIndex = 0;
-        
+
     }
 
     public List<Player> getPlayers() {
@@ -86,7 +95,7 @@ public class Team {
 
         // TODO: Logic for killing units?
     }
-    
+
     public int getActiveUnitIndex() {
         return activeUnitIndex;
     }
@@ -104,13 +113,13 @@ public class Team {
         //TODO
     }
 
-    public Item selectItem(int item) {
-        for (Map.Entry<Item, Integer> entry : items.entrySet()) {
-            if (entry.getKey().getName().toLowerCase().equals((EnumItems.values()[item]).toString().toLowerCase())) {
-                return (Item) entry.getKey();
-            }
+    public boolean selectItem(Item item) {
+        if (items.containsKey(item)) {
+            return true;
+        } else {
+            return false;
         }
-        return null;
+
     }
 
     public void increaseItemAmount(Item item, int amount) {
@@ -124,7 +133,7 @@ public class Team {
             }
             if (items.get(item) == 0 || items.get(item) < 0) {
                 //TODO: handle what happens when unlimited ammo (-1) or out of ammo
-               
+
             }
         }
     }

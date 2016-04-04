@@ -8,11 +8,12 @@ package com.wotf.game.classes.Items;
 /**
  *
  * @author chaos
- */
-public class Napalm extends Item{
+ *//*
+public class Napalm extends ??{
     
     public Napalm(String nm, int pw, int rad) {
         super(nm, pw, rad);
     }
     
 }
+*/

@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import java.util.Random;
 
 public class Map {
     private double gravityModifier = 9.8;
@@ -15,6 +17,8 @@ public class Map {
     private boolean[][] terrain;
     private Texture landscapeTexture;
     private Texture backgroundTexture;
+    
+    private Vector2 windForce;
 
     public Map(String filename) {
         // logic for loading
@@ -101,5 +105,29 @@ public class Map {
     
     public Rectangle getBounds() {
         return new Rectangle(0, 0, getWidth(), getHeight());
+    }
+    
+    /**
+     * Function that calculates a random wind, should be called every turn.
+     * TODO: Test!
+     */
+    public void calculateWind(){
+        Random random = new Random();
+        
+        int range = 20;
+        
+        float x = ( random.nextInt( range ) - range / 2 );
+        float y = ( random.nextInt( range ) - range / 2 );
+        
+        this.windForce = new Vector2( x, y );
+        System.out.println( windForce.toString() );
+    }
+    
+    /**
+     * Function that returns the current wind force.
+     * @return Vector2 wind force.
+     */
+    public Vector2 getWind(){
+        return this.windForce;
     }
 }

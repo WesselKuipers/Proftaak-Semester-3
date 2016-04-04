@@ -69,6 +69,7 @@ public class Game {
         turnLogic.endTurn();
         activeTeam = getActiveTeam();
         int count = 0;
+        
         for(Actor a : activeTeam.getUnit(0).getStage().getActors()) {
             if(activeTeam.getUnits().contains(a)) {
                 if(activeTeam.getActiveUnitIndex() == count) {

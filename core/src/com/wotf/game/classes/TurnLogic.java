@@ -18,6 +18,8 @@ public class TurnLogic {
         this.elapsedTime = 0;
         this.turn = 0;
         this.totalTeams = totalTeams;
+        
+        
     }
     
     public float getElapsedTime() {

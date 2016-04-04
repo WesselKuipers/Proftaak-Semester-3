@@ -32,6 +32,8 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.wotf.game.classes.Game;
+import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
+import com.wotf.game.classes.Items.Item;
 import com.wotf.game.classes.Projectile;
 import com.wotf.game.classes.Team;
 import com.wotf.game.classes.Unit;
@@ -120,6 +122,8 @@ public class GameStage extends Stage {
                     //camera.position.set(unit.getPosition().x, unit.getPosition().y, 0);
                     //camera.update();
                     activeUnit = unit;
+                    Item weapon = WEAPONS_ARMORY.get(1);
+                    activeUnit.selectWeapon( weapon );
                 }
                 this.addActor(unit);
                 count++;
@@ -456,8 +460,8 @@ public class GameStage extends Stage {
         // Jip Boesenkool - 29-030'16
         Vector2 wind = new Vector2(0f, 0f);
         double gravity = game.getMap().getGravityModifier();
-        //spawn bullet and add to scene
-        Projectile bullet = new Projectile(unitPosition, screenX, screenY, force, wind, gravity);
+        //spawn bullet and add to scene           
+        Projectile bullet = new Projectile(new Sprite(new Texture(Gdx.files.internal("BulletBill.png"))));
         bullet.updateShot();
         this.addActor(bullet);
     }
