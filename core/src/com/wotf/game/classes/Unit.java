@@ -105,7 +105,7 @@ public class Unit extends Actor {
                         setPosition(nextX, nextY);
 
                 }
-
+                
                 if (keycode == Keys.UP) {
                     //move(new Vector2(0, 50f));
                     jump();
@@ -204,14 +204,26 @@ public class Unit extends Actor {
         return position;
     }
 
+    /**
+     * Returns the name associated with this unit
+     * @return String containing the name of this unit
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns a rectangle representing the bounds of unit
+     * @return Rectangle based on X, Y, Width and Height of unit
+     */
     public Rectangle getBounds() {
         return this.sprite.getBoundingRectangle();
     }
 
+    /**
+     * Spawns a unit at the specified location
+     * @param position Position to spawn the unit at
+     */
     public void spawn(Vector2 position) {
         // logic for spawning
         this.setPosition(position.x, position.y);

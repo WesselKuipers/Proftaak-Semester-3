@@ -80,24 +80,31 @@ public class GameStage extends Stage {
 
     /**
      * Initial setup for the map used to add all team members to the list of actors
-     * Spawns the units at random locations
+     * Spawns the units at random collision-free locations
      */
     public void init() {
+        boolean[][] terrain = game.getMap().getTerrain();
+        
         // Adds every unit as an actor to this stage
-
         int count = 1;
         for (Team team : game.getTeams()) {
             for (Unit unit : team.getUnits()) {
-                // Retrieves the currently attached sprite of this unit,
-                // adds a color tint to it and assigns it back to the unit
-                //Sprite unitSprite = unit.getSprite();
-                //unitSprite.setColor(team.getColor());
-                //unit.setSprite(unitSprite);
-
-                // TODO: Check if spot is actually free/usable
-                // Spawns a unit in a random location (X axis)
-                Vector2 ranLocation = new Vector2(MathUtils.random(0, game.getMap().getWidth() - unit.getWidth()), 80);
-                unit.spawn(ranLocation);
+                // Generates a random X position and attempts to find the highest collision-free position
+                // and spawns the unit at that position, will continue looping until a position has been found
+                boolean spawned = false;
+                
+                while(!spawned) {
+                    int x = MathUtils.random(0 + (int) unit.getWidth(), (int) game.getMap().getWidth() - (int) unit.getWidth());
+                    
+                    for(int y = terrain[0].length - 1; y > 0; y--) {
+                        if(terrain[x][y]) {
+                            unit.spawn(new Vector2(x, y + 1));
+                            spawned = true;
+                            break;
+                        }
+                    }
+                }
+                
                 if (count == 1) {
                     //camera.position.set(unit.getPosition().x, unit.getPosition().y, 0);
                     //camera.update();
