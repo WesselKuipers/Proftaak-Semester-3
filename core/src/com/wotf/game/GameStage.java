@@ -45,7 +45,6 @@ public class GameStage extends Stage {
     private Texture backgroundTexture;
     private Pixmap pixmap;
     //private OrthographicCamera camera;
-    private Unit activeUnit;
 
     private Actor focusedActor; // if this is set to an actor
                                 // have the camera follow it automatically, otherwise set it to null
@@ -80,7 +79,6 @@ public class GameStage extends Stage {
         boolean[][] terrain = game.getMap().getTerrain();
         
         // Adds every unit as an actor to this stage
-        int count = 1;
         for (Team team : game.getTeams()) {
             for (Unit unit : team.getUnits()) {
                 // Generates a random X position and attempts to find the highest collision-free position
@@ -109,17 +107,12 @@ public class GameStage extends Stage {
                 
                 unit.spawn(new Vector2(posX, posY + 1));
                 
-                if (count == 1) {
-                    //camera.position.set(unit.getPosition().x, unit.getPosition().y, 0);
-                    //camera.update();
-                    activeUnit = unit;
-                }
                 this.addActor(unit);
-                count++;
             }
         }
         
         getCamera().update();
+        game.beginTurn();
     }
 
     /**
@@ -140,9 +133,11 @@ public class GameStage extends Stage {
         float delta = Gdx.graphics.getDeltaTime();
 
         game.getTurnLogic().update(delta);
+        
         if (game.getTurnLogic().getElapsedTime() >= game.getGameSettings().getTurnTime()) {
             game.endTurn();
-         }
+            game.beginTurn();
+        }
 	
         // if focusedActor is set to an actor, we want the camera to follow it
         // otherwise, call the update() method on camera normally
@@ -150,12 +145,6 @@ public class GameStage extends Stage {
             setCameraFocusToActor(focusedActor, false);
         } else {
             getCamera().update();
-        }
-        
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
-        }
-        
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)){
         }
     }
     
@@ -215,10 +204,10 @@ public class GameStage extends Stage {
                 
                 selectedPlayerIndex = (selectedPlayerIndex >= activeTeam.getUnits().size()) ? 0 : selectedPlayerIndex;
                 
-                for (Actor a : this.getActors()) {
-                    if(activeTeam.getUnit(selectedPlayerIndex) == a) {
-                        this.setKeyboardFocus(a);
-                        setCameraFocusToActor(a, true);
+                for (Actor actor : this.getActors()) {
+                    if(activeTeam.getUnit(selectedPlayerIndex) == actor) {
+                        this.setKeyboardFocus(actor);
+                        setCameraFocusToActor(actor, true);
                     }
                 }
                 break;
@@ -362,10 +351,16 @@ public class GameStage extends Stage {
             }
         }
         
-        // TODO: Iterate through collided units and call its damage/hit method
-
+        // TODO: Pass through correct/proper damage value?
+        // Iterates through all of the collided units and decreases their health
+        // based on the damage caused by the explosion
+        for(Unit u : collidedUnits) {
+            u.decreaseHealth(radius);
+        }
+        
         game.getMap().setTerrain(terrain);
         updateTerrain();
+        game.endTurn();
     }
     
     /**
@@ -387,6 +382,7 @@ public class GameStage extends Stage {
     public void setCameraFocusToActor(Actor actor, boolean keepFollowing) {
         OrthographicCamera cam = (OrthographicCamera) this.getCamera();
         
+        // Sets the camera's X position based on the center of the specified actor
         cam.position.x = actor.getX() + actor.getWidth() / 2;
         //if(followVertically) { cam.position.y = actor.getY() + actor.getHeight() / 2; }
         clampCamera();
@@ -408,8 +404,8 @@ public class GameStage extends Stage {
         // TODO: Fix this! data should be from data structure not from actor.
         // Jip Boesenkool - 29-030'16
         Vector2 unitPosition = new Vector2(
-           this.activeUnit.getX(),
-           this.activeUnit.getY()
+           game.getActiveTeam().getActiveUnit().getX(),
+           game.getActiveTeam().getActiveUnit().getY()
         );
          // TODO: Get correct force from weapon
         // Jip Boesenkool - 29-030'16

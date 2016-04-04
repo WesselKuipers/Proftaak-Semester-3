@@ -154,7 +154,7 @@ public class Unit extends Actor {
 
     public void decreaseHealth(int amount) {
         health -= amount;
-        // TODO: checking if health <= 0
+        if(health < 0) { health = 0; }
     }
 
     public Sprite getSprite() {
