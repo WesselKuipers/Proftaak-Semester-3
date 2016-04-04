@@ -18,12 +18,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.EdgeShape;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.wotf.game.classes.Game;
@@ -92,18 +86,28 @@ public class GameStage extends Stage {
                 // Generates a random X position and attempts to find the highest collision-free position
                 // and spawns the unit at that position, will continue looping until a position has been found
                 boolean spawned = false;
+                int posX = 0;
+                int posY = 0;
                 
                 while(!spawned) {
-                    int x = MathUtils.random(0 + (int) unit.getWidth(), (int) game.getMap().getWidth() - (int) unit.getWidth());
+                    posX = MathUtils.random(0 + (int) unit.getWidth(), (int) game.getMap().getWidth() - (int) unit.getWidth());
+                    posY = -1;
                     
-                    for(int y = terrain[0].length - 1; y > 0; y--) {
-                        if(terrain[x][y]) {
-                            unit.spawn(new Vector2(x, y + 1));
-                            spawned = true;
-                            break;
+                    for(int x = posX; x < posX + unit.getWidth(); x++) {
+                        for(int y = terrain[0].length - 1; y > 0; y--) {
+                            if(terrain[x][y]) {
+                                if (y > posY) { posY = y; }
+                            }
                         }
                     }
+                    
+                    if (posY != -1) {
+                        spawned = true;
+                        break;
+                    }
                 }
+                
+                unit.spawn(new Vector2(posX, posY + 1));
                 
                 if (count == 1) {
                     //camera.position.set(unit.getPosition().x, unit.getPosition().y, 0);
@@ -118,10 +122,18 @@ public class GameStage extends Stage {
         getCamera().update();
     }
 
+    /**
+     * Returns game object associated with this stage
+     * @return Object of type Game
+     */
     public Game getGame() {
         return this.game;
     }
 
+    /**
+     * Performs a single update step using the current game
+     * Calls act() method within each actor in the stage and updates the camera
+     */
     @Override
     public void act() {
         super.act();
@@ -132,6 +144,8 @@ public class GameStage extends Stage {
             game.endTurn();
          }
 	
+        // if focusedActor is set to an actor, we want the camera to follow it
+        // otherwise, call the update() method on camera normally
         if(focusedActor != null) {
             setCameraFocusToActor(focusedActor, false);
         } else {
@@ -145,13 +159,18 @@ public class GameStage extends Stage {
         }
     }
     
+    /**
+     * Handles all the keyDown inputs for the stage
+     * @param keyCode Entry from Keys enum
+     * @return True if the key was handled
+     */
     @Override
     public boolean keyDown(int keyCode) {
 
         OrthographicCamera cam = (OrthographicCamera) getCamera();
-
-        // Temporary camera controls
+        
         switch (keyCode) {
+            // Camera controls (position)
             case Keys.NUMPAD_2:
                 cam.translate(new Vector2(0, -50f));
                 focusedActor = null;
@@ -168,6 +187,8 @@ public class GameStage extends Stage {
                 cam.translate(new Vector2(50f, 0));
                 focusedActor = null;
                 break;
+                
+            // Camera controls (zoom)
             case Keys.PLUS:
                 cam.zoom -= 0.05f;
                 break;
@@ -177,6 +198,8 @@ public class GameStage extends Stage {
             case Keys.ENTER:
                 cam.zoom = 1;
                 break;
+                
+            // Unit selection
             case Keys.TAB:
                 int selectedPlayerIndex = 0;
                 int i = 0;
@@ -203,6 +226,7 @@ public class GameStage extends Stage {
 
         clampCamera();
         cam.update();
+        
         return super.keyDown(keyCode);
     }
     
@@ -227,6 +251,10 @@ public class GameStage extends Stage {
         return true;
     }
     
+    /**
+     * Draws the background and foreground textures
+     * and calls the draw() method in each actor
+     */
     @Override
     public void draw() {
         batch.setProjectionMatrix(getCamera().combined);
@@ -396,9 +424,11 @@ public class GameStage extends Stage {
         this.addActor(bullet);
     }
     
+    /**
+     * Constraints the camera's projection to the bounds of the stage
+     */
     private void clampCamera() {
-        // Retrains the camera from leaving the bounds of the map
-        // Uncomment this if you want an unrestrained camera
+        // Restrains the camera from leaving the bounds of the map
         OrthographicCamera cam = (OrthographicCamera) getCamera();
         
         if (cam.zoom > 1f) cam.zoom = 1;
@@ -410,6 +440,4 @@ public class GameStage extends Stage {
         cam.position.x = MathUtils.clamp(cam.position.x, effectiveViewportWidth / 2f, game.getMap().getWidth() - effectiveViewportWidth / 2f);
         cam.position.y = MathUtils.clamp(cam.position.y, effectiveViewportHeight / 2f, game.getMap().getHeight() - effectiveViewportHeight / 2f);
     }
-     
-     
 }
