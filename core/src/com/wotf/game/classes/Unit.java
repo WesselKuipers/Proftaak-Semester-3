@@ -10,15 +10,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
-import com.wotf.game.GameStage;
 import com.wotf.game.classes.Items.Item;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.World;
 
 /**
  * Created by Wessel on 14/03/2016.
@@ -92,6 +85,7 @@ public class Unit extends Actor {
         addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
+
                 if (keycode == Keys.UP) {
                     //move(new Vector2(0, 50f));
                     jump();
