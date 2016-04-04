@@ -51,7 +51,6 @@ public class GameStage extends Stage {
     private Texture backgroundTexture;
     private Pixmap pixmap;
     //private OrthographicCamera camera;
-    private Unit activeUnit;
 
     private Actor focusedActor; // if this is set to an actor
                                 // have the camera follow it automatically, otherwise set it to null
@@ -98,17 +97,13 @@ public class GameStage extends Stage {
                 // Spawns a unit in a random location (X axis)
                 Vector2 ranLocation = new Vector2(MathUtils.random(0, game.getMap().getWidth() - unit.getWidth()), 80);
                 unit.spawn(ranLocation);
-                if (count == 1) {
-                    //camera.position.set(unit.getPosition().x, unit.getPosition().y, 0);
-                    //camera.update();
-                    activeUnit = unit;
-                }
                 this.addActor(unit);
                 count++;
             }
         }
         
         getCamera().update();
+        game.beginTurn();
     }
 
     public Game getGame() {
@@ -121,9 +116,11 @@ public class GameStage extends Stage {
         float delta = Gdx.graphics.getDeltaTime();
 
         game.getTurnLogic().update(delta);
+        
         if (game.getTurnLogic().getElapsedTime() >= game.getGameSettings().getTurnTime()) {
             game.endTurn();
-         }
+            game.beginTurn();
+        }
 	
         if(focusedActor != null) {
             setCameraFocusToActor(focusedActor, false);
@@ -185,10 +182,10 @@ public class GameStage extends Stage {
                 
                 selectedPlayerIndex = (selectedPlayerIndex >= activeTeam.getUnits().size()) ? 0 : selectedPlayerIndex;
                 
-                for (Actor a : this.getActors()) {
-                    if(activeTeam.getUnit(selectedPlayerIndex) == a) {
-                        this.setKeyboardFocus(a);
-                        setCameraFocusToActor(a, true);
+                for (Actor actor : this.getActors()) {
+                    if(activeTeam.getUnit(selectedPlayerIndex) == actor) {
+                        this.setKeyboardFocus(actor);
+                        setCameraFocusToActor(actor, true);
                     }
                 }
                 break;
@@ -331,6 +328,7 @@ public class GameStage extends Stage {
 
         game.getMap().setTerrain(terrain);
         updateTerrain();
+        game.endTurn();
     }
     
     /**
@@ -373,8 +371,8 @@ public class GameStage extends Stage {
         // TODO: Fix this! data should be from data structure not from actor.
         // Jip Boesenkool - 29-030'16
         Vector2 unitPosition = new Vector2(
-           this.activeUnit.getX(),
-           this.activeUnit.getY()
+           game.getActiveTeam().getActiveUnit().getX(),
+           game.getActiveTeam().getActiveUnit().getY()
         );
          // TODO: Get correct force from weapon
         // Jip Boesenkool - 29-030'16
