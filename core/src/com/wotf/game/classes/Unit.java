@@ -7,28 +7,16 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.wotf.game.classes.Items.Item;
-import com.wotf.game.GameStage;
-import com.badlogic.gdx.utils.Array;
 import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 /**
  * Created by Wessel on 14/03/2016.
  */
 public class Unit extends Group {
-
-    public enum State {
-        FALLING, JUMPING, STANDING, RUNNING, DEAD
-    };
-    public State currentState;
-    public State previousState;
-
-    private float stateTimer;
-    
     private float angle;
     public float force = 3f;
     private Vector2 acceleration;
@@ -134,20 +122,34 @@ public class Unit extends Group {
             weapon.destroyActor();
         }
     }
-
+    
+    /**
+     * @return health of the unit
+     */
     public int getHealth() {
         return health;
     }
 
+     /**
+     * Increase the health of the unit
+     * @param amount to increase health
+     */
     public void increaseHealth(int amount) {
         health += amount;
     }
-
+    
+     /**
+     * Decrease the health of the unit
+     * @param amount to decrease health
+     */
     public void decreaseHealth(int amount) {
         health -= amount;
         if(health < 0) { health = 0; }
     }
-
+    
+    /**
+     * @return the sprite of the unit
+     */
     public Sprite getSprite() {
         return sprite;
     }
@@ -211,6 +213,14 @@ public class Unit extends Group {
         updateJump();
     }
 
+    /**
+     * In jump() we set the followin
+     *  - setAngle with the next position
+     *  - setAcceleration with the gravity
+     *  - setVelocity with the force
+     * 
+     * Then the act calls the updateJump().
+     */
     public void jump() {
         System.out.println("V= " + velocity.x);
         float nextX;
@@ -226,6 +236,15 @@ public class Unit extends Group {
         setVelocity(force);
     }
 
+    /**
+     * updateJump is called in the act() to update the jump of the unit
+     * Everytime its called, the position of the unit is update by the velocity
+     * and the velocity is calculate by acceleration multiple by delta
+     * After that the unit position iss changed.
+     * 
+     * After changing the position we look for a solid point on the map. 
+     * Is it possible the unit can move to the point?
+     */
     public void updateJump() {
         if (acceleration == null) {
             return;
@@ -254,7 +273,7 @@ public class Unit extends Group {
                 velocity.x = 0;
             } 
         }else{
-            boolean isSolidX = ((GameStage) getStage()).isPixelSolid((int) position.x + (int)(sprite.getWidth() / 2), (int) position.y);
+            boolean isSolidX = ((GameStage) getStage()).isPixelSolid((int) position.x + 15, (int) position.y);
             if (isSolidX) {
                 velocity.x = 0;
             } 
@@ -264,12 +283,11 @@ public class Unit extends Group {
         if (isSolidY) {
             velocity.y = 0;
         }
-        
+        sprite.setRotation(angle);
     }
 
     /**
      * Calculate and set the angle by 2 vectors.
-     *
      * @param startPos first x,y position.
      * @param destPos second x, y position.
      */
@@ -281,13 +299,21 @@ public class Unit extends Group {
                 )
         );
     }
-
+    
+    /**
+     * Calculate the acceleration per/turn by external forces.
+     * @param gravity Downwards pulling force.
+     */
     private void setAcceleration(double gravity) {
         acceleration = new Vector2();
         //account for gravity
         acceleration.y -= gravity;
     }
-
+    
+    /**
+     * Calculate the velocity in x and y coordinates by angle.
+     * @param force Force towards direction.
+     */
     private void setVelocity(float force) {
         final double DEG2RAD = Math.PI / 180;
         double ang = angle * DEG2RAD;
@@ -298,9 +324,9 @@ public class Unit extends Group {
         );
     }
     /**
-     * 
-     * @param dt
-     * @return 
+     * Gets the frame the unit is in. For example running left or running right.
+     * @param dt is the delta time
+     * @return the region of the sprite.
      */
     public TextureRegion getFrame(float dt) {
         TextureRegion region;
