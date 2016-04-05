@@ -8,15 +8,27 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.wotf.game.classes.Items.Item;
 import com.wotf.game.GameStage;
-
+import com.badlogic.gdx.utils.Array;
+import com.wotf.game.GameStage;
+import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 /**
  * Created by Wessel on 14/03/2016.
  */
-public class Unit extends Actor {
+public class Unit extends Group {
+
+    public enum State {
+        FALLING, JUMPING, STANDING, RUNNING, DEAD
+    };
+    public State currentState;
+    public State previousState;
+
+    private float stateTimer;
+    
     private float angle;
     public float force = 3f;
     private Vector2 acceleration;
@@ -42,7 +54,6 @@ public class Unit extends Actor {
         this.name = name;
         this.health = health;
         this.team = team;
-
         moveRight = true;
 
         Texture spriteSheet = new Texture(Gdx.files.internal("unit.png"));
@@ -53,6 +64,8 @@ public class Unit extends Actor {
         unitStand = sprite;
         //sprite.setRegion(spriteSheet);
 
+        sprite = new Sprite(unitStand);
+        sprite.setRegion(unitStand);
         this.setBounds(getX(), getY(), sprite.getWidth(), sprite.getHeight());
         this.setWidth(sprite.getWidth());
         this.setHeight(sprite.getHeight());
@@ -68,39 +81,17 @@ public class Unit extends Actor {
                 if (keycode == Keys.LEFT) {
                     moveRight = false;
                 }
-
                 if (keycode == Keys.UP) {
                     jump();
                 }
 
                 //switching between weapons
                 if (keycode == Keys.NUM_1) {
-                    // TODO: switch weapon A
                     // In Team's weaponlist choose weapon cooresponding to numbers & make weapon activated
-                    Item i = team.selectItem(0);
-                    if (i != null) {
-                        weapon = i;
-                        //TODO: WHAT BUTTON PRESSED TO FIRE WEAPON???????
-                        // Wessel: Probably the spacebar button, like in worms
-                        //FIRE & USE LOGIC + initiate projectile funtion --> TODO JIP z'n PROJECTIEL FUNCTIE
-                        useItem();
 
-                        System.out.println("GRENADE");
-                    } else {
-                        System.out.println("Selected weapon not found");
-                    }
-                }
-
-                if (keycode == Keys.NUM_2) {
-                    // TODO: switch weapon B
-                    // In Team's weaponlist choose weapon cooresponding to numbers
-                    // make weapon activated
-                    Item i = team.selectItem(1);
-                    if (i != null) {
-                        weapon = i;
-                        //TODO: WHAT BUTTON PRESSED TO FIRE WEAPON???????
-                        //FIRE & USE LOGIC + initiate projectile funtion --> TODO JIP z'n PROJECTIEL FUNCTIE
-                        useItem();
+                    if (team.selectItem(WEAPONS_ARMORY.get(0))) {
+                        Item w = WEAPONS_ARMORY.get(0);
+                        selectWeapon(w);
 
                         System.out.println("BAZOOKA");
                     } else {
@@ -108,11 +99,16 @@ public class Unit extends Actor {
                     }
                 }
 
-                if (keycode == Keys.SPACE) {
-                    // TODO: Logic for firing weapon
-                    // should be moved when shooting logic requires more than a single button down event
-                    System.out.println("Firing " + weapon.getName());
-                    useItem();
+                if (keycode == Keys.NUM_2) {
+                    // In Team's weaponlist choose weapon cooresponding to numbers & make weapon activated
+                    if (team.selectItem(WEAPONS_ARMORY.get(1))) {
+                        Item w = WEAPONS_ARMORY.get(1);
+                        selectWeapon(w);
+
+                        System.out.println("GRENADE");
+                    } else {
+                        System.out.println("Selected weapon not found");
+                    }
                 }
 
                 return true;
@@ -126,6 +122,19 @@ public class Unit extends Actor {
         this.velocity = new Vector2(0, 0);
     }
 
+    public void selectWeapon(Item i) {
+        destroyWeapon();
+        weapon = i;
+        //i.initActor();
+        ((GameStage) this.getStage()).addActor(weapon);
+    }
+    
+    public void destroyWeapon(){
+        if(weapon != null){
+            weapon.destroyActor();
+        }
+    }
+
     public int getHealth() {
         return health;
     }
@@ -136,7 +145,7 @@ public class Unit extends Actor {
 
     public void decreaseHealth(int amount) {
         health -= amount;
-        // TODO: checking if health <= 0
+        if(health < 0) { health = 0; }
     }
 
     public Sprite getSprite() {
@@ -187,6 +196,9 @@ public class Unit extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         sprite.draw(batch);
+        
+        // Sets color of the font to the same colour of the team
+        font.setColor(team.getColor());
 
         // Draws the name and current health of the unit above its sprite
         font.draw(batch, String.format("%s (%d)", name, health), getX(), getY() + getHeight() + 20);
@@ -255,17 +267,6 @@ public class Unit extends Actor {
         
     }
 
-    public void setPosition(Vector2 position) {
-        this.position = position;
-    }
-
-    public void useItem() {
-        //TODO: Jip projectiel functie koppelen aan impact en daarmee de activate aanroepen
-        //wapens ontploffen nu bij activate (suicide bombers)
-        weapon.activate();
-        team.decreaseItemAmount(weapon, 1);
-    }
-
     /**
      * Calculate and set the angle by 2 vectors.
      *
@@ -314,5 +315,13 @@ public class Unit extends Actor {
             moveRight = true;
         }
         return region;
+    }
+
+    public void setPosition(Vector2 position) {
+        this.position = position;
+    }
+    
+    public void fire( Vector2 mousePos, Vector2 wind, double gravity ) {
+        weapon.activate( this.position, mousePos, wind, gravity );
     }
 }
