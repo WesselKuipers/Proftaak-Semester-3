@@ -11,27 +11,21 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.wotf.game.classes.Items.Item;
-import com.badlogic.gdx.utils.Array;
 import com.wotf.game.GameStage;
 
 /**
  * Created by Wessel on 14/03/2016.
  */
 public class Unit extends Actor {
-
-    public enum State {
-        FALLING, JUMPING, STANDING, RUNNING, DEAD
-    };
-    public State currentState;
-    public State previousState;
-
+    private float angle;
+    public float force = 3f;
+    private Vector2 acceleration;
     private TextureRegion unitStand;
-    private Animation unitRun;
-    private TextureRegion unitJump;
-    
-    public float speed =  50 * 2;
+
+    public float speed = 50 * 2;
     public Vector2 velocity = new Vector2();
-    
+    boolean moveRight;
+
     private int health;
     private String name;
 
@@ -40,7 +34,7 @@ public class Unit extends Actor {
 
     private Item weapon;
     private Team team;
-    
+
     // Font is used for displaying name and health
     private static BitmapFont font = new BitmapFont();
 
@@ -48,34 +42,16 @@ public class Unit extends Actor {
         this.name = name;
         this.health = health;
         this.team = team;
-        
-        currentState = State.STANDING;
-        previousState = State.STANDING;
-        
-        TextureRegion[] frames;
-        frames = new TextureRegion[8];
+
+        moveRight = true;
 
         Texture spriteSheet = new Texture(Gdx.files.internal("unit.png"));
-        TextureRegion[][] tmpFrames = TextureRegion.split(spriteSheet, 80, 120);
-
-        for (int i = 0; i < 8; i++) {
-            frames[i] = tmpFrames[0][i];
-        }
-
-        Array<TextureRegion> framesRun = new Array<>();
-
-        for (int i = 1; i < 4; i++) {
-            framesRun.add(frames[i]);
-        }
-
-        unitRun = new Animation(0.1f, framesRun);
-        unitStand = frames[0];
-        unitJump = frames[2];
-
+        
         font.setColor(Color.BLACK);
 
-        sprite = new Sprite(unitStand);
-        sprite.setRegion(unitStand);
+        sprite = new Sprite(spriteSheet);
+        unitStand = sprite;
+        //sprite.setRegion(spriteSheet);
 
         this.setBounds(getX(), getY(), sprite.getWidth(), sprite.getHeight());
         this.setWidth(sprite.getWidth());
@@ -86,28 +62,14 @@ public class Unit extends Actor {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
                 if (keycode == Keys.RIGHT) {
-                    //move(new Vector2(50f, 0));
-                    velocity.x = speed;
-                    float nextX = getX() + velocity.x * Gdx.graphics.getDeltaTime();
-                    float nextY = getY() + velocity.y * Gdx.graphics.getDeltaTime();
-                    boolean isSolid = ((GameStage)getStage()).isPixelSolid((int) nextX, (int)nextY);
-                    if(isSolid)
-                        setPosition(nextX, nextY);
+                    moveRight = true;
                 }
 
                 if (keycode == Keys.LEFT) {
-                    //move(new Vector2(-50f, 0));
-                    velocity.x = -speed;
-                    float nextX = getX() + velocity.x * Gdx.graphics.getDeltaTime();
-                    float nextY = getY() + velocity.y * Gdx.graphics.getDeltaTime();
-                    boolean isSolid = ((GameStage)getStage()).isPixelSolid((int) nextX, (int)nextY);
-                    if(isSolid)
-                        setPosition(nextX, nextY);
-
+                    moveRight = false;
                 }
-                
+
                 if (keycode == Keys.UP) {
-                    //move(new Vector2(0, 50f));
                     jump();
                 }
 
@@ -115,22 +77,22 @@ public class Unit extends Actor {
                 if (keycode == Keys.NUM_1) {
                     // TODO: switch weapon A
                     // In Team's weaponlist choose weapon cooresponding to numbers & make weapon activated
-                      Item i = team.selectItem(0);
+                    Item i = team.selectItem(0);
                     if (i != null) {
                         weapon = i;
                         //TODO: WHAT BUTTON PRESSED TO FIRE WEAPON???????
                         // Wessel: Probably the spacebar button, like in worms
                         //FIRE & USE LOGIC + initiate projectile funtion --> TODO JIP z'n PROJECTIEL FUNCTIE
                         useItem();
-                    
-                    System.out.println("GRENADE");
+
+                        System.out.println("GRENADE");
                     } else {
-                        System.out.println("Selected weapon not found");  
+                        System.out.println("Selected weapon not found");
                     }
                 }
-                
+
                 if (keycode == Keys.NUM_2) {
-                     // TODO: switch weapon B
+                    // TODO: switch weapon B
                     // In Team's weaponlist choose weapon cooresponding to numbers
                     // make weapon activated
                     Item i = team.selectItem(1);
@@ -139,35 +101,20 @@ public class Unit extends Actor {
                         //TODO: WHAT BUTTON PRESSED TO FIRE WEAPON???????
                         //FIRE & USE LOGIC + initiate projectile funtion --> TODO JIP z'n PROJECTIEL FUNCTIE
                         useItem();
-                        
-                    System.out.println("BAZOOKA");                    
+
+                        System.out.println("BAZOOKA");
                     } else {
-                        System.out.println("Selected weapon not found");  
+                        System.out.println("Selected weapon not found");
                     }
                 }
-                
+
                 if (keycode == Keys.SPACE) {
                     // TODO: Logic for firing weapon
                     // should be moved when shooting logic requires more than a single button down event
                     System.out.println("Firing " + weapon.getName());
                     useItem();
                 }
-                
-                return true;
-            }
-            
-            public boolean keyUp(int keycode) {
-                switch (keycode) {
 
-                    case Keys.A:
-                    case Keys.D:
-                        velocity.x = 0;
-                        break;
-                    case Keys.W:
-                    case Keys.S:
-                        velocity.y = 0;
-                        break;
-                }
                 return true;
             }
         });
@@ -248,20 +195,124 @@ public class Unit extends Actor {
     @Override
     public void act(float delta) {
         super.act(delta);
+        sprite.setRegion(getFrame(delta));
+        updateJump();
     }
 
     public void jump() {
+        System.out.println("V= " + velocity.x);
+        float nextX;
+
+        if (moveRight) {
+            nextX = position.x + 20;
+        } else {
+            nextX = position.x - 20;
+        }
+
+        setAngle(position, new Vector2(nextX, position.y + 20));
+        setAcceleration(9.8);
+        setVelocity(force);
     }
 
+    public void updateJump() {
+        if (acceleration == null) {
+            return;
+        }
+
+        float delta = Gdx.graphics.getDeltaTime();
+        
+        //keep old position to change rotation of object
+        Vector2 oldPos = position.cpy();
+
+        position.x += velocity.x;
+        position.y += velocity.y;
+
+        setAngle(oldPos, position);
+
+        velocity.x += acceleration.x * delta;
+        velocity.y += acceleration.y * delta;
+
+        //System.out.println(velocity.toString());
+        this.setPosition(position.x, position.y);
+        positionChanged();
+        
+        if(!moveRight){
+            boolean isSolidX = ((GameStage) getStage()).isPixelSolid((int) position.x - 1, (int) position.y);
+            if (isSolidX) {
+                velocity.x = 0;
+            } 
+        }else{
+            boolean isSolidX = ((GameStage) getStage()).isPixelSolid((int) position.x + (int)(sprite.getWidth() / 2), (int) position.y);
+            if (isSolidX) {
+                velocity.x = 0;
+            } 
+        }
+
+        boolean isSolidY = ((GameStage) getStage()).isPixelSolid((int) position.x, (int) position.y - 1);
+        if (isSolidY) {
+            velocity.y = 0;
+        }
+        
+    }
 
     public void setPosition(Vector2 position) {
         this.position = position;
     }
-    
-    public void useItem(){
+
+    public void useItem() {
         //TODO: Jip projectiel functie koppelen aan impact en daarmee de activate aanroepen
         //wapens ontploffen nu bij activate (suicide bombers)
         weapon.activate();
         team.decreaseItemAmount(weapon, 1);
+    }
+
+    /**
+     * Calculate and set the angle by 2 vectors.
+     *
+     * @param startPos first x,y position.
+     * @param destPos second x, y position.
+     */
+    private void setAngle(Vector2 startPos, Vector2 destPos) {
+        angle = (float) Math.toDegrees(
+                Math.atan2(
+                        destPos.y - startPos.y,
+                        destPos.x - startPos.x
+                )
+        );
+    }
+
+    private void setAcceleration(double gravity) {
+        acceleration = new Vector2();
+        //account for gravity
+        acceleration.y -= gravity;
+    }
+
+    private void setVelocity(float force) {
+        final double DEG2RAD = Math.PI / 180;
+        double ang = angle * DEG2RAD;
+
+        velocity = new Vector2(
+                (float) (force * Math.cos(ang)),
+                (float) (force * Math.sin(ang))
+        );
+    }
+    /**
+     * 
+     * @param dt
+     * @return 
+     */
+    public TextureRegion getFrame(float dt) {
+        TextureRegion region;
+        region = unitStand;
+        //if unit is turn left and the texture isnt facing left... flip it.
+        if (!moveRight && !region.isFlipX()) {
+            region.flip(true, false);
+            moveRight = false;
+        } //if unit is turn right and the texture isnt facing right... flip it.
+        else if (moveRight && region.isFlipX()) {
+            region.flip(true, false);
+            moveRight = true;
+        }
+        return region;
     }
 }
