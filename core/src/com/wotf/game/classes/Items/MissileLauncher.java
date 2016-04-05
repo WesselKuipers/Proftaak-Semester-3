@@ -16,15 +16,15 @@ import com.wotf.game.classes.Projectile;
  */
 public class MissileLauncher extends Item {
 
-    public MissileLauncher(String nm, int pw, int rad, Sprite weaponSprite, Sprite bulletSprite) {
-        super(nm, pw, rad, weaponSprite, bulletSprite);
+    public MissileLauncher(String nm, int pw, int rad, int damage, Sprite weaponSprite, Sprite bulletSprite) {
+        super(nm, pw, rad, damage, weaponSprite, bulletSprite);
     }
 
     @Override
     public void activate(Vector2 position, Vector2 mousePos, Vector2 Wind, double grav) {
         //spawn bullet and add to scene
         Projectile bullet = super.getBullet();
-        bullet.fire(position, mousePos, super.getPower(), Wind, grav, super.getBlastRadius());
+        bullet.fire(position, mousePos, super.getPower(), Wind, grav, super.getBlastRadius(), super.getDamage());
         bullet.updateShot();
         ((GameStage) this.getStage()).addActor(bullet);
     }

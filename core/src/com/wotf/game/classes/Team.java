@@ -43,7 +43,7 @@ public class Team {
         //blok voor testen van weapons
         Sprite sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
         items = new HashMap<Item, Integer>();
-        items.put(new Bazooka("Bazooka", 40, 10, sprite, sprite), 99);
+        items.put( WEAPONS_ARMORY.get(0), 99);
 
         this.name = name;
         this.color = color;

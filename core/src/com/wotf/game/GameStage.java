@@ -172,8 +172,6 @@ public class GameStage extends Stage {
         } else {
             getCamera().update();
         }
-        
-        System.out.println(game.getActiveTeam().getActiveUnit().getName());
     }
 
     /**
@@ -269,7 +267,7 @@ public class GameStage extends Stage {
             System.out.println("Firing bullet");
             bulletLogic((int) rel.x, (int) rel.y);
         } else if (button == Input.Buttons.RIGHT) {
-            explode((int) rel.x, (int) rel.y, 30);
+            explode((int) rel.x, (int) rel.y, 30, 0);
             
 //        Vector3 rel = getCamera().unproject( new Vector3(screenX, screenY, 0) );
 //        
@@ -369,7 +367,7 @@ public class GameStage extends Stage {
      * @param y Y-position of the explosion (0 = bottom)
      * @param radius Length of the radius in pixels
      */
-    public void explode(int x, int y, int radius) {
+    public void explode(int x, int y, int radius, int damage ) {
         boolean[][] terrain = game.getMap().getTerrain();
         List<Unit> collidedUnits = new ArrayList<>();
 
@@ -409,7 +407,7 @@ public class GameStage extends Stage {
         // Iterates through all of the collided units and decreases their health
         // based on the damage caused by the explosion
         for (Unit u : collidedUnits) {
-            u.decreaseHealth(radius);
+            u.decreaseHealth( damage );
         }
 
         game.getMap().setTerrain(terrain);
@@ -468,12 +466,17 @@ public class GameStage extends Stage {
 
         double gravity = game.getMap().getGravityModifier();
 
+        //System.out.println( (game.getActiveTeam().getActiveUnit()).getName() );
+        
         Vector2 mousePos = new Vector2(screenX, screenY);
         (game.getActiveTeam().getActiveUnit()).fire(
                 mousePos,
                 wind,
                 gravity
         );
+        
+        focusedActor = (Actor)( game.getActiveTeam().getActiveUnit().getWeapon().getBullet() );
+        
     }
 
     /**
