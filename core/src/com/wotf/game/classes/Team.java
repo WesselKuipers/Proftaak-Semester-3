@@ -6,13 +6,11 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.wotf.game.GameStage;
 import com.wotf.game.classes.Items.*;
-import static com.wotf.game.classes.Items.EnumItems.Grenade;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Created by Wessel on 14/03/2016.
@@ -143,6 +141,8 @@ public class Team {
      * @param unit to be removed
      */
     public void removeUnit(Unit unit) {
+        if (unit == null || units.contains(unit)) { return; }
+        
         GameStage gameStage = (GameStage)unit.getStage();
         int i = 0;
         for (Actor actor : gameStage.getActors()) {

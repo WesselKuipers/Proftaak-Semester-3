@@ -10,15 +10,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
-import com.wotf.game.GameStage;
 import com.wotf.game.classes.Items.Item;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.World;
 
 /**
  * Created by Wessel on 14/03/2016.
@@ -78,8 +71,9 @@ public class Unit extends Actor {
         unitRun = new Animation(0.1f, framesRun);
         unitStand = frames[0];
         unitJump = frames[2];
-
-        font.setColor(Color.BLACK);
+        
+        // Sets color of the font to the same colour of the team
+        font.setColor(team.getColor());
 
         sprite = new Sprite(unitStand);
         sprite.setRegion(unitStand);
@@ -92,17 +86,6 @@ public class Unit extends Actor {
         addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-//                if (keycode == Keys.RIGHT) {
-//                    //move(new Vector2(50f, 0));
-//                     //b2body.applyLinearImpulse(new Vector2(0.1f, 0), b2body.getLocalCenter(), true);
-//                     b2body.setLinearVelocity(0.5f, 0f);
-//                }
-//
-//                if (keycode == Keys.LEFT) {
-//                    //move(new Vector2(-50f, 0));
-//                    //b2body.applyLinearImpulse(new Vector2(-0.1f, 0), b2body.getLocalCenter(), true);
-//                    b2body.setLinearVelocity(-0.5f,0f);
-//                }
 
                 if (keycode == Keys.UP) {
                     //move(new Vector2(0, 50f));
@@ -172,7 +155,7 @@ public class Unit extends Actor {
 
     public void decreaseHealth(int amount) {
         health -= amount;
-        // TODO: checking if health <= 0
+        if(health < 0) { health = 0; }
     }
 
     public Sprite getSprite() {
@@ -187,14 +170,26 @@ public class Unit extends Actor {
         return position;
     }
 
+    /**
+     * Returns the name associated with this unit
+     * @return String containing the name of this unit
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns a rectangle representing the bounds of unit
+     * @return Rectangle based on X, Y, Width and Height of unit
+     */
     public Rectangle getBounds() {
         return this.sprite.getBoundingRectangle();
     }
 
+    /**
+     * Spawns a unit at the specified location
+     * @param position Position to spawn the unit at
+     */
     public void spawn(Vector2 position) {
         // logic for spawning
         this.setPosition(position.x, position.y);

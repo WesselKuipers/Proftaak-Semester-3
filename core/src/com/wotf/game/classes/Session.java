@@ -1,6 +1,5 @@
 package com.wotf.game.classes;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
