@@ -113,6 +113,7 @@ public class Game {
      * Set keyboard & camera focus to active unit
      */
     public void beginTurn() {
+        turnLogic.beginTurn();
         Team activeTeam = getActiveTeam();
         GameStage gameStage = (GameStage)activeTeam.getActiveUnit().getStage();
         gameStage.setKeyboardFocus(activeTeam.getActiveUnit());
@@ -150,14 +151,14 @@ public class Game {
             }
         }
         
-        for(int i = 0; i < unitsToRemove.size(); i++) {
+        for (int i = 0; i < unitsToRemove.size(); i++) {
             for(Team t : teams) {
                 t.removeUnit(unitsToRemove.get(i));
             }
         }
         
         teams.removeAll(teamsToRemove);
-        for(int i = 0; i < teamsToRemove.size(); i++) {
+        for (int i = 0; i < teamsToRemove.size(); i++) {
             turnLogic.lowerTeamCount();
         }
     }

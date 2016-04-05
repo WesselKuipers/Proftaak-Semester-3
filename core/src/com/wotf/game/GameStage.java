@@ -23,6 +23,8 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.wotf.game.classes.Game;
 import com.wotf.game.classes.Projectile;
 import com.wotf.game.classes.Team;
+import com.wotf.game.classes.TurnLogic;
+import com.wotf.game.classes.TurnLogic.TurnState;
 import com.wotf.game.classes.Unit;
 import java.util.ArrayList;
 import java.util.List;
@@ -138,6 +140,12 @@ public class GameStage extends Stage {
             game.endTurn();
             game.beginTurn();
         }
+        
+        if(game.getTurnLogic().getTurnState() == TurnState.WITHDRAW) {
+            if(game.getTurnLogic().getElapsedTime() >= game.getGameSettings().getWithdrawTime()) {
+                game.beginTurn();
+            }
+        }
 	
         // if focusedActor is set to an actor, we want the camera to follow it
         // otherwise, call the update() method on camera normally
@@ -146,6 +154,8 @@ public class GameStage extends Stage {
         } else {
             getCamera().update();
         }
+        
+        System.out.println(game.getActiveTeam().getActiveUnit().getName());
     }
     
     /**
@@ -233,14 +243,19 @@ public class GameStage extends Stage {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         Vector3 rel = getCamera().unproject( new Vector3(screenX, screenY, 0) );
-        System.out.println(String.format("Touchdown event (%d, %d) button %d", screenX, screenY, button));
-        System.out.println(String.format("Relative Touchdown event (%f, %f) button %d", rel.x, rel.y, button));
         
-        if(button == Input.Buttons.LEFT) {
-            System.out.println("Firing bullet");
-            bulletLogic((int)rel.x, (int)rel.y);
-        } else if (button == Input.Buttons.RIGHT) {
-            explode((int) rel.x, (int) rel.y, 30);
+        if (game.getTurnLogic().getTurnState() == TurnState.PLAYING) {
+            game.endTurn();
+            
+            System.out.println(String.format("Touchdown event (%d, %d) button %d", screenX, screenY, button));
+            System.out.println(String.format("Relative Touchdown event (%f, %f) button %d", rel.x, rel.y, button));
+            
+            if(button == Input.Buttons.LEFT) {
+                System.out.println("Firing bullet");
+                bulletLogic((int)rel.x, (int)rel.y);
+            } else if (button == Input.Buttons.RIGHT) {
+                explode((int) rel.x, (int) rel.y, 30);
+            }
         }
         
         return true;
@@ -368,7 +383,6 @@ public class GameStage extends Stage {
         
         game.getMap().setTerrain(terrain);
         updateTerrain();
-        game.endTurn();
     }
     
     /**
