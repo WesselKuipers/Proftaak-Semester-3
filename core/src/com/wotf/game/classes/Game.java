@@ -117,6 +117,7 @@ public class Game {
         GameStage gameStage = (GameStage)activeTeam.getActiveUnit().getStage();
         gameStage.setKeyboardFocus(activeTeam.getActiveUnit());
         gameStage.setCameraFocusToActor(activeTeam.getActiveUnit(), true);
+        turnLogic.beginTurn();
     }
     
     /**
