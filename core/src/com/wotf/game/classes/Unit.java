@@ -71,8 +71,9 @@ public class Unit extends Actor {
         unitRun = new Animation(0.1f, framesRun);
         unitStand = frames[0];
         unitJump = frames[2];
-
-        font.setColor(Color.BLACK);
+        
+        // Sets color of the font to the same colour of the team
+        font.setColor(team.getColor());
 
         sprite = new Sprite(unitStand);
         sprite.setRegion(unitStand);

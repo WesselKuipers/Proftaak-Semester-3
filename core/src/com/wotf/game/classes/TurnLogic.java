@@ -40,4 +40,8 @@ public class TurnLogic {
     public int getActiveTeamIndex() {
         return turn % totalTeams;
     }
+    
+    public void lowerTeamCount() {
+        totalTeams--;
+    }
 }

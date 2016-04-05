@@ -130,15 +130,17 @@ public class Game {
         activeTeam.endTurn();
         turnLogic.endTurn();
         List<Team> teamsToRemove = new ArrayList<>();
+        List<Unit> unitsToRemove = new ArrayList<>();
         
         // TODO: Remove units and teams based on health and remaining unit count
         // When unit has lower or equal than 0 health, remove the unit from the team
-        /*for (Iterator<Team> it = teams.iterator(); it.hasNext();) {
+        for (Iterator<Team> it = teams.iterator(); it.hasNext();) {
             Team team = it.next();
-            Integer unitsAlive = new Integer(team.getUnits().size());
-            for (Unit unit : team.getUnits()) {
+            int unitsAlive = team.getUnits().size();
+            for (Iterator<Unit> itTeam = team.getUnits().iterator(); itTeam.hasNext();) {
+                Unit unit = itTeam.next();
                 if (unit.getHealth() <= 0) {
-                    team.removeUnit(unit);
+                    unitsToRemove.add(unit);
                     unitsAlive--;
                 }  
             }
@@ -147,7 +149,17 @@ public class Game {
                 teamsToRemove.add(team);
             }
         }
-        teams.removeAll(teamsToRemove);*/
+        
+        for(int i = 0; i < unitsToRemove.size(); i++) {
+            for(Team t : teams) {
+                t.removeUnit(unitsToRemove.get(i));
+            }
+        }
+        
+        teams.removeAll(teamsToRemove);
+        for(int i = 0; i < teamsToRemove.size(); i++) {
+            turnLogic.lowerTeamCount();
+        }
     }
 
     /**

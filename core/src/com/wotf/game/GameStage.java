@@ -211,6 +211,12 @@ public class GameStage extends Stage {
                     }
                 }
                 break;
+            
+            // Debug key for killing current unit
+            case Keys.G: 
+                game.getActiveTeam().getActiveUnit().decreaseHealth(100);
+                game.endTurn();
+                break;
         }
 
         clampCamera();
@@ -267,13 +273,15 @@ public class GameStage extends Stage {
 
         font.draw(guiBatch, "Debug variables:", 0, this.getHeight());
         font.draw(guiBatch, "Actors amount: " + this.getActors().size, 0, this.getHeight() - 20);
-        font.draw(guiBatch,
-                String.format("Active actor: %s XY[%f, %f]",
-                        this.getKeyboardFocus().getName(),
-                        this.getKeyboardFocus().getX(),
-                        this.getKeyboardFocus().getY()),
-                0,
-                this.getHeight() - 40);
+        if(this.game.getActiveTeam().getActiveUnit() != null) {
+            font.draw(guiBatch,
+                    String.format("Active actor: %s XY[%f, %f]",
+                            this.game.getActiveTeam().getActiveUnit().getName(),
+                            this.game.getActiveTeam().getActiveUnit().getX(),
+                            this.game.getActiveTeam().getActiveUnit().getY()),
+                    0,
+                    this.getHeight() - 40);
+        }
         font.draw(guiBatch, String.format("Mouse position: screen [%d, %d], viewport %s", Gdx.input.getX(), game.getMap().getHeight() - Gdx.input.getY(), getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0))), 0, this.getHeight() - 60);
         font.draw(guiBatch, String.format("Camera coords [%s], zoom %f", getCamera().position.toString(), ((OrthographicCamera) getCamera()).zoom), 0, this.getHeight() - 80);
         font.draw(guiBatch, "Time remaining: " + (game.getGameSettings().getTurnTime() - (int)game.getTurnLogic().getElapsedTime()), 0, this.getHeight() - 100);
@@ -370,7 +378,12 @@ public class GameStage extends Stage {
      * @return True if pixel is solid, false if not
      */
     public boolean isPixelSolid(int x, int y) {
-        return this.game.getMap().getTerrain()[x][y];
+        boolean[][] terrain = this.game.getMap().getTerrain();
+        if (!(x >= 0 && y >= 0 && x < terrain.length && y < terrain[0].length)) {
+            // Out of bounds
+            return false;
+        }
+        return terrain[x][y];
     }
     
     /**
