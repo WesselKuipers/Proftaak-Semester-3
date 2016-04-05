@@ -43,11 +43,23 @@ public class LobbyGUI implements Screen {
     private Pixmap pm1;
     private Lobby lobby;
 
+    /**
+     * Creates a new instance of the LobbyGUI based on the game.
+     *
+     * @param game so we can switch the screen of the 'current' game
+     */
     public LobbyGUI(WotFGame game) {
         this.game = game;
         lobby = new Lobby();
     }
 
+    /**
+     * Create a NinePatch Texture based on the internal file name.
+     *
+     * @param fname the location/name of the internal file
+     * @return NinePatch texture with the given bounds which is an internal
+     * file.
+     */
     private NinePatch getNinePatch(String fname) {
         // Get the image
         final Texture t = new Texture(Gdx.files.internal(fname));
@@ -59,6 +71,15 @@ public class LobbyGUI implements Screen {
         return new NinePatch(new TextureRegion(t, 1, 1, t.getWidth() - 2, t.getHeight() - 2), 150, 150, 200, 200);
     }
 
+    /**
+     * First makes a new stage for the LobbyGUI screen. Fill in the default skin
+     * file which is the uiskin.json. Create the Scene2d objects on the screen
+     * with the given position. There is a table around each section. There is a
+     * list of players which shows the ping of the players. There is a list of
+     * sessions which shows all the sessions There are buttons to create a
+     * session, join a session and to exit the LobbyGUI screen.
+     * Called when this screen becomes the current screen for a {@link Game}.
+     */
     @Override
     public void show() {
         stage = new Stage();
@@ -68,10 +89,10 @@ public class LobbyGUI implements Screen {
         List players = new List(skin);
         Table sessionstable = new Table();
         Table playerstable = new Table();
-        
+
         sessionstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"))));
         playerstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"))));
-        
+
         String[] playerlist = new String[4];
         playerlist[0] = "Wessel";
         playerlist[1] = "Dino";
@@ -131,6 +152,11 @@ public class LobbyGUI implements Screen {
 
     }
 
+    /**
+     * Called when the screen should render itself.
+     *
+     * @param delta The time in seconds since the last render.
+     */
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor((float) 122 / 255, (float) 122 / 255, (float) 122 / 255, 1);
@@ -140,24 +166,48 @@ public class LobbyGUI implements Screen {
         stage.draw();
     }
 
+    /**
+     * Called when the {@link Application} is resized. This can happen at any
+     * point during a non-paused state but will never happen before a call to
+     * {@link #create()}.
+     *
+     * @param width the new width in pixels
+     * @param height the new height in pixels
+     */
     @Override
     public void resize(int width, int height) {
         // Passes the new width and height to the viewport
         stage.getViewport().update(width, height);
     }
 
+    /**
+     * Called when the {@link Application} is paused, usually when it's not
+     * active or visible on screen. An Application is also paused before it is
+     * destroyed.
+     */
     @Override
     public void pause() {
     }
 
+    /**
+     * Called when the {@link Application} is resumed from a paused state,
+     * usually when it regains focus.
+     */
     @Override
     public void resume() {
     }
 
+    /**
+     * Called when this screen is no longer the current screen for a
+     * {@link Game}.
+     */
     @Override
     public void hide() {
     }
 
+    /**
+     * Called when this screen should release all resources.
+     */
     @Override
     public void dispose() {
     }

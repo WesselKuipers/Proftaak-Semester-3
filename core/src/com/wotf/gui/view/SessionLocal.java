@@ -218,7 +218,7 @@ public class SessionLocal implements Screen {
         for (FileHandle entry : dirHandle.list()) {
             mapslist.add(entry.toString());
         }
-        Image map1 = new Image(new Texture("maps/map1.jpg"));
+        Image map1 = new Image(new Texture("maps/STONES.PNG"));
         mapstable.add(map1).width(400).height(200).padBottom(5);
         mapstable.row();
         SelectBox chooseMap = new SelectBox(skin);
@@ -249,10 +249,10 @@ public class SessionLocal implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 // Selected MaxTime to an integer.
                 gamesettings.setMaxTime(Integer.parseInt(timerbox.getSelected().toString()));
-                
+
                 // Selected TurnTime to an integer.
                 gamesettings.setTurnTime(Integer.parseInt(turntimebox.getSelected().toString()));
-                
+
                 game.setScreen(new GameEngine(game, gamesettings));
             }
         });
@@ -272,6 +272,11 @@ public class SessionLocal implements Screen {
 
     }
 
+    /**
+     * Called when the screen should render itself.
+     *
+     * @param delta The time in seconds since the last render.
+     */
     @Override
     public void render(float f) {
         Gdx.gl.glClearColor((float) 122 / 255, (float) 122 / 255, (float) 122 / 255, 1);
@@ -281,24 +286,48 @@ public class SessionLocal implements Screen {
         stage.draw();
     }
 
+    /**
+     * Called when the {@link Application} is resized. This can happen at any
+     * point during a non-paused state but will never happen before a call to
+     * {@link #create()}.
+     *
+     * @param width the new width in pixels
+     * @param height the new height in pixels
+     */
     @Override
     public void resize(int width, int height) {
         // Passes the new width and height to the viewport
         stage.getViewport().update(width, height);
     }
 
+    /**
+     * Called when the {@link Application} is paused, usually when it's not
+     * active or visible on screen. An Application is also paused before it is
+     * destroyed.
+     */
     @Override
     public void pause() {
     }
 
+    /**
+     * Called when the {@link Application} is resumed from a paused state,
+     * usually when it regains focus.
+     */
     @Override
     public void resume() {
     }
 
+    /**
+     * Called when this screen is no longer the current screen for a
+     * {@link Game}.
+     */
     @Override
     public void hide() {
     }
 
+    /**
+     * Called when this screen should release all resources.
+     */
     @Override
     public void dispose() {
     }
