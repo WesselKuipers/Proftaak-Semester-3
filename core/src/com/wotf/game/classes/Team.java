@@ -141,16 +141,14 @@ public class Team {
      * @param unit to be removed
      */
     public void removeUnit(Unit unit) {
-        if (unit == null || units.contains(unit)) { return; }
-        
-        GameStage gameStage = (GameStage)unit.getStage();
-        int i = 0;
-        for (Actor actor : gameStage.getActors()) {
-            if (actor == unit) {
-                units.remove(unit);
-                actor.remove();
+        if (unit == null || units.contains(unit)) {
+            GameStage gameStage = (GameStage)unit.getStage();
+            for (Actor actor : gameStage.getActors()) {
+                if (actor == unit) {
+                    actor.remove();
+                    units.remove(unit);
+                }
             }
-            i++;
         }
     }
     

@@ -154,6 +154,8 @@ public class GameStage extends Stage {
         } else {
             getCamera().update();
         }
+        
+        System.out.println(game.getActiveTeam().getActiveUnit().getName());
     }
     
     /**

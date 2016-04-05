@@ -71,9 +71,6 @@ public class Unit extends Actor {
         unitRun = new Animation(0.1f, framesRun);
         unitStand = frames[0];
         unitJump = frames[2];
-        
-        // Sets color of the font to the same colour of the team
-        font.setColor(team.getColor());
 
         sprite = new Sprite(unitStand);
         sprite.setRegion(unitStand);
@@ -206,6 +203,9 @@ public class Unit extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         sprite.draw(batch);
+        
+        // Sets color of the font to the same colour of the team
+        font.setColor(team.getColor());
 
         // Draws the name and current health of the unit above its sprite
         font.draw(batch, String.format("%s (%d)", name, health), getX(), getY() + getHeight() + 20);
