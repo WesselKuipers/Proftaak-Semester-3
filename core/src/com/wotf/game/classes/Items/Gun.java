@@ -9,6 +9,6 @@ package com.wotf.game.classes.Items;
  *
  * @author chaos
  */
-public class Grenade {
+public class Gun {
     
 }

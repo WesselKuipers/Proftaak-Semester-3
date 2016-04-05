@@ -5,7 +5,12 @@
  */
 package com.wotf.game.classes;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.wotf.game.classes.Items.*;
+import com.wotf.game.classes.Items.Item;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +20,7 @@ import java.util.List;
  */
 public class GameSettings {
 
+    public static List<Item> WEAPONS_ARMORY;
     private List<Team> teams;
 
     private int maxTurns;
@@ -25,6 +31,9 @@ public class GameSettings {
     private boolean suddenDeath;
 
     public GameSettings() {
+        WEAPONS_ARMORY = new ArrayList<>();
+        fillWeapons();
+
         teams = new ArrayList<>();
 
         maxTurns = 30;
@@ -33,6 +42,15 @@ public class GameSettings {
         withdrawTime = 3;
         fallingDamage = true;
         suddenDeath = true;
+    }
+
+    /**
+     * Not dynamic list atm. will be replaced with user input in later itt.
+     */
+    private void fillWeapons() {
+        Sprite sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
+        WEAPONS_ARMORY.add(new Bazooka("Bazooka", 40, 10, sprite, sprite));
+        WEAPONS_ARMORY.add(new Bazooka("Grenade", 40, 10, sprite, sprite));
     }
 
     public int getMaxTurns() {

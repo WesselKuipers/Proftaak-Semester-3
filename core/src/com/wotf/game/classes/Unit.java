@@ -8,22 +8,25 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.wotf.game.classes.Items.Item;
 import com.badlogic.gdx.utils.Array;
+import com.wotf.game.GameStage;
+import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 
 /**
  * Created by Wessel on 14/03/2016.
  */
-public class Unit extends Actor {
+public class Unit extends Group {
 
     public enum State {
         FALLING, JUMPING, STANDING, RUNNING, DEAD
     };
     public State currentState;
     public State previousState;
-    
+
     private float stateTimer;
 
     private TextureRegion unitStand;
@@ -48,7 +51,7 @@ public class Unit extends Actor {
         this.name = name;
         this.health = health;
         this.team = team;
-        
+
         currentState = State.STANDING;
         previousState = State.STANDING;
         
@@ -91,46 +94,30 @@ public class Unit extends Actor {
 
                 //switching between weapons
                 if (keycode == Keys.NUM_1) {
-                    // TODO: switch weapon A
                     // In Team's weaponlist choose weapon cooresponding to numbers & make weapon activated
-                      Item i = team.selectItem(0);
-                    if (i != null) {
-                        weapon = i;
-                        //TODO: WHAT BUTTON PRESSED TO FIRE WEAPON???????
-                        // Wessel: Probably the spacebar button, like in worms
-                        //FIRE & USE LOGIC + initiate projectile funtion --> TODO JIP z'n PROJECTIEL FUNCTIE
-                        useItem();
-                    
-                    System.out.println("GRENADE");
+
+                    if (team.selectItem(WEAPONS_ARMORY.get(0))) {
+                        Item w = WEAPONS_ARMORY.get(0);
+                        selectWeapon(w);
+
+                        System.out.println("BAZOOKA");
                     } else {
-                        System.out.println("Selected weapon not found");  
+                        System.out.println("Selected weapon not found");
                     }
                 }
-                
+
                 if (keycode == Keys.NUM_2) {
-                     // TODO: switch weapon B
-                    // In Team's weaponlist choose weapon cooresponding to numbers
-                    // make weapon activated
-                    Item i = team.selectItem(1);
-                    if (i != null) {
-                        weapon = i;
-                        //TODO: WHAT BUTTON PRESSED TO FIRE WEAPON???????
-                        //FIRE & USE LOGIC + initiate projectile funtion --> TODO JIP z'n PROJECTIEL FUNCTIE
-                        useItem();
-                        
-                    System.out.println("BAZOOKA");                    
+                    // In Team's weaponlist choose weapon cooresponding to numbers & make weapon activated
+                    if (team.selectItem(WEAPONS_ARMORY.get(1))) {
+                        Item w = WEAPONS_ARMORY.get(1);
+                        selectWeapon(w);
+
+                        System.out.println("GRENADE");
                     } else {
-                        System.out.println("Selected weapon not found");  
+                        System.out.println("Selected weapon not found");
                     }
                 }
-                
-                if (keycode == Keys.SPACE) {
-                    // TODO: Logic for firing weapon
-                    // should be moved when shooting logic requires more than a single button down event
-                    System.out.println("Firing " + weapon.getName());
-                    useItem();
-                }
-                
+
                 return true;
             }
         });
@@ -140,6 +127,19 @@ public class Unit extends Actor {
         this(name, health, team);
         this.position = position;
         this.velocity = new Vector2(0, 0);
+    }
+
+    public void selectWeapon(Item i) {
+        destroyWeapon();
+        weapon = i;
+        //i.initActor();
+        ((GameStage) this.getStage()).addActor(weapon);
+    }
+    
+    public void destroyWeapon(){
+        if(weapon != null){
+            weapon.destroyActor();
+        }
     }
 
     public int getHealth() {
@@ -217,17 +217,14 @@ public class Unit extends Actor {
     }
 
     public void jump() {
+        
     }
-
 
     public void setPosition(Vector2 position) {
         this.position = position;
     }
     
-    public void useItem(){
-        //TODO: Jip projectiel functie koppelen aan impact en daarmee de activate aanroepen
-        //wapens ontploffen nu bij activate (suicide bombers)
-        weapon.activate();
-        team.decreaseItemAmount(weapon, 1);
+    public void fire( Vector2 mousePos, Vector2 wind, double gravity ) {
+        weapon.activate( this.position, mousePos, wind, gravity );
     }
 }

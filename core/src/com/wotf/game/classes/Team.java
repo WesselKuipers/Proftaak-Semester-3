@@ -1,16 +1,25 @@
 package com.wotf.game.classes;
 
+import com.badlogic.gdx.Gdx;
 import com.wotf.game.classes.Items.Item;
 import com.badlogic.gdx.graphics.Color;
+
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+
 import com.badlogic.gdx.scenes.scene2d.Actor;
+
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.wotf.game.GameStage;
+import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 import com.wotf.game.classes.Items.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Created by Wessel on 14/03/2016.
@@ -25,27 +34,30 @@ public class Team {
     private int activeUnitIndex;
 
     /**
-     * Constructor of Team,
-     * Initialize lists and set active unit index to zero.
+     * Constructor of Team, Initialize lists and set active unit index to zero.
+     *
      * @param name
-     * @param color 
+     * @param color
      */
     public Team(String name, Color color) {
+        //blok voor testen van weapons
+        Sprite sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
+        items = new HashMap<Item, Integer>();
+        items.put(new Bazooka("Bazooka", 40, 10, sprite, sprite), 99);
+
         this.name = name;
         this.color = color;
 
         //Instantiating list of items
-        items = new HashMap<>();
         players = new ArrayList<>();
         units = new ArrayList<>();
-        
+
         // Select first unit of team as active unit
         this.activeUnitIndex = 0;
-        
     }
 
     /**
-     * 
+     *
      * @return all the players of the team
      */
     public List<Player> getPlayers() {
@@ -54,6 +66,7 @@ public class Team {
 
     /**
      * Adds a player to team
+     *
      * @param p player
      */
     public void addPlayer(Player p) {
@@ -61,8 +74,8 @@ public class Team {
     }
 
     /**
-     * TODO: Logic for kicking player out
-     * Removes a player from the team
+     * TODO: Logic for kicking player out Removes a player from the team
+     *
      * @param p player
      */
     public void removePlayer(Player p) {
@@ -71,7 +84,7 @@ public class Team {
     }
 
     /**
-     * 
+     *
      * @return the team name
      */
     public String getName() {
@@ -80,14 +93,15 @@ public class Team {
 
     /**
      * Set the name of the team
-     * @param name 
+     *
+     * @param name
      */
     public void setName(String name) {
         this.name = name;
     }
 
     /**
-     * 
+     *
      * @return color of team
      */
     public Color getColor() {
@@ -96,6 +110,7 @@ public class Team {
 
     /**
      * set the color of team
+     *
      * @param color color of team
      */
     public void setColor(Color color) {
@@ -103,7 +118,7 @@ public class Team {
     }
 
     /**
-     * 
+     *
      * @return all the units of team
      */
     public List<Unit> getUnits() {
@@ -111,15 +126,15 @@ public class Team {
     }
 
     /**
-     * 
+     *
      * @return active unit by active unit index
      */
     public Unit getActiveUnit() {
         return units.get(activeUnitIndex);
     }
-    
+
     /**
-     * 
+     *
      * @param index index of player
      * @return unit by index
      */
@@ -129,6 +144,7 @@ public class Team {
 
     /**
      * Add a unit to the team
+     *
      * @param name name of the unit
      * @param health health of the unit
      */
@@ -137,7 +153,9 @@ public class Team {
     }
 
     /**
-     * When unit is killed (health is zero or lower), remove the actor and unit from team
+     * When unit is killed (health is zero or lower), remove the actor and unit
+     * from team
+     *
      * @param unit to be removed
      */
     public void removeUnit(Unit unit) {
@@ -151,9 +169,9 @@ public class Team {
             }
         }
     }
-    
+
     /**
-     * 
+     *
      * @return active unit index
      */
     public int getActiveUnitIndex() {
@@ -174,6 +192,7 @@ public class Team {
 
     /**
      * TODO: Set active unit
+     *
      * @param u unit
      */
     public void setActiveUnit(Unit u) {
@@ -182,20 +201,33 @@ public class Team {
 
     /**
      * select a item
+     *
      * @param item
      * @return the selected item
      */
-    public Item selectItem(int item) {
-        for (Map.Entry<Item, Integer> entry : items.entrySet()) {
-            if (entry.getKey().getName().toLowerCase().equals((EnumItems.values()[item]).toString().toLowerCase())) {
-                return (Item) entry.getKey();
+    public boolean selectItem(Item item) {
+        if (containsKey(item) != null) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    public Item containsKey(Item item) {
+        Item result = null;
+        for (Entry<Item, Integer> entry : items.entrySet()) {
+            if ((entry.getKey().getName().equals(item.getName()))) {
+                result = entry.getKey();
+                break;
             }
         }
-        return null;
+        return result;
     }
 
     /**
      * Decrease the item amount for the selected item
+     *
      * @param item selected
      * @param amount to increase
      */
@@ -204,25 +236,28 @@ public class Team {
     }
 
     /**
-     * TODO: Handle what happens when ammo is unlimited or out of ammo
-     * Increase the item amount for the selected item
+     * TODO: Handle what happens when ammo is unlimited or out of ammo Increase
+     * the item amount for the selected item
+     *
      * @param item selected
      * @param amount to decrease
      */
     public void decreaseItemAmount(Item item, int amount) {
         if (items.containsKey(item)) {
+
             if (items.get(item) > 0) {
                 increaseItemAmount(item, (items.get(item) - 1));
             }
             if (items.get(item) == 0 || items.get(item) < 0) {
                 //TODO: handle what happens when unlimited ammo (-1) or out of ammo
-               
+
             }
         }
     }
 
     /**
      * Check if item contains an amount
+     *
      * @param item
      * @return item
      */
@@ -234,7 +269,7 @@ public class Team {
     }
 
     /**
-     * 
+     *
      * @return string of name and color of team
      */
     @Override
