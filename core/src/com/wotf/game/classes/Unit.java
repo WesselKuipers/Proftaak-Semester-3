@@ -7,43 +7,34 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.wotf.game.classes.Items.Item;
-import com.badlogic.gdx.utils.Array;
 import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
-
 /**
  * Created by Wessel on 14/03/2016.
  */
 public class Unit extends Group {
-
-    public enum State {
-        FALLING, JUMPING, STANDING, RUNNING, DEAD
-    };
-    public State currentState;
-    public State previousState;
-
-    private float stateTimer;
-
+    private float angle;
+    public float force = 3f;
+    private Vector2 acceleration;
     private TextureRegion unitStand;
-    private Animation unitRun;
-    private TextureRegion unitJump;
-    
+
+    public float speed = 50 * 2;
+    public Vector2 velocity = new Vector2();
+    boolean moveRight;
+
     private int health;
     private String name;
 
     public Sprite sprite;
     private Vector2 position;
-    public Vector2 velocity;
 
     private Item weapon;
     private Team team;
 
-    public final float PIXELS_TO_METERS = 100;
     // Font is used for displaying name and health
     private static BitmapFont font = new BitmapFont();
 
@@ -51,33 +42,18 @@ public class Unit extends Group {
         this.name = name;
         this.health = health;
         this.team = team;
-
-        currentState = State.STANDING;
-        previousState = State.STANDING;
-        
-        TextureRegion[] frames;
-        frames = new TextureRegion[8];
+        moveRight = true;
 
         Texture spriteSheet = new Texture(Gdx.files.internal("unit.png"));
-        TextureRegion[][] tmpFrames = TextureRegion.split(spriteSheet, 80, 120);
+        
+        font.setColor(Color.BLACK);
 
-        for (int i = 0; i < 8; i++) {
-            frames[i] = tmpFrames[0][i];
-        }
-
-        Array<TextureRegion> framesRun = new Array<>();
-
-        for (int i = 1; i < 4; i++) {
-            framesRun.add(frames[i]);
-        }
-
-        unitRun = new Animation(0.1f, framesRun);
-        unitStand = frames[0];
-        unitJump = frames[2];
+        sprite = new Sprite(spriteSheet);
+        unitStand = sprite;
+        //sprite.setRegion(spriteSheet);
 
         sprite = new Sprite(unitStand);
         sprite.setRegion(unitStand);
-
         this.setBounds(getX(), getY(), sprite.getWidth(), sprite.getHeight());
         this.setWidth(sprite.getWidth());
         this.setHeight(sprite.getHeight());
@@ -86,9 +62,14 @@ public class Unit extends Group {
         addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
+                if (keycode == Keys.RIGHT) {
+                    moveRight = true;
+                }
 
+                if (keycode == Keys.LEFT) {
+                    moveRight = false;
+                }
                 if (keycode == Keys.UP) {
-                    //move(new Vector2(0, 50f));
                     jump();
                 }
 
@@ -141,20 +122,34 @@ public class Unit extends Group {
             weapon.destroyActor();
         }
     }
-
+    
+    /**
+     * @return health of the unit
+     */
     public int getHealth() {
         return health;
     }
 
+     /**
+     * Increase the health of the unit
+     * @param amount to increase health
+     */
     public void increaseHealth(int amount) {
         health += amount;
     }
-
+    
+     /**
+     * Decrease the health of the unit
+     * @param amount to decrease health
+     */
     public void decreaseHealth(int amount) {
         health -= amount;
         if(health < 0) { health = 0; }
     }
-
+    
+    /**
+     * @return the sprite of the unit
+     */
     public Sprite getSprite() {
         return sprite;
     }
@@ -214,10 +209,138 @@ public class Unit extends Group {
     @Override
     public void act(float delta) {
         super.act(delta);
+        sprite.setRegion(getFrame(delta));
+        updateJump();
     }
 
+    /**
+     * In jump() we set the followin
+     *  - setAngle with the next position
+     *  - setAcceleration with the gravity
+     *  - setVelocity with the force
+     * 
+     * Then the act calls the updateJump().
+     */
     public void jump() {
+        System.out.println("V= " + velocity.x);
+        float nextX;
+
+        if (moveRight) {
+            nextX = position.x + 20;
+        } else {
+            nextX = position.x - 20;
+        }
+
+        setAngle(position, new Vector2(nextX, position.y + 20));
+        setAcceleration(9.8);
+        setVelocity(force);
+    }
+
+    /**
+     * updateJump is called in the act() to update the jump of the unit
+     * Everytime its called, the position of the unit is update by the velocity
+     * and the velocity is calculate by acceleration multiple by delta
+     * After that the unit position iss changed.
+     * 
+     * After changing the position we look for a solid point on the map. 
+     * Is it possible the unit can move to the point?
+     */
+    public void updateJump() {
+        if (acceleration == null) {
+            return;
+        }
+
+        float delta = Gdx.graphics.getDeltaTime();
         
+        //keep old position to change rotation of object
+        Vector2 oldPos = position.cpy();
+
+        position.x += velocity.x;
+        position.y += velocity.y;
+
+        setAngle(oldPos, position);
+
+        velocity.x += acceleration.x * delta;
+        velocity.y += acceleration.y * delta;
+
+        //System.out.println(velocity.toString());
+        this.setPosition(position.x, position.y);
+        positionChanged();
+        
+        if(!moveRight){
+            boolean isSolidX = ((GameStage) getStage()).isPixelSolid((int) position.x - 1, (int) position.y);
+            if (isSolidX) {
+                velocity.x = 0;
+            } 
+        }else{
+            boolean isSolidX = ((GameStage) getStage()).isPixelSolid((int) position.x + 15, (int) position.y);
+            if (isSolidX) {
+                velocity.x = 0;
+            } 
+        }
+
+        boolean isSolidY = ((GameStage) getStage()).isPixelSolid((int) position.x, (int) position.y - 1);
+        if (isSolidY) {
+            velocity.y = 0;
+        }
+        sprite.setRotation(angle);
+    }
+
+    /**
+     * Calculate and set the angle by 2 vectors.
+     * @param startPos first x,y position.
+     * @param destPos second x, y position.
+     */
+    private void setAngle(Vector2 startPos, Vector2 destPos) {
+        angle = (float) Math.toDegrees(
+                Math.atan2(
+                        destPos.y - startPos.y,
+                        destPos.x - startPos.x
+                )
+        );
+    }
+    
+    /**
+     * Calculate the acceleration per/turn by external forces.
+     * @param gravity Downwards pulling force.
+     */
+    private void setAcceleration(double gravity) {
+        acceleration = new Vector2();
+        //account for gravity
+        acceleration.y -= gravity;
+    }
+    
+    /**
+     * Calculate the velocity in x and y coordinates by angle.
+     * @param force Force towards direction.
+     */
+    private void setVelocity(float force) {
+        final double DEG2RAD = Math.PI / 180;
+        double ang = angle * DEG2RAD;
+
+        velocity = new Vector2(
+                (float) (force * Math.cos(ang)),
+                (float) (force * Math.sin(ang))
+        );
+    }
+    /**
+     * Gets the frame the unit is in. For example running left or running right.
+     * @param dt is the delta time
+     * @return the region of the sprite.
+     */
+    public TextureRegion getFrame(float dt) {
+        TextureRegion region;
+        region = unitStand;
+        //if unit is turn left and the texture isnt facing left... flip it.
+        if (!moveRight && !region.isFlipX()) {
+            region.flip(true, false);
+            moveRight = false;
+        } //if unit is turn right and the texture isnt facing right... flip it.
+        else if (moveRight && region.isFlipX()) {
+            region.flip(true, false);
+            moveRight = true;
+        }
+        return region;
     }
 
     public void setPosition(Vector2 position) {
