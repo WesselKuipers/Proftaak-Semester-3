@@ -160,17 +160,13 @@ public class Team {
      */
     public void removeUnit(Unit unit) {
         if (unit == null || units.contains(unit)) {
-            return;
-        }
-
-        GameStage gameStage = (GameStage) unit.getStage();
-        int i = 0;
-        for (Actor actor : gameStage.getActors()) {
-            if (actor == unit) {
-                units.remove(unit);
-                actor.remove();
+            GameStage gameStage = (GameStage)unit.getStage();
+            for (Actor actor : gameStage.getActors()) {
+                if (actor == unit) {
+                    actor.remove();
+                    units.remove(unit);
+                }
             }
-            i++;
         }
     }
 
