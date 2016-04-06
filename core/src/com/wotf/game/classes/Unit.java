@@ -213,15 +213,13 @@ public class Unit extends Group {
     @Override
     public void act(float delta) {
         super.act(delta);
-    }
+        }
 
     public void jump() {
-
     }
 
 
     public void setPosition(Vector2 position) {
         this.position = position;
     }
-
 }
