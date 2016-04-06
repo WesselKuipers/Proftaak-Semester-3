@@ -35,10 +35,22 @@ public class MainMenu implements Screen {
     private SpriteBatch batch;
     private WotFGame game;
 
+    /**
+     * Creates a new instance of the MainMenu based on the game.
+     *
+     * @param game so we can switch the screen of the 'current' game
+     */
     public MainMenu(WotFGame game) {
         this.game = game;
     }
 
+    /**
+     * Create a NinePatch Texture based on the internal file name.
+     *
+     * @param fname the location/name of the internal file
+     * @return NinePatch texture with the given bounds which is an internal
+     * file.
+     */
     private NinePatch getNinePatch(String fname) {
 
         // Get the image
@@ -51,6 +63,15 @@ public class MainMenu implements Screen {
         return new NinePatch(new TextureRegion(t, 1, 1, t.getWidth() - 2, t.getHeight() - 2), 200, 200, 200, 200);
     }
 
+    /**
+     * First makes a new stage for the MainMenu screen. Fill in the default skin
+     * file which is the uiskin.json. Create the Scene2d objects on the screen
+     * with the given position. There is a table around each section. There is a
+     * list of players which shows the ping of the players. There is a list of
+     * sessions which shows all the sessions There are buttons to create a
+     * session, join a session and to exit the LobbyGUI screen. Called when this
+     * screen becomes the current screen for a {@link Game}.
+     */
     @Override
     public void show() {
         stage = new Stage();
@@ -101,9 +122,20 @@ public class MainMenu implements Screen {
         exit.setWidth(300);
         exit.setHeight(60);
         exit.setPosition(Gdx.graphics.getWidth() / 2 - exit.getWidth() / 2, 290);
+        exit.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.app.exit();
+            }
+        });
         stage.addActor(exit);
     }
 
+    /**
+     * Called when the screen should render itself.
+     *
+     * @param delta The time in seconds since the last render.
+     */
     @Override
     public void render(float f) {
         Gdx.gl.glClearColor((float) 122 / 255, (float) 122 / 255, (float) 122 / 255, 1);
@@ -113,25 +145,49 @@ public class MainMenu implements Screen {
         stage.draw();
     }
 
+    /**
+     * Called when the {@link Application} is resized. This can happen at any
+     * point during a non-paused state but will never happen before a call to
+     * {@link #create()}.
+     *
+     * @param width the new width in pixels
+     * @param height the new height in pixels
+     */
     @Override
     public void resize(int width, int height) {
         // Passes the new width and height to the viewport
         stage.getViewport().update(width, height);
     }
 
+    /**
+     * Called when the {@link Application} is paused, usually when it's not
+     * active or visible on screen. An Application is also paused before it is
+     * destroyed.
+     */
     @Override
     public void pause() {
     }
 
+    /**
+     * Called when the {@link Application} is resumed from a paused state,
+     * usually when it regains focus.
+     */
     @Override
     public void resume() {
     }
 
+    /**
+     * Called when this screen is no longer the current screen for a
+     * {@link Game}.
+     */
     @Override
     public void dispose() {
 
     }
 
+    /**
+     * Called when this screen should release all resources.
+     */
     @Override
     public void hide() {
     }
