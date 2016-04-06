@@ -9,26 +9,16 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.EdgeShape;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.wotf.game.classes.Game;
@@ -49,8 +39,6 @@ public class GameStage extends Stage {
 
     //private WotFGame game;
     private Game game;
-    private World world;
-    private Box2DDebugRenderer b2dr;
 
     private SpriteBatch batch;
     private SpriteBatch guiBatch;
@@ -59,21 +47,14 @@ public class GameStage extends Stage {
     private Texture terrainTexture;
     private Texture backgroundTexture;
     private Pixmap pixmap;
-    private Body floorBody;
     //private OrthographicCamera camera;
-    private float accumulator = 0f;
-    private Unit activeUnit;
 
-    public final float PIXELS_TO_METERS = 100;
-    private final float TIME_STEP = 1 / 300f;
     private Actor focusedActor; // if this is set to an actor
                                 // have the camera follow it automatically, otherwise set it to null
 
     public GameStage(Game game) {
         super(new ScreenViewport());
         this.game = game;
-        this.world = new World(new Vector2(0, -10f), true);
-        this.b2dr = new Box2DDebugRenderer();
         this.focusedActor = null;
 
         batch = new SpriteBatch();
@@ -81,9 +62,6 @@ public class GameStage extends Stage {
 
         font = new BitmapFont();
         font.setColor(Color.BLACK);
-        
-        //floor
-        createGroundFloor(world);
 
         Pixmap bgPixmap = new Pixmap(this.game.getMap().getWidth(), this.game.getMap().getHeight(), Pixmap.Format.RGBA8888);
         System.out.println(game.getMap().getWidth() + "" + game.getMap().getHeight() + "");
@@ -98,14 +76,15 @@ public class GameStage extends Stage {
 
     /**
      * Initial setup for the map used to add all team members to the list of actors
-     * Spawns the units at random locations
+     * Spawns the units at random collision-free locations
      */
     public void init() {
+        boolean[][] terrain = game.getMap().getTerrain();
+        
         // Adds every unit as an actor to this stage
-
-        int count = 1;
         for (Team team : game.getTeams()) {
             for (Unit unit : team.getUnits()) {
+
                 // Retrieves the currently attached sprite of this unit,
                 // adds a color tint to it and assigns it back to the unit
                 //Sprite unitSprite = unit.getSprite();
@@ -116,80 +95,90 @@ public class GameStage extends Stage {
                 // Spawns a unit in a random location (X axis)
                 Vector2 ranLocation = new Vector2(MathUtils.random(0, game.getMap().getWidth() - unit.getWidth()), 80);
                 unit.spawn(ranLocation);
-                unit.setWorld(world);
-                if (count == 1) {
-                    unit.defineBody(world);
-                    //camera.position.set(unit.getPosition().x, unit.getPosition().y, 0);
-                    //camera.update();
-                    activeUnit = unit;
+               
                     Item weapon = WEAPONS_ARMORY.get(1);
-                    activeUnit.selectWeapon( weapon );
+                    game.getActiveTeam().getActiveUnit().selectWeapon( weapon );
+
+                // Generates a random X position and attempts to find the highest collision-free position
+                // and spawns the unit at that position, will continue looping until a position has been found
+                boolean spawned = false;
+                int posX = 0;
+                int posY = 0;
+                
+                while(!spawned) {
+                    posX = MathUtils.random(0 + (int) unit.getWidth(), (int) game.getMap().getWidth() - (int) unit.getWidth());
+                    posY = -1;
+                    
+                    for(int x = posX; x < posX + unit.getWidth(); x++) {
+                        for(int y = terrain[0].length - 1; y > 0; y--) {
+                            if(terrain[x][y]) {
+                                if (y > posY) { posY = y; }
+                            }
+                        }
+                    }
+                    
+                    if (posY != -1) {
+                        spawned = true;
+                        break;
+                    }
+
                 }
+                
+                unit.spawn(new Vector2(posX, posY + 1));
+                
                 this.addActor(unit);
-                count++;
             }
         }
         
         getCamera().update();
+        game.beginTurn();
     }
 
+    /**
+     * Returns game object associated with this stage
+     * @return Object of type Game
+     */
     public Game getGame() {
         return this.game;
     }
 
+    /**
+     * Performs a single update step using the current game
+     * Calls act() method within each actor in the stage and updates the camera
+     */
     @Override
     public void act() {
         super.act();
         float delta = Gdx.graphics.getDeltaTime();
 
         game.getTurnLogic().update(delta);
+        
         if (game.getTurnLogic().getElapsedTime() >= game.getGameSettings().getTurnTime()) {
             game.endTurn();
-         }
+            game.beginTurn();
+        }
 	
+        // if focusedActor is set to an actor, we want the camera to follow it
+        // otherwise, call the update() method on camera normally
         if(focusedActor != null) {
             setCameraFocusToActor(focusedActor, false);
         } else {
             getCamera().update();
         }
-        
-        if (activeUnit.b2body != null) {
-            activeUnit.setPosition(activeUnit.b2body.getPosition().x * 95f, activeUnit.b2body.getPosition().y  * 50f);
-            activeUnit.sprite.setPosition(activeUnit.b2body.getPosition().x * 95f, activeUnit.b2body.getPosition().y * 50f);
-        }
-        
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)
-            && (activeUnit.getState() == Unit.State.STANDING || activeUnit.getState() == Unit.State.RUNNING)
-            && activeUnit.b2body.getLinearVelocity().x <= 2) {
-            // TODO: Refactor using a speed or velocity field in activeUnit
-            // and move all unit controls to either GameStage or Unit
-            // so that they can all be accessed from the same place
-            activeUnit.b2body.setLinearVelocity(0.5f, 0f);
-        }
-        
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)
-            && (activeUnit.getState() == Unit.State.STANDING || activeUnit.getState() == Unit.State.RUNNING)
-            && activeUnit.b2body.getLinearVelocity().x >= -2) {
-            activeUnit.b2body.setLinearVelocity(-0.5f,0f);
-        }
-
-        // Fixed timestep
-        accumulator += delta;
-
-        while (accumulator >= delta) {
-            world.step(TIME_STEP, 6, 2);
-            accumulator -= TIME_STEP;
-        }
-
     }
     
+    /**
+     * Handles all the keyDown inputs for the stage
+     * @param keyCode Entry from Keys enum
+     * @return True if the key was handled
+     */
     @Override
     public boolean keyDown(int keyCode) {
 
         OrthographicCamera cam = (OrthographicCamera) getCamera();
-
-        // Temporary camera controls
+        
         switch (keyCode) {
+            // Camera controls (position)
             case Keys.NUMPAD_2:
                 cam.translate(new Vector2(0, -50f));
                 focusedActor = null;
@@ -206,6 +195,8 @@ public class GameStage extends Stage {
                 cam.translate(new Vector2(50f, 0));
                 focusedActor = null;
                 break;
+                
+            // Camera controls (zoom)
             case Keys.PLUS:
                 cam.zoom -= 0.05f;
                 break;
@@ -215,6 +206,8 @@ public class GameStage extends Stage {
             case Keys.ENTER:
                 cam.zoom = 1;
                 break;
+                
+            // Unit selection
             case Keys.TAB:
                 int selectedPlayerIndex = 0;
                 int i = 0;
@@ -230,17 +223,24 @@ public class GameStage extends Stage {
                 
                 selectedPlayerIndex = (selectedPlayerIndex >= activeTeam.getUnits().size()) ? 0 : selectedPlayerIndex;
                 
-                for (Actor a : this.getActors()) {
-                    if(activeTeam.getUnit(selectedPlayerIndex) == a) {
-                        this.setKeyboardFocus(a);
-                        setCameraFocusToActor(a, true);
+                for (Actor actor : this.getActors()) {
+                    if(activeTeam.getUnit(selectedPlayerIndex) == actor) {
+                        this.setKeyboardFocus(actor);
+                        setCameraFocusToActor(actor, true);
                     }
                 }
+                break;
+            
+            // Debug key for killing current unit
+            case Keys.G: 
+                game.getActiveTeam().getActiveUnit().decreaseHealth(100);
+                game.endTurn();
                 break;
         }
 
         clampCamera();
         cam.update();
+        
         return super.keyDown(keyCode);
     }
     
@@ -265,6 +265,10 @@ public class GameStage extends Stage {
         return true;
     }
     
+    /**
+     * Draws the background and foreground textures
+     * and calls the draw() method in each actor
+     */
     @Override
     public void draw() {
         batch.setProjectionMatrix(getCamera().combined);
@@ -284,31 +288,23 @@ public class GameStage extends Stage {
         batch.end();
 
         super.draw();
-        world.step(1f / 60f, 6, 2);
-        //batch.setProjectionMatrix(camera.combined);
-        b2dr.render(world, batch.getProjectionMatrix().cpy().scale(PIXELS_TO_METERS, PIXELS_TO_METERS, 0));
-
         guiBatch.begin();
 
         font.draw(guiBatch, "Debug variables:", 0, this.getHeight());
         font.draw(guiBatch, "Actors amount: " + this.getActors().size, 0, this.getHeight() - 20);
-        font.draw(guiBatch,
-                String.format("Active actor: %s XY[%f, %f]",
-                        this.getKeyboardFocus().getName(),
-                        this.getKeyboardFocus().getX(),
-                        this.getKeyboardFocus().getY()),
-                0,
-                this.getHeight() - 40);
+        if(this.game.getActiveTeam().getActiveUnit() != null) {
+            font.draw(guiBatch,
+                    String.format("Active actor: %s XY[%f, %f]",
+                            this.game.getActiveTeam().getActiveUnit().getName(),
+                            this.game.getActiveTeam().getActiveUnit().getX(),
+                            this.game.getActiveTeam().getActiveUnit().getY()),
+                    0,
+                    this.getHeight() - 40);
+        }
         font.draw(guiBatch, String.format("Mouse position: screen [%d, %d], viewport %s", Gdx.input.getX(), game.getMap().getHeight() - Gdx.input.getY(), getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0))), 0, this.getHeight() - 60);
         font.draw(guiBatch, String.format("Camera coords [%s], zoom %f", getCamera().position.toString(), ((OrthographicCamera) getCamera()).zoom), 0, this.getHeight() - 80);
         font.draw(guiBatch, "Time remaining: " + (game.getGameSettings().getTurnTime() - (int)game.getTurnLogic().getElapsedTime()), 0, this.getHeight() - 100);
 
-        font.draw(guiBatch, String.format("Active body: %s XY[%f, %f]",
-                this.getKeyboardFocus().getName(),
-                activeUnit.b2body.getPosition().x,
-                activeUnit.b2body.getPosition().y),
-                0,
-                this.getHeight() - 120);
         guiBatch.end();
     }
 
@@ -382,14 +378,16 @@ public class GameStage extends Stage {
             }
         }
         
-        // TODO: Iterate through collided units and call its damage/hit method
-
+        // TODO: Pass through correct/proper damage value?
+        // Iterates through all of the collided units and decreases their health
+        // based on the damage caused by the explosion
+        for(Unit u : collidedUnits) {
+            u.decreaseHealth(radius);
+        }
+        
         game.getMap().setTerrain(terrain);
         updateTerrain();
-    }
-
-    public World getWorld() {
-        return world;
+        game.endTurn();
     }
     
     /**
@@ -399,7 +397,12 @@ public class GameStage extends Stage {
      * @return True if pixel is solid, false if not
      */
     public boolean isPixelSolid(int x, int y) {
-        return this.game.getMap().getTerrain()[x][y];
+        boolean[][] terrain = this.game.getMap().getTerrain();
+        if (!(x >= 0 && y >= 0 && x < terrain.length && y < terrain[0].length)) {
+            // Out of bounds
+            return false;
+        }
+        return terrain[x][y];
     }
     
     /**
@@ -411,6 +414,7 @@ public class GameStage extends Stage {
     public void setCameraFocusToActor(Actor actor, boolean keepFollowing) {
         OrthographicCamera cam = (OrthographicCamera) this.getCamera();
         
+        // Sets the camera's X position based on the center of the specified actor
         cam.position.x = actor.getX() + actor.getWidth() / 2;
         //if(followVertically) { cam.position.y = actor.getY() + actor.getHeight() / 2; }
         clampCamera();
@@ -419,24 +423,6 @@ public class GameStage extends Stage {
         if(keepFollowing) {
             focusedActor = actor;
         }
-    }
-
-    public void createGroundFloor(World world) {
-        BodyDef floorDef = new BodyDef();
-        floorDef.type = BodyDef.BodyType.StaticBody;
-        float w = Gdx.graphics.getWidth();
-        float h = Gdx.graphics.getHeight() / PIXELS_TO_METERS
-                / PIXELS_TO_METERS;
-        floorDef.position.set(10f, 0.84f);
-
-        FixtureDef FloorFixDeff = new FixtureDef();
-        EdgeShape FloorEdgeShape = new EdgeShape();
-
-        FloorEdgeShape.set(-w / 2, -h / 2, w / 2, -h / 2);
-        FloorFixDeff.shape = FloorEdgeShape;
-        floorBody = world.createBody(floorDef);
-        floorBody.createFixture(FloorFixDeff);
-        FloorEdgeShape.dispose();
     }
 
     /**
@@ -450,8 +436,8 @@ public class GameStage extends Stage {
         // TODO: Fix this! data should be from data structure not from actor.
         // Jip Boesenkool - 29-030'16
         Vector2 unitPosition = new Vector2(
-           this.activeUnit.getX(),
-           this.activeUnit.getY()
+           game.getActiveTeam().getActiveUnit().getX(),
+           game.getActiveTeam().getActiveUnit().getY()
         );
          // TODO: Get correct force from weapon
         // Jip Boesenkool - 29-030'16
@@ -466,9 +452,11 @@ public class GameStage extends Stage {
         this.addActor(bullet);
     }
     
+    /**
+     * Constraints the camera's projection to the bounds of the stage
+     */
     private void clampCamera() {
-        // Retrains the camera from leaving the bounds of the map
-        // Uncomment this if you want an unrestrained camera
+        // Restrains the camera from leaving the bounds of the map
         OrthographicCamera cam = (OrthographicCamera) getCamera();
         
         if (cam.zoom > 1f) cam.zoom = 1;
@@ -480,6 +468,4 @@ public class GameStage extends Stage {
         cam.position.x = MathUtils.clamp(cam.position.x, effectiveViewportWidth / 2f, game.getMap().getWidth() - effectiveViewportWidth / 2f);
         cam.position.y = MathUtils.clamp(cam.position.y, effectiveViewportHeight / 2f, game.getMap().getHeight() - effectiveViewportHeight / 2f);
     }
-     
-     
 }

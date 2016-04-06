@@ -8,18 +8,11 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
-import com.wotf.game.GameStage;
 import com.wotf.game.classes.Items.Item;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 
 /**
@@ -34,21 +27,17 @@ public class Unit extends Group {
     public State previousState;
 
     private float stateTimer;
-    private boolean runningRight;
-
-    public Body b2body;
-    public World world;
 
     private TextureRegion unitStand;
     private Animation unitRun;
     private TextureRegion unitJump;
-
+    
     private int health;
     private String name;
 
     public Sprite sprite;
     private Vector2 position;
-    private Vector2 velocity;
+    public Vector2 velocity;
 
     private Item weapon;
     private Team team;
@@ -64,9 +53,7 @@ public class Unit extends Group {
 
         currentState = State.STANDING;
         previousState = State.STANDING;
-        stateTimer = 0;
-        runningRight = true;
-
+        
         TextureRegion[] frames;
         frames = new TextureRegion[8];
 
@@ -86,8 +73,9 @@ public class Unit extends Group {
         unitRun = new Animation(0.1f, framesRun);
         unitStand = frames[0];
         unitJump = frames[2];
-
-        font.setColor(Color.BLACK);
+        
+        // Sets color of the font to the same colour of the team
+        font.setColor(team.getColor());
 
         sprite = new Sprite(unitStand);
         sprite.setRegion(unitStand);
@@ -100,17 +88,6 @@ public class Unit extends Group {
         addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-//                if (keycode == Keys.RIGHT) {
-//                    //move(new Vector2(50f, 0));
-//                     //b2body.applyLinearImpulse(new Vector2(0.1f, 0), b2body.getLocalCenter(), true);
-//                     b2body.setLinearVelocity(0.5f, 0f);
-//                }
-//
-//                if (keycode == Keys.LEFT) {
-//                    //move(new Vector2(-50f, 0));
-//                    //b2body.applyLinearImpulse(new Vector2(-0.1f, 0), b2body.getLocalCenter(), true);
-//                    b2body.setLinearVelocity(-0.5f,0f);
-//                }
 
                 if (keycode == Keys.UP) {
                     //move(new Vector2(0, 50f));
@@ -167,42 +144,6 @@ public class Unit extends Group {
         }
     }
 
-//    public void redefineBody(){
-//        world.destroyBody(b2body);
-//        
-//        BodyDef bdef = new BodyDef();
-//        bdef.type = BodyDef.BodyType.DynamicBody;
-//        bdef.position.set(position.x /PIXELS_TO_METERS - 12.5f, position.y / PIXELS_TO_METERS - 3);
-//
-//
-//        b2body = world.createBody(bdef);
-//        
-//        CircleShape shape = new CircleShape();
-//        shape.setRadius(1f);
-//        FixtureDef fdef = new FixtureDef();
-//        fdef.shape = shape;
-//        
-//        b2body.createFixture(fdef);
-//        shape.dispose();
-//    }
-    public void defineBody(World world) {
-        this.world = world;
-        BodyDef bdef = new BodyDef();
-        bdef.type = BodyDef.BodyType.DynamicBody;
-
-        bdef.position.set(position.x / PIXELS_TO_METERS - 6f, position.y / PIXELS_TO_METERS + 1f);
-
-        b2body = world.createBody(bdef);
-
-        CircleShape shape = new CircleShape();
-        shape.setRadius(0.8f);
-        FixtureDef fdef = new FixtureDef();
-        fdef.shape = shape;
-
-        b2body.createFixture(fdef);
-        shape.dispose();
-    }
-
     public int getHealth() {
         return health;
     }
@@ -213,7 +154,7 @@ public class Unit extends Group {
 
     public void decreaseHealth(int amount) {
         health -= amount;
-        // TODO: checking if health <= 0
+        if(health < 0) { health = 0; }
     }
 
     public Sprite getSprite() {
@@ -228,14 +169,26 @@ public class Unit extends Group {
         return position;
     }
 
+    /**
+     * Returns the name associated with this unit
+     * @return String containing the name of this unit
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns a rectangle representing the bounds of unit
+     * @return Rectangle based on X, Y, Width and Height of unit
+     */
     public Rectangle getBounds() {
         return this.sprite.getBoundingRectangle();
     }
 
+    /**
+     * Spawns a unit at the specified location
+     * @param position Position to spawn the unit at
+     */
     public void spawn(Vector2 position) {
         // logic for spawning
         this.setPosition(position.x, position.y);
@@ -260,91 +213,15 @@ public class Unit extends Group {
     @Override
     public void act(float delta) {
         super.act(delta);
-        if (b2body != null) {
-            sprite.setRegion(getFrame(delta));
-        }
     }
 
     public void jump() {
-        // Only allow jumping when you're standing on the ground
-        //if (this.getState() != State.STANDING) { return; }
 
-        if (b2body != null) {
-            b2body.applyLinearImpulse(new Vector2(0, 10), b2body.getLocalCenter(), true);
-        }
     }
 
-    public void setWorld(World world) {
-        this.world = world;
-    }
 
     public void setPosition(Vector2 position) {
         this.position = position;
     }
 
-    public TextureRegion getFrame(float dt) {
-        //get unit current state. ie. jumping, running, standing...
-        currentState = getState();
-
-        TextureRegion region;
-
-        //depending on the state, get corresponding animation keyFrame.
-        switch (currentState) {
-            case JUMPING:
-                region = unitJump;
-                break;
-            case RUNNING:
-                region = unitRun.getKeyFrame(stateTimer, true);
-                break;
-            case FALLING:
-            case STANDING:
-            default:
-                region = unitStand;
-                break;
-        }
-
-        //if unit is running left and the texture isnt facing left... flip it.
-        if ((b2body.getLinearVelocity().x < 0 || !runningRight) && !region.isFlipX()) {
-            region.flip(true, false);
-            runningRight = false;
-        } //if unit is running right and the texture isnt facing right... flip it.
-        else if ((b2body.getLinearVelocity().x > 0 || runningRight) && region.isFlipX()) {
-            region.flip(true, false);
-            runningRight = true;
-        }
-
-        //if the current state is the same as the previous state increase the state timer.
-        //otherwise the state has changed and we need to reset timer.
-        stateTimer = currentState == previousState ? stateTimer + dt : 0;
-        //update previous state
-        previousState = currentState;
-        //return our final adjusted frame
-        return region;
-
-    }
-
-    public State getState() {
-        // if unit is going positive in Y-Axis he is jumping...
-        // or if he just jumped and is falling remain in jump state
-
-        if ((b2body.getLinearVelocity().y > 0 && currentState == State.JUMPING) || (b2body.getLinearVelocity().y < 0 && previousState == State.JUMPING)) {
-            return State.JUMPING;
-        } // if negative in Y-Axis unit is falling
-        else if (b2body.getLinearVelocity().y < 0) {
-            return State.FALLING;
-        } // if unit is positive or negative in the X axis he is running
-        else if (b2body.getLinearVelocity().x != 0) {
-            return State.RUNNING;
-        } // if none of these return then he must be standing
-        else {
-            // TODO: Check collision with stage
-            /* The following can be used to determine if a unit is standing
-            int x = (int) (getOriginX() + getWidth() / 2);
-            int y = (int) getOriginY();
-            boolean isOnGround = ((GameStage)getStage()).isPixelSolid(x, y);
-             */
-
-            return State.STANDING;
-        }
-    }
 }
