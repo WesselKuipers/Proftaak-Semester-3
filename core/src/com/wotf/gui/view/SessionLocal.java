@@ -162,6 +162,7 @@ public class SessionLocal implements Screen {
         settingstable.add(turntimelabel).width(120);
         SelectBox turntimebox = new SelectBox(skin);
         turntimebox.setItems(turntimevals);
+        turntimebox.setSelectedIndex(3);
         settingstable.add(turntimebox).width(180);
         settingstable.row();
 
@@ -247,10 +248,10 @@ public class SessionLocal implements Screen {
         start.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if(teamlist.size() < 2){
+                if (teamlist.size() < 2) {
                     return;
                 }
-                
+
                 // Selected MaxTime to an integer.
                 gamesettings.setMaxTime(Integer.parseInt(timerbox.getSelected().toString()));
 
