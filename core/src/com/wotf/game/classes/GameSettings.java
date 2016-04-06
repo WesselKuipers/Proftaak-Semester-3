@@ -49,8 +49,8 @@ public class GameSettings {
      */
     private void fillWeapons() {
         Sprite sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
-        WEAPONS_ARMORY.add(new Bazooka("Bazooka", 5, 5, sprite, sprite));
-        WEAPONS_ARMORY.add(new Bazooka("Grenade", 5, 5, sprite, sprite));
+        WEAPONS_ARMORY.add(new Bazooka("Bazooka", 40, 10, sprite, sprite));
+        WEAPONS_ARMORY.add(new Bazooka("Grenade", 40, 10, sprite, sprite));
     }
 
     public int getMaxTurns() {

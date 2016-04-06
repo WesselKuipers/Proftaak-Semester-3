@@ -21,10 +21,10 @@ public class MissileLauncher extends Item {
     }
 
     @Override
-    public void activate(Vector2 position, Vector2 mousePos, Vector2 Wind, double grav, int blastRadius) {
+    public void activate(Vector2 position, Vector2 mousePos, Vector2 Wind, double grav) {
         //spawn bullet and add to scene
         Projectile bullet = super.getBullet();
-        bullet.fire(position, mousePos, super.getPower(), Wind, grav, blastRadius);
+        bullet.fire(position, mousePos, super.getPower(), Wind, grav, super.getBlastRadius());
         bullet.updateShot();
         ((GameStage) this.getStage()).addActor(bullet);
     }

@@ -5,6 +5,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.wotf.game.GameStage;
+import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
+import com.wotf.game.classes.Items.Item;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -114,66 +116,57 @@ public class Game {
      * Set keyboard & camera focus to active unit
      */
     public void beginTurn() {
+        map.calculateWind();
+        
         Team activeTeam = getActiveTeam();
         GameStage gameStage = (GameStage) activeTeam.getActiveUnit().getStage();
         gameStage.setKeyboardFocus(activeTeam.getActiveUnit());
         gameStage.setCameraFocusToActor(activeTeam.getActiveUnit(), true);
+        
+        Item i = WEAPONS_ARMORY.get(0);
+        activeTeam.getActiveUnit().selectWeapon(i);
     }
 
     /**
-     * Method to end a turn in the game. First call the endTurn method of the
-     * active team and turn logic, After that select the new active team and set
-     * the active index of the team to keyboard and camera focus. Last check
-     * whether team and its units are still alive.
+     * Method to end a turn in the game.
+     * First call the endTurn method of the active team and turn logic,
+     * After that select the new active team and set the active index of the team to keyboard and camera focus.
+     * Last check whether team and its units are still alive.
      */
     public void endTurn() {
         Team activeTeam = getActiveTeam();
         activeTeam.endTurn();
         turnLogic.endTurn();
-
-        activeTeam = this.getActiveTeam();
-        int count = 0;
-
-        for (Actor a : activeTeam.getUnit(0).getStage().getActors()) {
-            if (activeTeam.getUnits().contains(a)) {
-                if (activeTeam.getActiveUnitIndex() == count) {
-                    a.getStage().setKeyboardFocus(a);
-                }
-                count++;
-
-                List<Team> teamsToRemove = new ArrayList<>();
-                List<Unit> unitsToRemove = new ArrayList<>();
-
-                // TODO: Remove units and teams based on health and remaining unit count
-                // When unit has lower or equal than 0 health, remove the unit from the team
-                for (Iterator<Team> it = teams.iterator(); it.hasNext();) {
-                    Team team = it.next();
-                    int unitsAlive = team.getUnits().size();
-                    for (Iterator<Unit> itTeam = team.getUnits().iterator(); itTeam.hasNext();) {
-                        Unit unit = itTeam.next();
-                        if (unit.getHealth() <= 0) {
-                            unitsToRemove.add(unit);
-                            unitsAlive--;
-                        }
-                    }
-                    // Remove team when no units are alive
-                    if (unitsAlive <= 0) {
-                        teamsToRemove.add(team);
-
-                    }
-                }
-
-                for (int i = 0; i < unitsToRemove.size(); i++) {
-                    for (Team t : teams) {
-                        t.removeUnit(unitsToRemove.get(i));
-                    }
-                }
-
-                teams.removeAll(teamsToRemove);
-                for (int i = 0; i < teamsToRemove.size(); i++) {
-                    turnLogic.lowerTeamCount();
-                }
+        List<Team> teamsToRemove = new ArrayList<>();
+        List<Unit> unitsToRemove = new ArrayList<>();
+        
+        // TODO: Remove units and teams based on health and remaining unit count
+        // When unit has lower or equal than 0 health, remove the unit from the team
+        for (Iterator<Team> it = teams.iterator(); it.hasNext();) {
+            Team team = it.next();
+            int unitsAlive = team.getUnits().size();
+            for (Iterator<Unit> itTeam = team.getUnits().iterator(); itTeam.hasNext();) {
+                Unit unit = itTeam.next();
+                if (unit.getHealth() <= 0) {
+                    unitsToRemove.add(unit);
+                    unitsAlive--;
+                }  
             }
+            // Remove team when no units are alive
+            if (unitsAlive <= 0) {
+                teamsToRemove.add(team);
+            }
+        }
+        
+        for(int i = 0; i < unitsToRemove.size(); i++) {
+            for(Team t : teams) {
+                t.removeUnit(unitsToRemove.get(i));
+            }
+        }
+        
+        teams.removeAll(teamsToRemove);
+        for(int i = 0; i < teamsToRemove.size(); i++) {
+            turnLogic.lowerTeamCount();
         }
     }
 

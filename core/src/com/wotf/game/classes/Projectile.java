@@ -55,6 +55,9 @@ public class Projectile extends Actor {
     
     public void fire( Vector2 unitPos, Vector2 mousePos,
             float force, Vector2 wind, double gravity, int blastRadius){
+        //spawn visual actor
+        
+        
         //game data
         position = unitPos;
 

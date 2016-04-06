@@ -1,5 +1,7 @@
 package com.wotf.game.classes.Items;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -24,10 +26,16 @@ public abstract class Item extends Actor {
     private Projectile bullet;
 
     public Item(String nm, float pw, int rad, Sprite weaponSprite, Sprite bulletSprite) {
+        //graphics
+        this.Weaponsprite = weaponSprite;
+
+        this.setBounds(getX(), getY(), weaponSprite.getWidth(), weaponSprite.getHeight());
+        this.setWidth(weaponSprite.getWidth());
+        this.setHeight(weaponSprite.getHeight());
+        
         this.name = nm;
         this.power = pw;
         this.blastRadius = rad;
-        this.Weaponsprite = weaponSprite;
         this.bullet = new Projectile(bulletSprite);
     }
 
@@ -71,6 +79,13 @@ public abstract class Item extends Actor {
         this.remove();
     }
 
-    public abstract void activate(Vector2 position, Vector2 mousePos, Vector2 Wind, double grav, int blastRadius);
+    public abstract void activate( Vector2 position, Vector2 mousePos, Vector2 Wind, double grav );
+    
+    @Override
+    public boolean equals( Object anObject ){
+        System.out.println( this.getName() );
+        System.out.println( ((Item)anObject).getName() );
+        return this.getName().equals( ((Item)anObject).getName() );
+    }
 
 }

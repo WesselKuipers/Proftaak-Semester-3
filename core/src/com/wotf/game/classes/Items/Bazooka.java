@@ -21,8 +21,8 @@ public class Bazooka extends MissileLauncher implements IExplosion {
     }
 
     @Override
-    public void activate(Vector2 position, Vector2 mousePos, Vector2 Wind, double grav, int blastRadius) {
-        super.activate(position, mousePos, Wind, grav, 5);
+    public void activate(Vector2 position, Vector2 mousePos, Vector2 Wind, double grav) {
+        super.activate(position, mousePos, Wind, grav );
     }
 
     @Override

@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.wotf.game.classes.Items.Item;
 import com.badlogic.gdx.utils.Array;
+import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 
 /**
@@ -99,10 +100,10 @@ public class Unit extends Group {
                     // In Team's weaponlist choose weapon cooresponding to numbers & make weapon activated
 
                     if (team.selectItem(WEAPONS_ARMORY.get(0))) {
-                        Item w = WEAPONS_ARMORY.get(1);
+                        Item w = WEAPONS_ARMORY.get(0);
                         selectWeapon(w);
 
-                        System.out.println("GRENADE");
+                        System.out.println("BAZOOKA");
                     } else {
                         System.out.println("Selected weapon not found");
                     }
@@ -134,8 +135,8 @@ public class Unit extends Group {
     public void selectWeapon(Item i) {
         destroyWeapon();
         weapon = i;
-        i.initActor();
-
+        //i.initActor();
+        ((GameStage) this.getStage()).addActor(weapon);
     }
     
     public void destroyWeapon(){
@@ -213,13 +214,17 @@ public class Unit extends Group {
     @Override
     public void act(float delta) {
         super.act(delta);
-        }
-
-    public void jump() {
     }
 
+    public void jump() {
+        
+    }
 
     public void setPosition(Vector2 position) {
         this.position = position;
+    }
+    
+    public void fire( Vector2 mousePos, Vector2 wind, double gravity ) {
+        weapon.activate( this.position, mousePos, wind, gravity );
     }
 }
