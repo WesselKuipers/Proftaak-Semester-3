@@ -260,6 +260,7 @@ public class GameStage extends Stage {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         Vector3 rel = getCamera().unproject(new Vector3(screenX, screenY, 0));
+        if (game.getTurnLogic().getTurnState() == TurnState.PLAYING) {
         System.out.println(String.format("Touchdown event (%d, %d) button %d", screenX, screenY, button));
         System.out.println(String.format("Relative Touchdown event (%f, %f) button %d", rel.x, rel.y, button));
 
@@ -268,22 +269,8 @@ public class GameStage extends Stage {
             bulletLogic((int) rel.x, (int) rel.y);
         } else if (button == Input.Buttons.RIGHT) {
             explode((int) rel.x, (int) rel.y, 30, 0);
-            
-//        Vector3 rel = getCamera().unproject( new Vector3(screenX, screenY, 0) );
-//        
-//        if (game.getTurnLogic().getTurnState() == TurnState.PLAYING) {
-//            game.endTurn();
-//            
-//            System.out.println(String.format("Touchdown event (%d, %d) button %d", screenX, screenY, button));
-//            System.out.println(String.format("Relative Touchdown event (%f, %f) button %d", rel.x, rel.y, button));
-//            
-//            if(button == Input.Buttons.LEFT) {
-//                System.out.println("Firing bullet");
-//                bulletLogic((int)rel.x, (int)rel.y);
-//            } else if (button == Input.Buttons.RIGHT) {
-//                explode((int) rel.x, (int) rel.y, 30);
-//            }
-//        }
+        }
+        game.endTurn();
         }
         return true;
     }

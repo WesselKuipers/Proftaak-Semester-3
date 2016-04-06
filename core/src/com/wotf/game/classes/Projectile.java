@@ -66,7 +66,7 @@ public class Projectile extends Actor {
             float force, Vector2 wind, double gravity, int blastRadius, int damage ){
      
         //game data
-        position = unitPos;
+        position = unitPos.cpy();
         
         //projectile information
         this.blastRadius = blastRadius;
