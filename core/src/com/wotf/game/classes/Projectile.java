@@ -17,6 +17,7 @@ import com.wotf.game.GameStage;
  *
  * @author Jip Boesenkool
  * @Date 29-03-'16
+ * Class which holds all the data and functionality to display an bullet and update the logic.
  */
 public class Projectile extends Actor {
 
@@ -31,15 +32,14 @@ public class Projectile extends Actor {
     //position
     private Vector2 position;
 
+    //projectile information
+    private int blastRadius;
+    private int damage;
+    
     /**
-     * Projectile object which handles the logic to fire a projectile.
-     *
-     * @param unitPos Start position of the bullet.
-     * @param mouseX Mouse position x.
-     * @param mouseY Mouse position y.
-     * @param force The speed at which the bullet is fired.
-     * @param wind Vector2 which has the force of the wind.
-     * @param gravity Downwards pulling force.
+     * /**
+     * Projectile constructor to initialize visual appearence of the bullet.
+     * @param sprite 
      */
     public Projectile( Sprite sprite ) {
         //graphics
@@ -53,13 +53,24 @@ public class Projectile extends Actor {
         this.setHeight(sprite.getHeight());
     }
     
+    /**
+     * Function that handles the shooting of the bullet with physics.
+     * @param unitPos       Start position from which the bullet is fired from.
+     * @param mousePos      position where the mouse was clicked.
+     * @param force         Force of the projectile in the direction of mousePos.
+     * @param wind          Vector2 wind physics.
+     * @param gravity       Pulling force towards the ground.
+     * @param blastRadius   Impact radius of the bullet on the terrain.
+     */
     public void fire( Vector2 unitPos, Vector2 mousePos,
-            float force, Vector2 wind, double gravity, int blastRadius){
-        //spawn visual actor
-        
-        
+            float force, Vector2 wind, double gravity, int blastRadius, int damage ){
+     
         //game data
         position = unitPos;
+        
+        //projectile information
+        this.blastRadius = blastRadius;
+        this.damage = damage;
 
         //calculate angle
         setAngle(unitPos, mousePos);
@@ -76,7 +87,6 @@ public class Projectile extends Actor {
 
     /**
      * Calculate the velocity in x and y coordinates by angle.
-     *
      * @param force Force towards direction.
      */
     private void setVelocity(float force) {
@@ -91,7 +101,6 @@ public class Projectile extends Actor {
 
     /**
      * Calculate and set the angle by 2 vectors.
-     *
      * @param startPos first x,y position.
      * @param destPos second x, y position.
      */
@@ -137,22 +146,33 @@ public class Projectile extends Actor {
         velocity.x += acceleration.x * delta;
         velocity.y += acceleration.y * delta;
 
-        //System.out.println(velocity.toString());
         this.setPosition(position.x, position.y);
         positionChanged();
     }
 
+    /**
+     * LibGDX function which handles the sprite position.
+     */
     @Override
     public void positionChanged() {
         sprite.setPosition(getX(), getY());
         super.positionChanged();
     }
 
+    /**
+     * LibGDX function which is responsible for writing the sprite.
+     * @param batch         ?
+     * @param parentAlpha   ?
+     */
     @Override
     public void draw(Batch batch, float parentAlpha) {
         sprite.draw(batch);
     }
 
+    /**
+     * LibGDX function which handles the update loop for this object.
+     * @param delta     Time passed since last update.
+     */
     @Override
     public void act(float delta) {
         updateShot();
@@ -162,9 +182,7 @@ public class Projectile extends Actor {
         boolean[][] terrain = gameMap.getTerrain();
 
         // if projectile is out of bounds, remove it from the stage
-        if (this.getX() - this.getWidth() > gameMap.getWidth()
-                || this.getX() + this.getWidth() < 0
-                || this.getY() + this.getHeight() < 0) {
+        if ( isProjectileOutOfBounds(gameMap) ) {
             this.remove();
         }
 
@@ -178,9 +196,25 @@ public class Projectile extends Actor {
             // Projectile collided with terrain
             System.out.println("Bullet collided at " + this.getX() + " " + this.getY());
 
-            // TODO: call GameStage.explode() with appropriate values
-            ((GameStage) getStage()).explode((int) getX(), (int) getY(), 50);
+            ((GameStage) getStage()).explode((int) getX(), (int) getY(), blastRadius, damage);
             this.remove();
         }
     }
+    
+    /**
+     * Function to check if projectile is within bounds.
+     * @param gameMap   map object which holds data about the map
+     * @return          True if projectile is out of bounds, false otherwise.
+     */
+    private boolean isProjectileOutOfBounds( Map gameMap ){
+        if (this.getX() - this.getWidth() > gameMap.getWidth()
+                || this.getX() + this.getWidth() < 0
+                || this.getY() + this.getHeight() < 0) {
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    
 }

@@ -347,7 +347,21 @@ public class Unit extends Group {
         this.position = position;
     }
     
+    /**
+     * Function to fire the active weapon.
+     * @param mousePos Position where the mouse was clicked.
+     * @param wind     Wind force.
+     * @param gravity  Downwards pulling force.
+     */
     public void fire( Vector2 mousePos, Vector2 wind, double gravity ) {
         weapon.activate( this.position, mousePos, wind, gravity );
+    }
+    
+    /**
+     * Function to get the current weapon of the unit, needed to get bullet in gamescene.
+     * @return return activeWeapon.
+     */
+    public Item getWeapon(){
+        return weapon;
     }
 }

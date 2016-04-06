@@ -24,8 +24,9 @@ public abstract class Item extends Actor {
     private int blastRadius;
     public Sprite Weaponsprite;
     private Projectile bullet;
+    private int damage;
 
-    public Item(String nm, float pw, int rad, Sprite weaponSprite, Sprite bulletSprite) {
+    public Item(String nm, float pw, int rad, int damage, Sprite weaponSprite, Sprite bulletSprite) {
         //graphics
         this.Weaponsprite = weaponSprite;
 
@@ -36,11 +37,12 @@ public abstract class Item extends Actor {
         this.name = nm;
         this.power = pw;
         this.blastRadius = rad;
+        this.damage = damage;
         this.bullet = new Projectile(bulletSprite);
     }
 
     public Item(String nm, float pw, Sprite weaponSprite, Sprite bulletSprite) {
-        this(nm, pw, 1, weaponSprite, bulletSprite);
+        this(nm, pw, 1, 25, weaponSprite, bulletSprite);
     }
 
     public String getName() {
@@ -70,6 +72,10 @@ public abstract class Item extends Actor {
     public Projectile getBullet() {
         return bullet;
     }
+    
+    public int getDamage() {
+        return damage;
+    }
 
     public void initActor() {
         ((GameStage) this.getStage()).addActor(this); //todo--> Add update sequence in gamestage
@@ -81,11 +87,5 @@ public abstract class Item extends Actor {
 
     public abstract void activate( Vector2 position, Vector2 mousePos, Vector2 Wind, double grav );
     
-    @Override
-    public boolean equals( Object anObject ){
-        System.out.println( this.getName() );
-        System.out.println( ((Item)anObject).getName() );
-        return this.getName().equals( ((Item)anObject).getName() );
-    }
 
 }
