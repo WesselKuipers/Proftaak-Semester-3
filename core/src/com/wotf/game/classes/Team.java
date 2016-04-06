@@ -274,6 +274,6 @@ public class Team {
      */
     @Override
     public String toString() {
-        return getName() + " - " + getColor();
+        return getName() + " - " + getColor() + "\n";
     }
 }
