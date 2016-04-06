@@ -83,8 +83,6 @@ public class GameEngine implements Screen {
         stage.init();
         stage.setViewport(viewport);
 
-        stage.setKeyboardFocus(stage.getActors().first());
-
         Gdx.input.setInputProcessor(stage);
     }
 

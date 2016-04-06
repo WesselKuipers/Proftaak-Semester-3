@@ -10,8 +10,8 @@ import java.util.Random;
 /**
  *
  * @author chaos
- */
-public class Clusterbomb extends Item implements ICluster, IExplosion {
+ *//*
+public class Clusterbomb extends Grenade implements ICluster, IExplosion {
 
     public Clusterbomb(String nm, int pw, int rad) {
         super(nm, pw, rad);
@@ -80,3 +80,4 @@ public class Clusterbomb extends Item implements ICluster, IExplosion {
     }
 
 }
+*/

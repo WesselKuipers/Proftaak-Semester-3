@@ -7,51 +7,34 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
-import com.wotf.game.GameStage;
 import com.wotf.game.classes.Items.Item;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.World;
-
+import com.wotf.game.GameStage;
+import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 /**
  * Created by Wessel on 14/03/2016.
  */
-public class Unit extends Actor {
-
-    public enum State {
-        FALLING, JUMPING, STANDING, RUNNING, DEAD
-    };
-    public State currentState;
-    public State previousState;
-    
-    private float stateTimer;
-    private boolean runningRight;
-
-    public Body b2body;
-    public World world;
-
+public class Unit extends Group {
+    private float angle;
+    public float force = 3f;
+    private Vector2 acceleration;
     private TextureRegion unitStand;
-    private Animation unitRun;
-    private TextureRegion unitJump;
+
+    public float speed = 50 * 2;
+    public Vector2 velocity = new Vector2();
+    boolean moveRight;
 
     private int health;
     private String name;
 
     public Sprite sprite;
     private Vector2 position;
-    private Vector2 velocity;
 
     private Item weapon;
     private Team team;
 
-    public final float PIXELS_TO_METERS = 100;
     // Font is used for displaying name and health
     private static BitmapFont font = new BitmapFont();
 
@@ -59,37 +42,18 @@ public class Unit extends Actor {
         this.name = name;
         this.health = health;
         this.team = team;
-        
-        currentState = State.STANDING;
-        previousState = State.STANDING;
-        stateTimer = 0;
-        runningRight = true;
-
-        TextureRegion[] frames;
-        frames = new TextureRegion[8];
+        moveRight = true;
 
         Texture spriteSheet = new Texture(Gdx.files.internal("unit.png"));
-        TextureRegion[][] tmpFrames = TextureRegion.split(spriteSheet, 80, 120);
-
-        for (int i = 0; i < 8; i++) {
-            frames[i] = tmpFrames[0][i];
-        }
-
-        Array<TextureRegion> framesRun = new Array<>();
-
-        for (int i = 1; i < 4; i++) {
-            framesRun.add(frames[i]);
-        }
-
-        unitRun = new Animation(0.1f, framesRun);
-        unitStand = frames[0];
-        unitJump = frames[2];
-
+        
         font.setColor(Color.BLACK);
+
+        sprite = new Sprite(spriteSheet);
+        unitStand = sprite;
+        //sprite.setRegion(spriteSheet);
 
         sprite = new Sprite(unitStand);
         sprite.setRegion(unitStand);
-
         this.setBounds(getX(), getY(), sprite.getWidth(), sprite.getHeight());
         this.setWidth(sprite.getWidth());
         this.setHeight(sprite.getHeight());
@@ -98,65 +62,43 @@ public class Unit extends Actor {
         addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-//                if (keycode == Keys.RIGHT) {
-//                    //move(new Vector2(50f, 0));
-//                     //b2body.applyLinearImpulse(new Vector2(0.1f, 0), b2body.getLocalCenter(), true);
-//                     b2body.setLinearVelocity(0.5f, 0f);
-//                }
-//
-//                if (keycode == Keys.LEFT) {
-//                    //move(new Vector2(-50f, 0));
-//                    //b2body.applyLinearImpulse(new Vector2(-0.1f, 0), b2body.getLocalCenter(), true);
-//                    b2body.setLinearVelocity(-0.5f,0f);
-//                }
+                if (keycode == Keys.RIGHT) {
+                    moveRight = true;
+                }
 
+                if (keycode == Keys.LEFT) {
+                    moveRight = false;
+                }
                 if (keycode == Keys.UP) {
-                    //move(new Vector2(0, 50f));
                     jump();
                 }
 
                 //switching between weapons
                 if (keycode == Keys.NUM_1) {
-                    // TODO: switch weapon A
                     // In Team's weaponlist choose weapon cooresponding to numbers & make weapon activated
-                      Item i = team.selectItem(0);
-                    if (i != null) {
-                        weapon = i;
-                        //TODO: WHAT BUTTON PRESSED TO FIRE WEAPON???????
-                        // Wessel: Probably the spacebar button, like in worms
-                        //FIRE & USE LOGIC + initiate projectile funtion --> TODO JIP z'n PROJECTIEL FUNCTIE
-                        useItem();
-                    
-                    System.out.println("GRENADE");
+
+                    if (team.selectItem(WEAPONS_ARMORY.get(0))) {
+                        Item w = WEAPONS_ARMORY.get(0);
+                        selectWeapon(w);
+
+                        System.out.println("BAZOOKA");
                     } else {
-                        System.out.println("Selected weapon not found");  
+                        System.out.println("Selected weapon not found");
                     }
                 }
-                
+
                 if (keycode == Keys.NUM_2) {
-                     // TODO: switch weapon B
-                    // In Team's weaponlist choose weapon cooresponding to numbers
-                    // make weapon activated
-                    Item i = team.selectItem(1);
-                    if (i != null) {
-                        weapon = i;
-                        //TODO: WHAT BUTTON PRESSED TO FIRE WEAPON???????
-                        //FIRE & USE LOGIC + initiate projectile funtion --> TODO JIP z'n PROJECTIEL FUNCTIE
-                        useItem();
-                        
-                    System.out.println("BAZOOKA");                    
+                    // In Team's weaponlist choose weapon cooresponding to numbers & make weapon activated
+                    if (team.selectItem(WEAPONS_ARMORY.get(1))) {
+                        Item w = WEAPONS_ARMORY.get(1);
+                        selectWeapon(w);
+
+                        System.out.println("GRENADE");
                     } else {
-                        System.out.println("Selected weapon not found");  
+                        System.out.println("Selected weapon not found");
                     }
                 }
-                
-                if (keycode == Keys.SPACE) {
-                    // TODO: Logic for firing weapon
-                    // should be moved when shooting logic requires more than a single button down event
-                    System.out.println("Firing " + weapon.getName());
-                    useItem();
-                }
-                
+
                 return true;
             }
         });
@@ -168,56 +110,46 @@ public class Unit extends Actor {
         this.velocity = new Vector2(0, 0);
     }
 
-//    public void redefineBody(){
-//        world.destroyBody(b2body);
-//        
-//        BodyDef bdef = new BodyDef();
-//        bdef.type = BodyDef.BodyType.DynamicBody;
-//        bdef.position.set(position.x /PIXELS_TO_METERS - 12.5f, position.y / PIXELS_TO_METERS - 3);
-//
-//
-//        b2body = world.createBody(bdef);
-//        
-//        CircleShape shape = new CircleShape();
-//        shape.setRadius(1f);
-//        FixtureDef fdef = new FixtureDef();
-//        fdef.shape = shape;
-//        
-//        b2body.createFixture(fdef);
-//        shape.dispose();
-//    }
-    
-    public void defineBody(World world) {
-        this.world = world;
-        BodyDef bdef = new BodyDef();
-        bdef.type = BodyDef.BodyType.DynamicBody;
-
-        bdef.position.set(position.x / PIXELS_TO_METERS - 6f, position.y / PIXELS_TO_METERS + 1f);
-
-        b2body = world.createBody(bdef);
-
-        CircleShape shape = new CircleShape();
-        shape.setRadius(0.8f);
-        FixtureDef fdef = new FixtureDef();
-        fdef.shape = shape;
-
-        b2body.createFixture(fdef);
-        shape.dispose();
+    public void selectWeapon(Item i) {
+        destroyWeapon();
+        weapon = i;
+        //i.initActor();
+        ((GameStage) this.getStage()).addActor(weapon);
     }
-
+    
+    public void destroyWeapon(){
+        if(weapon != null){
+            weapon.destroyActor();
+        }
+    }
+    
+    /**
+     * @return health of the unit
+     */
     public int getHealth() {
         return health;
     }
 
+     /**
+     * Increase the health of the unit
+     * @param amount to increase health
+     */
     public void increaseHealth(int amount) {
         health += amount;
     }
-
+    
+     /**
+     * Decrease the health of the unit
+     * @param amount to decrease health
+     */
     public void decreaseHealth(int amount) {
         health -= amount;
-        // TODO: checking if health <= 0
+        if(health < 0) { health = 0; }
     }
-
+    
+    /**
+     * @return the sprite of the unit
+     */
     public Sprite getSprite() {
         return sprite;
     }
@@ -230,14 +162,26 @@ public class Unit extends Actor {
         return position;
     }
 
+    /**
+     * Returns the name associated with this unit
+     * @return String containing the name of this unit
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns a rectangle representing the bounds of unit
+     * @return Rectangle based on X, Y, Width and Height of unit
+     */
     public Rectangle getBounds() {
         return this.sprite.getBoundingRectangle();
     }
 
+    /**
+     * Spawns a unit at the specified location
+     * @param position Position to spawn the unit at
+     */
     public void spawn(Vector2 position) {
         // logic for spawning
         this.setPosition(position.x, position.y);
@@ -254,6 +198,9 @@ public class Unit extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         sprite.draw(batch);
+        
+        // Sets color of the font to the same colour of the team
+        font.setColor(team.getColor());
 
         // Draws the name and current health of the unit above its sprite
         font.draw(batch, String.format("%s (%d)", name, health), getX(), getY() + getHeight() + 20);
@@ -262,96 +209,159 @@ public class Unit extends Actor {
     @Override
     public void act(float delta) {
         super.act(delta);
-        if(b2body != null)
-            sprite.setRegion(getFrame(delta));
+        sprite.setRegion(getFrame(delta));
+        updateJump();
     }
 
+    /**
+     * In jump() we set the followin
+     *  - setAngle with the next position
+     *  - setAcceleration with the gravity
+     *  - setVelocity with the force
+     * 
+     * Then the act calls the updateJump().
+     */
     public void jump() {
-        // Only allow jumping when you're standing on the ground
-        //if (this.getState() != State.STANDING) { return; }
-        
-        if(b2body != null)
-            b2body.applyLinearImpulse(new Vector2(0, 10), b2body.getLocalCenter(), true);
+        System.out.println("V= " + velocity.x);
+        float nextX;
+
+        if (moveRight) {
+            nextX = position.x + 20;
+        } else {
+            nextX = position.x - 20;
+        }
+
+        setAngle(position, new Vector2(nextX, position.y + 20));
+        setAcceleration(9.8);
+        setVelocity(force);
     }
 
-    public void setWorld(World world) {
-        this.world = world;
+    /**
+     * updateJump is called in the act() to update the jump of the unit
+     * Everytime its called, the position of the unit is update by the velocity
+     * and the velocity is calculate by acceleration multiple by delta
+     * After that the unit position iss changed.
+     * 
+     * After changing the position we look for a solid point on the map. 
+     * Is it possible the unit can move to the point?
+     */
+    public void updateJump() {
+        if (acceleration == null) {
+            return;
+        }
+
+        float delta = Gdx.graphics.getDeltaTime();
+        
+        //keep old position to change rotation of object
+        Vector2 oldPos = position.cpy();
+
+        position.x += velocity.x;
+        position.y += velocity.y;
+
+        setAngle(oldPos, position);
+
+        velocity.x += acceleration.x * delta;
+        velocity.y += acceleration.y * delta;
+
+        //System.out.println(velocity.toString());
+        this.setPosition(position.x, position.y);
+        positionChanged();
+        
+        if(!moveRight){
+            boolean isSolidX = ((GameStage) getStage()).isPixelSolid((int) position.x - 1, (int) position.y);
+            if (isSolidX) {
+                velocity.x = 0;
+            } 
+        }else{
+            boolean isSolidX = ((GameStage) getStage()).isPixelSolid((int) position.x + 15, (int) position.y);
+            if (isSolidX) {
+                velocity.x = 0;
+            } 
+        }
+
+        boolean isSolidY = ((GameStage) getStage()).isPixelSolid((int) position.x, (int) position.y - 1);
+        if (isSolidY) {
+            velocity.y = 0;
+        }
+        sprite.setRotation(angle);
+    }
+
+    /**
+     * Calculate and set the angle by 2 vectors.
+     * @param startPos first x,y position.
+     * @param destPos second x, y position.
+     */
+    private void setAngle(Vector2 startPos, Vector2 destPos) {
+        angle = (float) Math.toDegrees(
+                Math.atan2(
+                        destPos.y - startPos.y,
+                        destPos.x - startPos.x
+                )
+        );
+    }
+    
+    /**
+     * Calculate the acceleration per/turn by external forces.
+     * @param gravity Downwards pulling force.
+     */
+    private void setAcceleration(double gravity) {
+        acceleration = new Vector2();
+        //account for gravity
+        acceleration.y -= gravity;
+    }
+    
+    /**
+     * Calculate the velocity in x and y coordinates by angle.
+     * @param force Force towards direction.
+     */
+    private void setVelocity(float force) {
+        final double DEG2RAD = Math.PI / 180;
+        double ang = angle * DEG2RAD;
+
+        velocity = new Vector2(
+                (float) (force * Math.cos(ang)),
+                (float) (force * Math.sin(ang))
+        );
+    }
+    /**
+     * Gets the frame the unit is in. For example running left or running right.
+     * @param dt is the delta time
+     * @return the region of the sprite.
+     */
+    public TextureRegion getFrame(float dt) {
+        TextureRegion region;
+        region = unitStand;
+        //if unit is turn left and the texture isnt facing left... flip it.
+        if (!moveRight && !region.isFlipX()) {
+            region.flip(true, false);
+            moveRight = false;
+        } //if unit is turn right and the texture isnt facing right... flip it.
+        else if (moveRight && region.isFlipX()) {
+            region.flip(true, false);
+            moveRight = true;
+        }
+        return region;
     }
 
     public void setPosition(Vector2 position) {
         this.position = position;
     }
-
-    public TextureRegion getFrame(float dt) {
-        //get unit current state. ie. jumping, running, standing...
-        currentState = getState();
-
-        TextureRegion region;
-
-        //depending on the state, get corresponding animation keyFrame.
-        switch (currentState) {
-            case JUMPING:
-                region = unitJump;
-                break;
-            case RUNNING:
-                region = unitRun.getKeyFrame(stateTimer, true);
-                break;
-            case FALLING:
-            case STANDING:
-            default:
-                region = unitStand;
-                break;
-        }
-
-        //if unit is running left and the texture isnt facing left... flip it.
-        if ((b2body.getLinearVelocity().x < 0 || !runningRight) && !region.isFlipX()) {
-            region.flip(true, false);
-            runningRight = false;
-        } //if unit is running right and the texture isnt facing right... flip it.
-        else if ((b2body.getLinearVelocity().x > 0 || runningRight) && region.isFlipX()) {
-            region.flip(true, false);
-            runningRight = true;
-        }
-
-        //if the current state is the same as the previous state increase the state timer.
-        //otherwise the state has changed and we need to reset timer.
-        stateTimer = currentState == previousState ? stateTimer + dt : 0;
-        //update previous state
-        previousState = currentState;
-        //return our final adjusted frame
-        return region;
-
-    }
-
-    public State getState() {
-        // if unit is going positive in Y-Axis he is jumping...
-        // or if he just jumped and is falling remain in jump state
-        
-        if ((b2body.getLinearVelocity().y > 0 && currentState == State.JUMPING) || (b2body.getLinearVelocity().y < 0 && previousState == State.JUMPING)) {
-            return State.JUMPING;
-        } // if negative in Y-Axis unit is falling
-        else if (b2body.getLinearVelocity().y < 0) {
-            return State.FALLING;
-        } // if unit is positive or negative in the X axis he is running
-        else if (b2body.getLinearVelocity().x != 0) {
-            return State.RUNNING;
-        } // if none of these return then he must be standing
-        else {
-            // TODO: Check collision with stage
-            /* The following can be used to determine if a unit is standing
-            int x = (int) (getOriginX() + getWidth() / 2);
-            int y = (int) getOriginY();
-            boolean isOnGround = ((GameStage)getStage()).isPixelSolid(x, y);
-            */
-            
-            return State.STANDING;
-        }
+    
+    /**
+     * Function to fire the active weapon.
+     * @param mousePos Position where the mouse was clicked.
+     * @param wind     Wind force.
+     * @param gravity  Downwards pulling force.
+     */
+    public void fire( Vector2 mousePos, Vector2 wind, double gravity ) {
+        weapon.activate( this.position, mousePos, wind, gravity );
     }
     
-    public void useItem(){
-        //TODO: Jip projectiel functie koppelen aan impact en daarmee de activate aanroepen
-        //wapens ontploffen nu bij activate (suicide bombers)
-        weapon.activate();
-        team.decreaseItemAmount(weapon, 1);
+    /**
+     * Function to get the current weapon of the unit, needed to get bullet in gamescene.
+     * @return return activeWeapon.
+     */
+    public Item getWeapon(){
+        return weapon;
     }
 }
