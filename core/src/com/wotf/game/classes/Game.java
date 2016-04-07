@@ -101,6 +101,9 @@ public class Game {
      * @return the active team used by the active team index
      */
     public Team getActiveTeam() {
+        if(teams.isEmpty()) {
+            return null;
+        }
         return teams.get(turnLogic.getActiveTeamIndex());
     }
 
@@ -168,6 +171,11 @@ public class Game {
         for (int i = 0; i < teamsToRemove.size(); i++) {
             turnLogic.lowerTeamCount();
         }
+        
+        // Game over
+        if (teams.size() <= teamsToRemove.size()) {
+            turnLogic.gameOverState();
+        } 
     }
 
     /**

@@ -11,7 +11,7 @@ package com.wotf.game.classes;
  */
 public class TurnLogic {
     public enum TurnState {
-        PLAYING, WITHDRAW
+        PLAYING, WITHDRAW, GAMEOVER
     };
     
     public TurnState currentState;
@@ -90,6 +90,10 @@ public class TurnLogic {
      */
     public int getActiveTeamIndex() {
         return turn % totalTeams;
+    }
+    
+    public void gameOverState() {
+        this.currentState = TurnState.GAMEOVER;
     }
     
     public void lowerTeamCount() {

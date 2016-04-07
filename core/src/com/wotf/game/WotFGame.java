@@ -22,5 +22,6 @@ public class WotFGame extends Game {
         //setScreen(new MainMenu(game));
         game.setScreen(new MainMenu(game));
     }
+    
 
 }

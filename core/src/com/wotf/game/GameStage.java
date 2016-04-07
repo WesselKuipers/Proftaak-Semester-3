@@ -261,16 +261,16 @@ public class GameStage extends Stage {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         Vector3 rel = getCamera().unproject(new Vector3(screenX, screenY, 0));
         if (game.getTurnLogic().getTurnState() == TurnState.PLAYING) {
-        System.out.println(String.format("Touchdown event (%d, %d) button %d", screenX, screenY, button));
-        System.out.println(String.format("Relative Touchdown event (%f, %f) button %d", rel.x, rel.y, button));
+            System.out.println(String.format("Touchdown event (%d, %d) button %d", screenX, screenY, button));
+            System.out.println(String.format("Relative Touchdown event (%f, %f) button %d", rel.x, rel.y, button));
 
-        if (button == Input.Buttons.LEFT) {
-            System.out.println("Firing bullet");
-            bulletLogic((int) rel.x, (int) rel.y);
-        } else if (button == Input.Buttons.RIGHT) {
-            explode((int) rel.x, (int) rel.y, 30, 0);
-        }
-        game.endTurn();
+            if (button == Input.Buttons.LEFT) {
+                System.out.println("Firing bullet");
+                bulletLogic((int) rel.x, (int) rel.y);
+            } else if (button == Input.Buttons.RIGHT) {
+                explode((int) rel.x, (int) rel.y, 30, 0);
+            }
+            game.endTurn();
         }
         return true;
     }
@@ -315,6 +315,13 @@ public class GameStage extends Stage {
         font.draw(guiBatch, String.format("Camera coords [%s], zoom %f", getCamera().position.toString(), ((OrthographicCamera) getCamera()).zoom), 0, this.getHeight() - 80);
         font.draw(guiBatch, "Time remaining: " + (game.getGameSettings().getTurnTime() - (int) game.getTurnLogic().getElapsedTime()), 0, this.getHeight() - 100);
 
+        if (game.getTurnLogic().getTurnState() == TurnState.GAMEOVER) {
+            game.endTurn();
+            game.getTurnLogic().gameOverState();
+            font.draw(guiBatch, "GAME OVER", this.getWidth() / 2, this.getHeight() / 2);
+        }
+        
+        
         guiBatch.end();
     }
 
