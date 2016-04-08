@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -84,13 +85,34 @@ public class MapTest {
         // Background textures are not implemented. So it should be null.
         assertNull(map.getBackgroundTexture());
     }
-    
+
     @Test
     public void testgetBounds() {
         // Test if the given rectangle has the width set to 1920. 
         // This is the width of the Stones.png image file.
-        Rectangle testrect = new Rectangle(0,0,1920,720);
+        Rectangle testrect = new Rectangle(0, 0, 1920, 720);
         // Test if the rectangles are the same. 
         assertEquals(testrect, map.getBounds());
+    }
+
+    @Test
+    public void testCalculateWind() {
+        /**
+         * Function that calculates a random wind, should be called every turn.
+         */
+        // The range in the method is 20. So it should be used here as well.
+        int range = 20;
+        for (int i = 0; i < 20; i++) {
+            // Calculate the wind and check 20 times to be sure. Just in case the windvector X or Y is bigger than the range.
+            // Which shouldn't be possible.
+            map.calculateWind();
+            if (map.getWind().x > range) {
+                fail("The windforce on X is bigger than the range. This shouldn't happen.");
+            }
+            if (map.getWind().y > range) {
+                fail("The windforce on X is bigger than the range. This shouldn't happen.");
+            }
+        }
+
     }
 }

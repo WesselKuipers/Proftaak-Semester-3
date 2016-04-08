@@ -5,32 +5,31 @@
  */
 package com.wotf.game.classes.Items;
 
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Timer;
 import java.util.Random;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  *
  * @author chaos
  */
-public class Bazooka extends MissileLauncher implements IExplosion {
-
-    public Bazooka(String nm, int pw, int rad, int damage, Sprite weaponSprite, Sprite bulletSprite) {
-        super(nm, pw, rad, damage, weaponSprite, bulletSprite);
+/*
+public class GrenadePrototype extends Grenade implements ITimer, IThrowable, IExplosion{
+    
+    public GrenadePrototype(String nm, int pw, int rad) {
+        super(nm, pw, rad);
     }
-
+    
     @Override
-    public void activate(Vector2 position, Vector2 mousePos, Vector2 Wind, double grav) {
-        super.activate(position, mousePos, Wind, grav );
+    public void activate() {
+        detonationTime();
+        //other things?
     }
 
     @Override
     public void explode() {
         //TODO: AANROEPEN DESTROY METHODE VAN WESSEL
-
-        // radius wordt bepaald door de radius functie hieronder
-        int useMeAsRadius = radius();
+        
+        // radius wordt bepaald door de radius functie 
         
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -38,33 +37,39 @@ public class Bazooka extends MissileLauncher implements IExplosion {
     @Override
     public int radius() {
         int rad = super.getBlastRadius();
-        float power = super.getPower();
+        int power = super.getPower();
         Random r = new Random();
         int newRad = r.nextInt(rad) + 1;
-        float newPower = r.nextFloat() * power;
+        int newPower = r.nextInt(power) + 1;
         return (newRad + (int) (Math.random() * newPower));
     }
-
+    
     @Override
     public int blastControl(int distance) {
-       /* //returns int with the power an object gets pushed backwards
+        //returns int with the power an object gets pushed backwards
         //direction is always from center of explosion through unit 
         //e.g. if unit on top, unit gets blown upwards
         //if unit on left, unit gets blown left etc. 
-
+        
         int blastradius = super.getBlastRadius();
-        float power = super.getPower();
-        float force = power + blastradius;
-
-        if (distance < force) {
+        int power = super.getPower();
+        int force = power+blastradius;
+        
+        if(distance < force){
             force -= distance;
             //working with vectors, we'd need:
             //explosion coords (1), and unit coords (2) for finding angle of explosion--> Tan2(x1-x2, y1-y2)*180/PI
             //force X --> force*cos(angle)      force Y --> force*sin(angle)
             return force;
         }
-        return 0;*/
-       throw new NotImplementedException();
+        return 0;
     }
 
-}
+    @Override
+    public void detonationTime() {
+        //use timer to explode after time x
+        
+        explode();
+    }
+    
+}*/

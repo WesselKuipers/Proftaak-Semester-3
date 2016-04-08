@@ -19,23 +19,13 @@ public class BazookaTest {
 
     @Before
     public void initItem() {
-        bazooka = new Bazooka("Bazooka", 20, 30);
+        bazooka = new Bazooka("Bazooka", 20, 30, 100, null, null);
     }
 
     @Test
     public void testInit() {
         // Test if the before class is working properly
         assertNotNull("The before class is not working properly", bazooka);
-    }
-
-    @Test
-    public void testActivate() {
-        // Just runs the explode method..
-    }
-
-    @Test
-    public void testExplode() {
-
     }
 
     @Test
