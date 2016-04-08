@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.wotf.game.classes.Items.Item;
 import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
+
 /**
  * Created by Wessel on 14/03/2016.
  */
@@ -103,13 +104,18 @@ public class Unit extends Group {
             }
         });
     }
-
+    
+    //constructor
     public Unit(String name, int health, Team team, Vector2 position) {
         this(name, health, team);
         this.position = position;
         this.velocity = new Vector2(0, 0);
     }
 
+    /**
+     * selects a given weapon and adds it to the stage 
+     * @param i item object that you want to select
+     */
     public void selectWeapon(Item i) {
         destroyWeapon();
         weapon = i;
@@ -117,6 +123,9 @@ public class Unit extends Group {
         ((GameStage) this.getStage()).addActor(weapon);
     }
     
+    /**
+     * Destroy a previously created weapon
+     */
     public void destroyWeapon(){
         if(weapon != null){
             weapon.destroyActor();
@@ -154,10 +163,17 @@ public class Unit extends Group {
         return sprite;
     }
 
+    /**
+     * Set the sprite of this unit
+     * @param sprite sorite to be set to the unit
+     */
     public void setSprite(Sprite sprite) {
         this.sprite = sprite;
     }
 
+    /**
+     * @return position of the unit
+     */
     public Vector2 getPosition() {
         return position;
     }
@@ -189,6 +205,9 @@ public class Unit extends Group {
         positionChanged();
     }
 
+    /**
+     * change position of the unit and update the old with the new position
+     */
     @Override
     public void positionChanged() {
         sprite.setPosition(getX(), getY());

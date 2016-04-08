@@ -20,6 +20,13 @@ public class MissileLauncher extends Item {
         super(nm, pw, rad, damage, weaponSprite, bulletSprite);
     }
 
+    /**
+     * The activate function that is given from Item and will be given to specific weapons
+     * @param position original fire position
+     * @param mousePos position to fire too
+     * @param Wind wind affection
+     * @param grav gravity affection
+     */
     @Override
     public void activate(Vector2 position, Vector2 mousePos, Vector2 Wind, double grav) {
         //spawn bullet and add to scene

@@ -11,8 +11,8 @@ import java.util.Random;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
- *
  * @author chaos
+ * The weapon classes need to be remodeeled in a later version of this game. 
  */
 public class Bazooka extends MissileLauncher implements IExplosion {
 
@@ -20,21 +20,34 @@ public class Bazooka extends MissileLauncher implements IExplosion {
         super(nm, pw, rad, damage, weaponSprite, bulletSprite);
     }
 
+    /**
+     * trigger the activation method of the object
+     * @param position position from where it is fired
+     * @param mousePos pisition where it fires too
+     * @param Wind wind affection
+     * @param grav  gravity affection
+     */
     @Override
     public void activate(Vector2 position, Vector2 mousePos, Vector2 Wind, double grav) {
         super.activate(position, mousePos, Wind, grav );
     }
 
+    /**
+     * trigger the explosion method of the object
+     */
     @Override
     public void explode() {
-        //TODO: AANROEPEN DESTROY METHODE VAN WESSEL
-
+        
         // radius wordt bepaald door de radius functie hieronder
         int useMeAsRadius = radius();
         
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
+    
+    /**
+     * size of the explosion
+     * @return the radius of the explosion
+     */
     @Override
     public int radius() {
         int rad = super.getBlastRadius();
@@ -45,6 +58,11 @@ public class Bazooka extends MissileLauncher implements IExplosion {
         return (newRad + (int) (Math.random() * newPower));
     }
 
+    /**
+     * Method to cotnrol the blast and the objects affected by this explosion
+     * @param distance distance of object to the explosion centre
+     * @return the force an object is affected by
+     */
     @Override
     public int blastControl(int distance) {
        /* //returns int with the power an object gets pushed backwards
