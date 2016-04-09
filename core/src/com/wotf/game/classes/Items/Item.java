@@ -1,7 +1,5 @@
 package com.wotf.game.classes.Items;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -9,7 +7,7 @@ import com.wotf.game.GameStage;
 import com.wotf.game.classes.Projectile;
 
 /**
- * Created by wesse on 14/03/2016.
+ * Abstract class that describes all necessary fields for an Item
  */
 public abstract class Item extends Actor {
 
@@ -23,13 +21,22 @@ public abstract class Item extends Actor {
     private String name;
     private float power;
     private int blastRadius;
-    public Sprite Weaponsprite;
+    private Sprite weaponSprite;
     private Projectile bullet;
     private int damage;
 
+    /**
+     * Main constructor of Item used to initialize all necessary fields
+     * @param nm Name of the item
+     * @param pw Power of the item
+     * @param rad Radius of the explosion of the item
+     * @param damage Damage the item inflicts
+     * @param weaponSprite Sprite of the weapon of the item
+     * @param bulletSprite Sprite of the bullet/projectile of the item
+     */
     public Item(String nm, float pw, int rad, int damage, Sprite weaponSprite, Sprite bulletSprite) {
         //graphics
-        this.Weaponsprite = weaponSprite;
+        this.weaponSprite = weaponSprite;
 
         this.setBounds(getX(), getY(), weaponSprite.getWidth(), weaponSprite.getHeight());
         this.setWidth(weaponSprite.getWidth());
@@ -42,6 +49,13 @@ public abstract class Item extends Actor {
         this.bullet = new Projectile(bulletSprite);
     }
 
+    /**
+     * Constructor of Item used to initialize all necessary fields
+     * @param nm Name of the item
+     * @param pw Power of the item
+     * @param weaponSprite Sprite of the weapon of the item
+     * @param bulletSprite Sprite of the bullet/projectile of the item
+     */
     public Item(String nm, float pw, Sprite weaponSprite, Sprite bulletSprite) {
         this(nm, pw, 1, 25, weaponSprite, bulletSprite);
     }
@@ -49,6 +63,7 @@ public abstract class Item extends Actor {
     /**
      * @return the name of the item
      */
+    @Override
     public String getName() {
         return name;
     }
@@ -56,6 +71,7 @@ public abstract class Item extends Actor {
     /**
      * @param name sets the name of the item
      */
+    @Override
     public void setName(String name) {
         this.name = name;
     }
@@ -115,7 +131,13 @@ public abstract class Item extends Actor {
         this.remove();
     }
 
-    public abstract void activate( Vector2 position, Vector2 mousePos, Vector2 Wind, double grav );
-    
+    /**
+     * The implementation of this method should specifiy what an item does when it's activated
+     * @param position Position from which the activation originates
+     * @param mousePos Mouse position of the activation
+     * @param wind Current wind upon activation
+     * @param grav Gravity modifier upon activation
+     */
+    public abstract void activate(Vector2 position, Vector2 mousePos, Vector2 wind, double grav);
 
 }

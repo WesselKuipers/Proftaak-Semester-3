@@ -5,7 +5,7 @@ package com.wotf.game.classes;
  */
 public class Player {
 
-    private String ip;
+    private final String ip;
     private String name;
 
     /**

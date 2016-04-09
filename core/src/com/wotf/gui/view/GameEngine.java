@@ -1,17 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/**
- *
- * @author DinoS
- */
 package com.wotf.gui.view;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -25,22 +15,37 @@ import java.util.ArrayList;
 import java.util.List;
 import com.wotf.game.WotFGame;
 
+/**
+ * Wrapper class that contains the Game object
+ */
 public class GameEngine implements Screen {
 
-    private WotFGame game;
+    private final WotFGame game;
     private GameStage stage;
     private List<Team> teams;
-    private GameSettings gamesettings;
+    private GameSettings gameSettings;
 
+    /**
+     * Constructor of GameEngine
+     * @param game Game that will be launched
+     */
     public GameEngine(WotFGame game) {
         this.game = game;
     }
 
-    public GameEngine(WotFGame game, GameSettings gamesettings) {
+    /**
+    * Constructor of GameEngine
+    * @param game Game that will be launched
+    * @param gameSettings Settings associated with this game
+    */
+    public GameEngine(WotFGame game, GameSettings gameSettings) {
         this.game = game;
-        this.gamesettings = gamesettings;
+        this.gameSettings = gameSettings;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void show() {
         // Creates default players list and object
@@ -50,7 +55,7 @@ public class GameEngine implements Screen {
         Map map = new Map("maps/STONES.PNG");
         map.setWaterLevel(30);
         
-        /*
+        /* Debug map:
         // Creates a new terrain mask and assigns a flat rectangle as terrain
         boolean[][] terrain = new boolean[map.getWidth()][map.getHeight()];
         for (int x = 100; x < (map.getWidth() - 100); x++) {
@@ -76,7 +81,7 @@ public class GameEngine implements Screen {
         viewport.apply();
 
         // Initializes game object using game settings
-        Game gameclass = new Game(gamesettings, map, players);
+        Game gameclass = new Game(gameSettings, map, players);
 
         // Initializes the stage object and sets the viewport
         stage = new GameStage(gameclass);
@@ -86,6 +91,9 @@ public class GameEngine implements Screen {
         Gdx.input.setInputProcessor(stage);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0.9f, 0.9f, 0.9f, 1);
@@ -95,24 +103,39 @@ public class GameEngine implements Screen {
         stage.draw();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void hide() {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void resize(int width, int height) {
         // Passes the new width and height to the viewport
         stage.getViewport().update(width, height);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void pause() {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void resume() {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void dispose() {
     }

@@ -16,6 +16,9 @@ import com.wotf.game.classes.Projectile;
  */
 public class MissileLauncher extends Item {
 
+    /**
+     * {@inheritDoc}
+     */
     public MissileLauncher(String nm, int pw, int rad, int damage, Sprite weaponSprite, Sprite bulletSprite) {
         super(nm, pw, rad, damage, weaponSprite, bulletSprite);
     }

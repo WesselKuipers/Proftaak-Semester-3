@@ -9,11 +9,15 @@ import com.wotf.game.WotFGame;
  * @author Remco
  */
 public class DesktopLauncher {
-	public static void main (String[] arg) {
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-                // Sets the default width and height of the window to 720p
-                config.width = 1280;
-                config.height = 720;
-		new LwjglApplication(new WotFGame(), config);
-	}
+    /**
+     * Main entry point of the game on desktop machines
+     * @param arg Argslist
+     */
+    public static void main (String[] arg) {
+            LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+            // Sets the default width and height of the window to 720p
+            config.width = 1280;
+            config.height = 720;
+            LwjglApplication lwjglApplication = new LwjglApplication(new WotFGame(), config);
+    }
 }

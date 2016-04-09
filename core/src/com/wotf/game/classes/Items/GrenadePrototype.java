@@ -5,9 +5,6 @@
  */
 package com.wotf.game.classes.Items;
 
-import com.badlogic.gdx.utils.Timer;
-import java.util.Random;
-
 /**
  *
  * @author chaos

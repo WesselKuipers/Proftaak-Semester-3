@@ -5,8 +5,6 @@
  */
 package com.wotf.game.classes.Items;
 
-import java.util.Random;
-
 /**
  *
  * @author chaos

@@ -16,6 +16,9 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  */
 public class Bazooka extends MissileLauncher implements IExplosion {
 
+    /**
+     * {@inheritDoc}
+     */
     public Bazooka(String nm, int pw, int rad, int damage, Sprite weaponSprite, Sprite bulletSprite) {
         super(nm, pw, rad, damage, weaponSprite, bulletSprite);
     }

@@ -9,7 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.wotf.game.GameStage;
@@ -22,7 +21,7 @@ import com.wotf.game.GameStage;
  */
 public class Projectile extends Actor {
 
-    private Sprite sprite;
+    private final Sprite sprite;
 
     //projectile trajectory variables
     private float angle;
@@ -62,6 +61,7 @@ public class Projectile extends Actor {
      * @param wind          Vector2 wind physics.
      * @param gravity       Pulling force towards the ground.
      * @param blastRadius   Impact radius of the bullet on the terrain.
+     * @param damage        Damage this projectile should do should it collide with a unit.
      */
     public void fire( Vector2 unitPos, Vector2 mousePos,
             float force, Vector2 wind, double gravity, int blastRadius, int damage ){
@@ -188,7 +188,11 @@ public class Projectile extends Actor {
             return;
         }
 
-        // TODO: Determine how the location of the projectile gets calculated
+        // bounds check for terrain[][]
+        if (!(this.getX() >= 0 && this.getY() >= 0 && this.getX() < terrain.length && this.getY() < terrain[0].length)) {
+            return;
+        }
+        
         // Terrain and unit collision
         if (terrain[(int) getX()][(int) getY()] || checkUnitCollision()) {
             // Projectile collided with terrain

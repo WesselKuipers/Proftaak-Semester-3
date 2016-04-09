@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -22,11 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.wotf.game.classes.Game;
-import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
-import com.wotf.game.classes.Items.Item;
-import com.wotf.game.classes.Projectile;
 import com.wotf.game.classes.Team;
-import com.wotf.game.classes.TurnLogic;
 import com.wotf.game.classes.TurnLogic.TurnState;
 import com.wotf.game.classes.Unit;
 import java.util.ArrayList;
@@ -40,20 +35,25 @@ import java.util.List;
 public class GameStage extends Stage {
 
     //private WotFGame game;
-    private Game game;
+    private final Game game;
 
-    private SpriteBatch batch;
-    private SpriteBatch guiBatch;
-    private BitmapFont font;
+    private final SpriteBatch batch;
+    private final SpriteBatch guiBatch;
+    private final BitmapFont font;
 
     private Texture terrainTexture;
-    private Texture backgroundTexture;
+    private final Texture backgroundTexture;
     private Pixmap pixmap;
-    //private OrthographicCamera camera;
 
     private Actor focusedActor; // if this is set to an actor
-    // have the camera follow it automatically, otherwise set it to null
+                                // have the camera follow it automatically, otherwise set it to null
 
+    
+    /**
+     * Constructor for GameStage that initializes everything required for the game to run
+     * Generates the initial texture based on the data contained within Map
+     * @param game Game data structure to base initial variables on (settings, map, etc)
+     */
     public GameStage(Game game) {
         super(new ScreenViewport());
         this.game = game;
@@ -73,7 +73,6 @@ public class GameStage extends Stage {
         bgPixmap.dispose();
 
         terrainTexture = game.getMap().getLandscapeTexture();
-        //updateTerrain();
     }
 
     /**
@@ -87,12 +86,6 @@ public class GameStage extends Stage {
         for (Team team : game.getTeams()) {
             for (Unit unit : team.getUnits()) {
 
-                // Retrieves the currently attached sprite of this unit,
-                // adds a color tint to it and assigns it back to the unit
-                //Sprite unitSprite = unit.getSprite();
-                //unitSprite.setColor(team.getColor());
-                //unit.setSprite(unitSprite);
-                // TODO: Check if spot is actually free/usable
                 // Spawns a unit in a random location (X axis)
                 Vector2 ranLocation = new Vector2(MathUtils.random(0, game.getMap().getWidth() - unit.getWidth()), 80);
                 unit.spawn(ranLocation);
@@ -107,6 +100,7 @@ public class GameStage extends Stage {
                     posX = MathUtils.random(0 + (int) unit.getWidth(), (int) game.getMap().getWidth() - (int) unit.getWidth());
                     posY = -1;
 
+                    // loops through terrain[x ± half its width][y] to check for collision free locations
                     for (int x = posX; x < posX + unit.getWidth(); x++) {
                         for (int y = terrain[0].length - 1; y > 0; y--) {
                             if (terrain[x][y]) {
@@ -117,15 +111,17 @@ public class GameStage extends Stage {
                         }
                     }
 
+                    // if a position has been found, we can exit the loop
                     if (posY != -1) {
                         spawned = true;
                         break;
                     }
-
                 }
 
+                // since [posX][posY] is solid, we want to spawn the unit one pixel higher
                 unit.spawn(new Vector2(posX, posY + 1));
 
+                // formally adds the unit as an actor to the stage
                 this.addActor(unit);
             }
         }
@@ -253,13 +249,18 @@ public class GameStage extends Stage {
     }
 
     /**
-     * @Author Jip Boesenkool Function which handles the bullets on button
-     * click.
-     * @return
+     * Click event for the stage
+     * Handles the logic for using the currently selected item
+     * @param screenX X-coordinate of the cursor
+     * @param screenY Y-coordinate of the cursor
+     * @param pointer The pointer of the event
+     * @param button The keycode of the button passed through
+     * @return Whether the input was processed
      */
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         Vector3 rel = getCamera().unproject(new Vector3(screenX, screenY, 0));
+        
         if (game.getTurnLogic().getTurnState() == TurnState.PLAYING) {
             System.out.println(String.format("Touchdown event (%d, %d) button %d", screenX, screenY, button));
             System.out.println(String.format("Relative Touchdown event (%f, %f) button %d", rel.x, rel.y, button));
@@ -270,6 +271,7 @@ public class GameStage extends Stage {
             } else if (button == Input.Buttons.RIGHT) {
                 explode((int) rel.x, (int) rel.y, 30, 0);
             }
+            
             game.endTurn();
         }
         return true;
@@ -352,14 +354,14 @@ public class GameStage extends Stage {
     }
 
     /**
-     * Calculates an explosion at position X and Y using specified radius Sets
-     * all solid pixels that were detected within the radius to false and
+     * Calculates an explosion at position X and Y using specified radius
+     * Sets all solid pixels that were detected within the radius to false and
      * updates the terrain accordingly Iterates through all units that got hit
-     * (currently unused)
      *
      * @param x X-position of the explosion
      * @param y Y-position of the explosion (0 = bottom)
      * @param radius Length of the radius in pixels
+     * @param damage Amount of damage the explosion does should it collide with a Unit
      */
     public void explode(int x, int y, int radius, int damage ) {
         boolean[][] terrain = game.getMap().getTerrain();
@@ -391,7 +393,6 @@ public class GameStage extends Stage {
                     if (terrain[xPos][yPos]) {
                         // Additional checks can be done here
                         terrain[xPos][yPos] = false;
-                        // TODO: Spawn cool explosion effect here
                     }
                 }
             }
