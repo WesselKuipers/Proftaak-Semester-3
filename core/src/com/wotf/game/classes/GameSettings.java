@@ -49,7 +49,8 @@ public class GameSettings {
      */
     private void fillWeapons() {
         Sprite sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
-        WEAPONS_ARMORY.add(new Bazooka("Bazooka", 10, 10, 40, sprite, sprite));
+        
+        WEAPONS_ARMORY.add(new Bazooka("Bazooka", 10, 30, 40, sprite, sprite));
         WEAPONS_ARMORY.add(new Bazooka("Grenade", 10, 10, 40, sprite, sprite));
     }
 

@@ -230,10 +230,21 @@ public class Unit extends Group {
         super.act(delta);
         sprite.setRegion(getFrame(delta));
         updateJump();
+        
+        // Units with 0 health automatically get cleaned up at the end of the turn
+        // We assume units are dead if they end up out of bounds
+        if (isOutOfBounds()) {
+            health = 0;
+            
+            // if it's currently this unit's turn, manually call the endTurn() method
+            if (((GameStage) this.getStage()).getGame().getActiveTeam().getActiveUnit().equals(this)) {
+                ((GameStage) this.getStage()).getGame().endTurn();
+            }
+        }
     }
 
     /**
-     * In jump() we set the followin
+     * In jump() we set the following
      *  - setAngle with the next position
      *  - setAcceleration with the gravity
      *  - setVelocity with the force
@@ -382,5 +393,14 @@ public class Unit extends Group {
      */
     public Item getWeapon(){
         return weapon;
+    }
+    
+    /**
+     * Checks if the unit (checking from the center of the sprite) is currently out of bounds
+     * @return True if out of bounds, false if not
+     */
+    public boolean isOutOfBounds() {
+        Rectangle bounds = ((GameStage) this.getStage()).getGame().getMap().getBounds();
+        return !bounds.contains(this.getX() + this.getWidth() / 2, this.getY() + this.getHeight() / 2);
     }
 }
