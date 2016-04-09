@@ -9,12 +9,9 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
-import com.wotf.game.classes.Items.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
