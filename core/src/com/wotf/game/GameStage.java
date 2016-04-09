@@ -13,7 +13,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -22,11 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.wotf.game.classes.Game;
-import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
-import com.wotf.game.classes.Items.Item;
-import com.wotf.game.classes.Projectile;
 import com.wotf.game.classes.Team;
-import com.wotf.game.classes.TurnLogic;
 import com.wotf.game.classes.TurnLogic.TurnState;
 import com.wotf.game.classes.Unit;
 import java.util.ArrayList;
@@ -260,30 +255,17 @@ public class GameStage extends Stage {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         Vector3 rel = getCamera().unproject(new Vector3(screenX, screenY, 0));
-        System.out.println(String.format("Touchdown event (%d, %d) button %d", screenX, screenY, button));
-        System.out.println(String.format("Relative Touchdown event (%f, %f) button %d", rel.x, rel.y, button));
+        if (game.getTurnLogic().getTurnState() == TurnState.PLAYING) {
+            System.out.println(String.format("Touchdown event (%d, %d) button %d", screenX, screenY, button));
+            System.out.println(String.format("Relative Touchdown event (%f, %f) button %d", rel.x, rel.y, button));
 
-        if (button == Input.Buttons.LEFT) {
-            System.out.println("Firing bullet");
-            bulletLogic((int) rel.x, (int) rel.y);
-        } else if (button == Input.Buttons.RIGHT) {
-            explode((int) rel.x, (int) rel.y, 30, 0);
-            
-//        Vector3 rel = getCamera().unproject( new Vector3(screenX, screenY, 0) );
-//        
-//        if (game.getTurnLogic().getTurnState() == TurnState.PLAYING) {
-//            game.endTurn();
-//            
-//            System.out.println(String.format("Touchdown event (%d, %d) button %d", screenX, screenY, button));
-//            System.out.println(String.format("Relative Touchdown event (%f, %f) button %d", rel.x, rel.y, button));
-//            
-//            if(button == Input.Buttons.LEFT) {
-//                System.out.println("Firing bullet");
-//                bulletLogic((int)rel.x, (int)rel.y);
-//            } else if (button == Input.Buttons.RIGHT) {
-//                explode((int) rel.x, (int) rel.y, 30);
-//            }
-//        }
+            if (button == Input.Buttons.LEFT) {
+                System.out.println("Firing bullet");
+                bulletLogic((int) rel.x, (int) rel.y);
+            } else if (button == Input.Buttons.RIGHT) {
+                explode((int) rel.x, (int) rel.y, 30, 0);
+            }
+            game.endTurn();
         }
         return true;
     }
@@ -328,6 +310,13 @@ public class GameStage extends Stage {
         font.draw(guiBatch, String.format("Camera coords [%s], zoom %f", getCamera().position.toString(), ((OrthographicCamera) getCamera()).zoom), 0, this.getHeight() - 80);
         font.draw(guiBatch, "Time remaining: " + (game.getGameSettings().getTurnTime() - (int) game.getTurnLogic().getElapsedTime()), 0, this.getHeight() - 100);
 
+        if (game.getTurnLogic().getTurnState() == TurnState.GAMEOVER) {
+            game.endTurn();
+            game.getTurnLogic().gameOverState();
+            font.draw(guiBatch, "GAME OVER", this.getWidth() / 2, this.getHeight() / 2);
+        }
+        
+        
         guiBatch.end();
     }
 

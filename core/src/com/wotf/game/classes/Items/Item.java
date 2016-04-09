@@ -1,7 +1,5 @@
 package com.wotf.game.classes.Items;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -18,6 +16,7 @@ public abstract class Item extends Actor {
     Weapons extend item and implement e.g. IExplosion \/ IReplace \/ IHeal \/ IHeal \/ ICluster
     weapons/items have own implementation of these interfaces 
     
+    Weapons logic should be remodeled in the next version when it is mapped where what function goes
      */
     private String name;
     private float power;
@@ -45,42 +44,71 @@ public abstract class Item extends Actor {
         this(nm, pw, 1, 25, weaponSprite, bulletSprite);
     }
 
+    /**
+     * @return the name of the item
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @param name sets the name of the item
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * @return gets the power of the item
+     */
     public float getPower() {
         return power;
     }
-
+ /**
+  * @param power sets the given power as the item's power
+  */
     public void setPower(int power) {
         this.power = power;
     }
 
+    /**
+     * @return gets the initial blastradius
+     */
     public int getBlastRadius() {
         return blastRadius;
     }
 
+    /**
+     * @param blastRadius sets the new blastradius
+     */
     public void setBlastRadius(int blastRadius) {
         this.blastRadius = blastRadius;
     }
-
+    
+    /**
+     * @return gets the bullet 
+     */
     public Projectile getBullet() {
         return bullet;
     }
     
+    /**
+     * @return gets the damage that this item can do
+     */
     public int getDamage() {
         return damage;
     }
 
+    /**
+     * initiate this object as an actor
+     */
     public void initActor() {
         ((GameStage) this.getStage()).addActor(this); //todo--> Add update sequence in gamestage
     }
 
+    /**
+     * destroys the actor object of the item
+     */
     public void destroyActor() {
         this.remove();
     }

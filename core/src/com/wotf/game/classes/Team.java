@@ -9,12 +9,9 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
-import com.wotf.game.classes.Items.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +38,7 @@ public class Team {
      */
     public Team(String name, Color color) {
         //blok voor testen van weapons
+        Sprite sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
         items = new HashMap<Item, Integer>();
         items.put( WEAPONS_ARMORY.get(0), 99);
 
@@ -56,7 +54,6 @@ public class Team {
     }
 
     /**
-     *
      * @return all the players of the team
      */
     public List<Player> getPlayers() {
@@ -64,8 +61,7 @@ public class Team {
     }
 
     /**
-     * Adds a player to team
-     *
+     * Adds a player to the team
      * @param p player
      */
     public void addPlayer(Player p) {
@@ -83,7 +79,6 @@ public class Team {
     }
 
     /**
-     *
      * @return the team name
      */
     public String getName() {
@@ -92,7 +87,6 @@ public class Team {
 
     /**
      * Set the name of the team
-     *
      * @param name
      */
     public void setName(String name) {
@@ -100,7 +94,6 @@ public class Team {
     }
 
     /**
-     *
      * @return color of team
      */
     public Color getColor() {
@@ -109,7 +102,6 @@ public class Team {
 
     /**
      * set the color of team
-     *
      * @param color color of team
      */
     public void setColor(Color color) {
@@ -117,7 +109,6 @@ public class Team {
     }
 
     /**
-     *
      * @return all the units of team
      */
     public List<Unit> getUnits() {
@@ -125,7 +116,6 @@ public class Team {
     }
 
     /**
-     *
      * @return active unit by active unit index
      */
     public Unit getActiveUnit() {
@@ -133,7 +123,6 @@ public class Team {
     }
 
     /**
-     *
      * @param index index of player
      * @return unit by index
      */
@@ -143,7 +132,6 @@ public class Team {
 
     /**
      * Add a unit to the team
-     *
      * @param name name of the unit
      * @param health health of the unit
      */
@@ -199,9 +187,8 @@ public class Team {
     }
 
     /**
-     * select a item
-     *
-     * @param item
+     * select an item that is foudn inside the teamlist
+     * @param item item that needs to be selected
      * @return the selected item
      */
     public boolean selectItem(Item item) {
@@ -213,6 +200,11 @@ public class Team {
 
     }
 
+    /**
+     * Check if the item excists inside the team's item list
+     * @param item item to check for
+     * @return return the item that is found inside the team
+     */
     public Item containsKey(Item item) {
         Item result = null;
         for (Entry<Item, Integer> entry : items.entrySet()) {
@@ -226,7 +218,6 @@ public class Team {
 
     /**
      * Decrease the item amount for the selected item
-     *
      * @param item selected
      * @param amount to increase
      */
@@ -256,7 +247,6 @@ public class Team {
 
     /**
      * Check if item contains an amount
-     *
      * @param item
      * @return item
      */
@@ -268,7 +258,6 @@ public class Team {
     }
 
     /**
-     *
      * @return string of name and color of team
      */
     @Override

@@ -6,7 +6,8 @@
 package com.wotf.game.classes.Items;
 
 /**
- *
+ *SHOULD BE DELETED IN THE NEXT VERSION
+ * 
  * @author chaos
  */
 public enum EnumItems {

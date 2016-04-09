@@ -1,9 +1,5 @@
 package com.wotf.game.classes;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.utils.Array;
 import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 import com.wotf.game.classes.Items.Item;
@@ -101,6 +97,9 @@ public class Game {
      * @return the active team used by the active team index
      */
     public Team getActiveTeam() {
+        if(teams.isEmpty()) {
+            return null;
+        }
         return teams.get(turnLogic.getActiveTeamIndex());
     }
 
@@ -168,6 +167,11 @@ public class Game {
         for (int i = 0; i < teamsToRemove.size(); i++) {
             turnLogic.lowerTeamCount();
         }
+        
+        // Game over
+        if (teams.size() <= teamsToRemove.size()) {
+            turnLogic.gameOverState();
+        } 
     }
 
     /**

@@ -4,7 +4,6 @@ import com.badlogic.gdx.Game;
 import com.wotf.game.WotFGame;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.wotf.gui.view.GameEngine;
 import com.wotf.gui.view.MainMenu;
 
 public class WotFGame extends Game {
@@ -22,5 +21,5 @@ public class WotFGame extends Game {
         //setScreen(new MainMenu(game));
         game.setScreen(new MainMenu(game));
     }
-
+    
 }
