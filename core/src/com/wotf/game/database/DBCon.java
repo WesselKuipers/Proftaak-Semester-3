@@ -12,38 +12,42 @@ public class DBCon {
     private static Connection connection;
 
     // TODO: 6-3-2016 Refactor this so that the username and password are loaded from a file instead of being hard-coded
-    private static String connectionPath = "ourConnectionString"; // example oracle string: "jdbc:oracle:thin:@localhost:1521:XE";
-    private static String username = "username";
-    private static String password = "password";
+    private static final String ConnectionPath = "ourConnectionString"; // example oracle string: "jdbc:oracle:thin:@localhost:1521:XE";
+    private static final String Username = "username";
+    private static final String Password = "password";
 
-    private static String numericDefault = "0";
+    private static final String NumericDefault = "0";
 
-    // Static block that gets executed the moment anything from this class gets called
-    // This block is no longer necessary in the newer versions of JDBC
-    /*static {
-        try {
-            //DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
-            System.out.println("Registered Oracle OJDBC driver");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }*/
+    /**
+     * @return a JDBC Connection object based
+     */
     public static Connection getConnection() {
         try {
-            connection = DriverManager.getConnection(connectionPath, username, password);
+            connection = DriverManager.getConnection(ConnectionPath, Username, Password);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             return null;
         }
 
         return connection;
     }
 
-    public static int ExecuteUpdate(String query) {
-        return ExecuteUpdate(query, null);
+    /**
+     * Executes an update query
+     * @param query Query to run
+     * @return Number of rows afflicted
+     */
+    public static int executeUpdate(String query) {
+        return executeUpdate(query, null);
     }
 
-    public static int ExecuteUpdate(String query, List<Object> parameters) {
+    /**
+     * Executes an update query with parameters
+     * @param query Query to run
+     * @param parameters Parameters to add to the prepared statement
+     * @return Number of rows afflicted
+     */
+    public static int executeUpdate(String query, List<Object> parameters) {
         Connection con = getConnection();
         PreparedStatement ps;
 
@@ -62,18 +66,29 @@ public class DBCon {
                 return result;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
 
         // If we've reached this point, it means the query didn't succeed, return -1
         return -1;
     }
 
-    public static ResultSet ExecuteResultSet(String query) {
-        return ExecuteResultSet(query, null);
+    /**
+     * Executes a query and returns the resulting ResultSet object
+     * @param query Query to run
+     * @return ResultSet of the query
+     */
+    public static ResultSet executeResultSet(String query) {
+        return executeResultSet(query, null);
     }
 
-    public static ResultSet ExecuteResultSet(String query, List<Object> parameters) {
+     /**
+     * Executes a query and returns the resulting ResultSet object
+     * @param query Query to run
+     * @param parameters Parameters to add to the prepared statement
+     * @return ResultSet of the query
+     */
+    public static ResultSet executeResultSet(String query, List<Object> parameters) {
         Connection con = getConnection();
         PreparedStatement ps;
 
@@ -92,18 +107,29 @@ public class DBCon {
                 return ps.getResultSet();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
 
         // If we've reached this point, it means the query didn't succeed, return null
         return null;
     }
 
-    public static List<String[]> ExecuteResultSetAsList(String query) {
-        return ExecuteResultSetAsList(query, null);
+     /**
+     * Executes a query and converts its result set as a List of Strings
+     * @param query Query to run
+     * @return List of String[] representing every row returned from the query
+     */
+    public static List<String[]> executeResultSetAsList(String query) {
+        return executeResultSetAsList(query, null);
     }
 
-    public static List<String[]> ExecuteResultSetAsList(String query, List<Object> parameters) {
+    /**
+     * Executes a query with parameters and converts its result set as a List of Strings
+     * @param query Query to run
+     * @param parameters Parameters to add to the prepared statement
+     * @return List of String[] representing every row returned from the query
+     */
+    public static List<String[]> executeResultSetAsList(String query, List<Object> parameters) {
         Connection con = getConnection();
         PreparedStatement ps;
 
@@ -139,7 +165,7 @@ public class DBCon {
                                 case Types.FLOAT:
                                 case Types.NUMERIC:
                                 case Types.SMALLINT:
-                                    record[i - 1] = numericDefault;
+                                    record[i - 1] = NumericDefault;
                                     continue;
                             }
 
@@ -155,7 +181,7 @@ public class DBCon {
                 return result;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
 
         // If we've reached this point, it means the query didn't succeed, return null

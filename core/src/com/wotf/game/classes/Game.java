@@ -5,19 +5,21 @@ import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 import com.wotf.game.classes.Items.Item;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Main data structure used to contain all data required to start and run a game session
+ */
 public class Game {
 
-    private Player host;
-    private List<Player> players;
-    private List<Team> teams;
-    private Map map;
+    private final Player host;
+    private final List<Player> players;
+    private final List<Team> teams;
+    private final Map map;
 
-    private GamePhysics gamePhysics;
-    private GameSettings gameSettings;
-    private TurnLogic turnLogic;
+    private final GamePhysics gamePhysics;
+    private final GameSettings gameSettings;
+    private final TurnLogic turnLogic;
 
     /**
      * Constructor of Game, assign params to properties. Add new game physics
@@ -141,11 +143,9 @@ public class Game {
         
         // TODO: Remove units and teams based on health and remaining unit count
         // When unit has lower or equal than 0 health, remove the unit from the team
-        for (Iterator<Team> it = teams.iterator(); it.hasNext();) {
-            Team team = it.next();
+        for (Team team : teams) {
             int unitsAlive = team.getUnits().size();
-            for (Iterator<Unit> itTeam = team.getUnits().iterator(); itTeam.hasNext();) {
-                Unit unit = itTeam.next();
+            for (Unit unit : team.getUnits()) {
                 if (unit.getHealth() <= 0) {
                     unitsToRemove.add(unit);
                     unitsAlive--;

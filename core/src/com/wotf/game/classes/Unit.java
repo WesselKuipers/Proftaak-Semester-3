@@ -15,22 +15,22 @@ import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 
 /**
- * Created by Wessel on 14/03/2016.
+ * Unit represents a playable character on the map
  */
 public class Unit extends Group {
     private float angle;
-    public float force = 3f;
+    private float force = 3f;
     private Vector2 acceleration;
     private TextureRegion unitStand;
 
-    public float speed = 50 * 2;
-    public Vector2 velocity = new Vector2();
-    boolean moveRight;
+    private float speed = 50 * 2;
+    private Vector2 velocity = new Vector2();
+    private boolean moveRight;
 
     private int health;
     private String name;
 
-    public Sprite sprite;
+    private Sprite sprite;
     private Vector2 position;
 
     private Item weapon;
@@ -39,6 +39,12 @@ public class Unit extends Group {
     // Font is used for displaying name and health
     private static BitmapFont font = new BitmapFont();
 
+    /**
+     * Initializes a unit object
+     * @param name Name of the unit
+     * @param health Amount of health the unit starts with
+     * @param team Team this unit belongs to
+     */
     public Unit(String name, int health, Team team) {
         this.name = name;
         this.health = health;
@@ -59,7 +65,7 @@ public class Unit extends Group {
         this.setWidth(sprite.getWidth());
         this.setHeight(sprite.getHeight());
 
-        // Temporary input listener
+        // Input listener for every unit
         addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
@@ -105,7 +111,13 @@ public class Unit extends Group {
         });
     }
     
-    //constructor
+    /**
+     * Initializes a unit object with a starting position
+     * @param name Name of the unit
+     * @param health Amount of health the unit starts with
+     * @param team Team this unit belongs to
+     * @param position Position to start the unit at
+     */
     public Unit(String name, int health, Team team, Vector2 position) {
         this(name, health, team);
         this.position = position;
@@ -113,8 +125,8 @@ public class Unit extends Group {
     }
 
     /**
-     * selects a given weapon and adds it to the stage 
-     * @param i item object that you want to select
+     * Selects a given weapon and adds it to the stage 
+     * @param i Item object that you want to select
      */
     public void selectWeapon(Item i) {
         destroyWeapon();
@@ -182,6 +194,7 @@ public class Unit extends Group {
      * Returns the name associated with this unit
      * @return String containing the name of this unit
      */
+    @Override
     public String getName() {
         return name;
     }
@@ -214,6 +227,12 @@ public class Unit extends Group {
         super.positionChanged();
     }
 
+    /**
+     * Draws the unit's sprite to the spriteBatch
+     * Also draws text representing the unit's health, team colour and name
+     * @param batch SpriteBatch to draw to
+     * @param parentAlpha Alpha channel to control transparancy 
+     */
     @Override
     public void draw(Batch batch, float parentAlpha) {
         sprite.draw(batch);
@@ -225,15 +244,30 @@ public class Unit extends Group {
         font.draw(batch, String.format("%s (%d)", name, health), getX(), getY() + getHeight() + 20);
     }
 
+    /**
+     * Performs an update step for this unit
+     * @param delta Deltatime since last act() call
+     */
     @Override
     public void act(float delta) {
         super.act(delta);
         sprite.setRegion(getFrame(delta));
         updateJump();
+        
+        // Units with 0 health automatically get cleaned up at the end of the turn
+        // We assume units are dead if they end up out of bounds
+        if (isOutOfBounds()) {
+            health = 0;
+            
+            // if it's currently this unit's turn, manually call the endTurn() method
+            if (((GameStage) this.getStage()).getGame().getActiveTeam().getActiveUnit().equals(this)) {
+                ((GameStage) this.getStage()).getGame().endTurn();
+            }
+        }
     }
 
     /**
-     * In jump() we set the followin
+     * In jump() we set the following
      *  - setAngle with the next position
      *  - setAcceleration with the gravity
      *  - setVelocity with the force
@@ -362,6 +396,10 @@ public class Unit extends Group {
         return region;
     }
 
+    /**
+     * Sets the unit's position to a new position
+     * @param position Position to set
+     */
     public void setPosition(Vector2 position) {
         this.position = position;
     }
@@ -382,5 +420,14 @@ public class Unit extends Group {
      */
     public Item getWeapon(){
         return weapon;
+    }
+    
+    /**
+     * Checks if the unit (checking from the center of the sprite) is currently out of bounds
+     * @return True if out of bounds, false if not
+     */
+    public boolean isOutOfBounds() {
+        Rectangle bounds = ((GameStage) this.getStage()).getGame().getMap().getBounds();
+        return !bounds.contains(this.getX() + this.getWidth() / 2, this.getY() + this.getHeight() / 2);
     }
 }

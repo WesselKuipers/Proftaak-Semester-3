@@ -1,33 +1,31 @@
 package com.wotf.game.classes;
 
 import com.badlogic.gdx.Gdx;
-import com.wotf.game.classes.Items.Item;
 import com.badlogic.gdx.graphics.Color;
-
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-
 import com.badlogic.gdx.scenes.scene2d.Actor;
-
-import com.wotf.game.GameStage;
-import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import com.wotf.game.classes.Items.Item;
+import com.wotf.game.GameStage;
+import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 
 /**
- * Created by Wessel on 14/03/2016.
+ * Team contains data that represent a team
+ * Contains a list of players, list of units, a list of items including ammo, a name and a team colour
  */
 public class Team {
 
     private String name;
     private Color color;
-    private List<Player> players;
-    private List<Unit> units;
-    private Map<Item, Integer> items; // The integer represents the ammo remaining
+    private final List<Player> players;
+    private final List<Unit> units;
+    private final Map<Item, Integer> items; // The integer represents the ammo remaining
     private int activeUnitIndex;
 
     /**
@@ -37,9 +35,8 @@ public class Team {
      * @param color
      */
     public Team(String name, Color color) {
-        //blok voor testen van weapons
         Sprite sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
-        items = new HashMap<Item, Integer>();
+        items = new HashMap<>();
         items.put( WEAPONS_ARMORY.get(0), 99);
 
         this.name = name;
@@ -140,13 +137,13 @@ public class Team {
     }
 
     /**
-     * When unit is killed (health is zero or lower), remove the actor and unit
-     * from team
+     * When unit is killed (health is zero or lower), 
+     * remove the actor and unit from team
      *
      * @param unit to be removed
      */
     public void removeUnit(Unit unit) {
-        if (unit == null || units.contains(unit)) {
+        if (unit != null && units.contains(unit)) {
             GameStage gameStage = (GameStage)unit.getStage();
             for (Actor actor : gameStage.getActors()) {
                 if (actor == unit) {
@@ -192,12 +189,7 @@ public class Team {
      * @return the selected item
      */
     public boolean selectItem(Item item) {
-        if (containsKey(item) != null) {
-            return true;
-        } else {
-            return false;
-        }
-
+        return containsKey(item) != null;
     }
 
     /**

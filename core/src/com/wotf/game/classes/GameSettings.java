@@ -15,13 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
- * @author rensphilipsen
+ * Contains the settings used to determine some of the rules the game has to follow
  */
 public class GameSettings {
 
     public static List<Item> WEAPONS_ARMORY;
-    private List<Team> teams;
+    private final List<Team> teams;
 
     private int maxTurns;
     private int maxTime;
@@ -30,6 +29,10 @@ public class GameSettings {
     private boolean fallingDamage;
     private boolean suddenDeath;
 
+    /**
+     * Main constructor for GameSettings
+     * Sets all variables to the default rules
+     */
     public GameSettings() {
         WEAPONS_ARMORY = new ArrayList<>();
         fillWeapons();
@@ -49,7 +52,8 @@ public class GameSettings {
      */
     private void fillWeapons() {
         Sprite sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
-        WEAPONS_ARMORY.add(new Bazooka("Bazooka", 10, 10, 40, sprite, sprite));
+        
+        WEAPONS_ARMORY.add(new Bazooka("Bazooka", 10, 30, 40, sprite, sprite));
         WEAPONS_ARMORY.add(new Bazooka("Grenade", 10, 10, 40, sprite, sprite));
     }
 

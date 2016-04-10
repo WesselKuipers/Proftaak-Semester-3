@@ -21,7 +21,7 @@ import com.wotf.game.GameStage;
  */
 public class Projectile extends Actor {
 
-    private Sprite sprite;
+    private final Sprite sprite;
 
     //projectile trajectory variables
     private float angle;
@@ -61,6 +61,7 @@ public class Projectile extends Actor {
      * @param wind          Vector2 wind physics.
      * @param gravity       Pulling force towards the ground.
      * @param blastRadius   Impact radius of the bullet on the terrain.
+     * @param damage        Damage this projectile should do should it collide with a unit.
      */
     public void fire( Vector2 unitPos, Vector2 mousePos,
             float force, Vector2 wind, double gravity, int blastRadius, int damage ){
@@ -182,17 +183,18 @@ public class Projectile extends Actor {
         boolean[][] terrain = gameMap.getTerrain();
 
         // if projectile is out of bounds, remove it from the stage
-        if ( isProjectileOutOfBounds(gameMap) ) {
+        if (isProjectileOutOfBounds(gameMap)) {
             this.remove();
-        }
-
-        // Terrain collision
-        if (!(this.getX() >= 0 && this.getY() >= 0 && this.getX() < terrain.length && this.getY() < terrain[0].length)) {
             return;
         }
 
-        // TODO: Determine how the location of the projectile gets calculated
-        if (terrain[(int) getX()][(int) getY()]) {
+        // bounds check for terrain[][]
+        if (!(this.getX() >= 0 && this.getY() >= 0 && this.getX() < terrain.length && this.getY() < terrain[0].length)) {
+            return;
+        }
+        
+        // Terrain and unit collision
+        if (terrain[(int) getX()][(int) getY()] || checkUnitCollision()) {
             // Projectile collided with terrain
             System.out.println("Bullet collided at " + this.getX() + " " + this.getY());
 
@@ -206,15 +208,25 @@ public class Projectile extends Actor {
      * @param gameMap   map object which holds data about the map
      * @return          True if projectile is out of bounds, false otherwise.
      */
-    private boolean isProjectileOutOfBounds( Map gameMap ){
-        if (this.getX() - this.getWidth() > gameMap.getWidth()
+    private boolean isProjectileOutOfBounds(Map gameMap) {
+        return this.getX() - this.getWidth() > gameMap.getWidth()
                 || this.getX() + this.getWidth() < 0
-                || this.getY() + this.getHeight() < 0) {
-            return true;
-        }
-        else{
-            return false;
-        }
+                || this.getY() + this.getHeight() < 0;
     }
     
+    /**
+     * Function to check if projectile collided with any of the units
+     * @return True if a collision as detected, false otherwise.
+     */
+    private boolean checkUnitCollision() {
+        for (Team t : ((GameStage) getStage()).getGame().getTeams()) {
+            for (Unit u : t.getUnits()) {
+                if (u.getBounds().contains(this.position)) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
 }

@@ -10,9 +10,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -20,39 +18,49 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
-import com.badlogic.gdx.scenes.scene2d.ui.List.ListStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.wotf.game.GameStage;
 import com.wotf.game.WotFGame;
 import com.wotf.game.classes.GameSettings;
-import com.wotf.game.classes.Player;
 import com.wotf.game.classes.Team;
 import java.util.ArrayList;
 
 /**
- *
+ * Screen that shows the local sessions menu
  * @author Gebruiker
  */
 public class SessionLocal implements Screen {
 
     private List teams;
-    private WotFGame game;
+    private final WotFGame game;
     private Stage stage;
     private Skin skin;
-    private ArrayList<Team> teamlist;
-    private GameSettings gamesettings;
+    private final ArrayList<Team> teamList;
+    private final GameSettings gameSettings;
 
+    /**
+     * Constructor of SessionLocal, initializes teamList and gameSetting
+     * @param game 
+     */
     public SessionLocal(WotFGame game) {
         this.game = game;
-        gamesettings = new GameSettings();
-        teamlist = new ArrayList<>();
+        gameSettings = new GameSettings();
+        teamList = new ArrayList<>();
     }
 
+    /**
+     * Returns a NinePatch object based on the given image
+     * @param fname Filename of the image
+     * @param left Left edge of NinePatch
+     * @param right Right edge of NinePatch
+     * @param bottom Bottom edge of NinePatch 
+     * @param top Top edge of NinePatch
+     * @return Resulting NinePatch
+     */
     private NinePatch getNinePatch(String fname, int left, int right, int bottom, int top) {
 
         // Get the image
@@ -66,6 +74,9 @@ public class SessionLocal implements Screen {
         return new NinePatch(new TextureRegion(t, 1, 1, t.getWidth() - 2, t.getHeight() - 2), left, right, bottom, top);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void show() {
         stage = new Stage();
@@ -95,10 +106,10 @@ public class SessionLocal implements Screen {
                 teamalpha.addUnit(teamalpha.getName(), 100);
                 //Mogelijk voor als iedere player in online een eigen team heeft.
                 //teamalpha.addPlayer(new Player("127.0.0.1", "AlphaPlayer"));
-                teamlist.add(teamalpha);
-                gamesettings.addTeam(teamalpha);
+                teamList.add(teamalpha);
+                gameSettings.addTeam(teamalpha);
                 teams.clear();
-                teams.setItems(teamlist);
+                teams.setItems(teamList);
                 teams.invalidateHierarchy();
             }
         });
@@ -114,9 +125,9 @@ public class SessionLocal implements Screen {
                 teambeta.addUnit(teambeta.getName(), 100);
                 //Mogelijk voor als iedere player in online een eigen team heeft.
                 //teambeta.addPlayer(new Player("127.0.0.1", "BetaPlayer"));
-                teamlist.add(teambeta);
-                gamesettings.addTeam(teambeta);
-                teams.setItems(teamlist);
+                teamList.add(teambeta);
+                gameSettings.addTeam(teambeta);
+                teams.setItems(teamList);
             }
         });
         teamselecttable.add(teambeta).padBottom(10).width(150).height(50);
@@ -130,9 +141,9 @@ public class SessionLocal implements Screen {
                 teamgamma.addUnit(teamgamma.getName(), 100);
                 //Mogelijk voor als iedere player in online een eigen team heeft.
                 //teamgamma.addPlayer(new Player("127.0.0.1", "GammaPlayer"));
-                teamlist.add(teamgamma);
-                gamesettings.addTeam(teamgamma);
-                teams.setItems(teamlist);
+                teamList.add(teamgamma);
+                gameSettings.addTeam(teamgamma);
+                teams.setItems(teamList);
             }
         });
         teamselecttable.add(teamgamma).width(150).height(50);
@@ -248,17 +259,17 @@ public class SessionLocal implements Screen {
         start.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (teamlist.size() < 2) {
+                if (teamList.size() < 2) {
                     return;
                 }
 
                 // Selected MaxTime to an integer.
-                gamesettings.setMaxTime(Integer.parseInt(timerbox.getSelected().toString()));
+                gameSettings.setMaxTime(Integer.parseInt(timerbox.getSelected().toString()));
 
                 // Selected TurnTime to an integer.
-                gamesettings.setTurnTime(Integer.parseInt(turntimebox.getSelected().toString()));
+                gameSettings.setTurnTime(Integer.parseInt(turntimebox.getSelected().toString()));
 
-                game.setScreen(new GameEngine(game, gamesettings));
+                game.setScreen(new GameEngine(game, gameSettings));
             }
         });
 
@@ -283,7 +294,7 @@ public class SessionLocal implements Screen {
      * @param delta The time in seconds since the last render.
      */
     @Override
-    public void render(float f) {
+    public void render(float delta) {
         Gdx.gl.glClearColor((float) 122 / 255, (float) 122 / 255, (float) 122 / 255, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 

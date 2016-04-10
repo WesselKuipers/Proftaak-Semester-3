@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.wotf.gui.view;
 
 import com.badlogic.gdx.Game;
@@ -10,8 +5,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -24,24 +17,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.wotf.game.WotFGame;
 import com.wotf.game.classes.Lobby;
-import com.wotf.game.classes.Session;
-import java.util.ArrayList;
 
 /**
- *
- * @author Gebruiker
+ * Screen that shows the lobby GUI
  */
 public class LobbyGUI implements Screen {
 
-    private WotFGame game;
+    private final WotFGame game;
     private Stage stage;
     private Skin skin;
     private List sessions;
-    private Pixmap pm1;
-    private Lobby lobby;
+    private final Lobby lobby;
 
     /**
      * Creates a new instance of the LobbyGUI based on the game.

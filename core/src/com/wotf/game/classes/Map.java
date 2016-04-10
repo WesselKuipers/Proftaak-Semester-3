@@ -8,13 +8,16 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import java.util.Random;
 
+/**
+ * Map contains data regarding the map the session is using for its terrain
+ */
 public class Map {
-    private double gravityModifier = 9.8;
+    private final double gravityModifier = 9.8;
     private int waterLevel;
     private int width;
     private int height;
     private boolean[][] terrain;
-    private Texture landscapeTexture;
+    private final Texture landscapeTexture;
     private Texture backgroundTexture;
     
     private Vector2 windForce;
@@ -56,11 +59,6 @@ public class Map {
         
         landscapeTexture = new Texture(out);
         pixmap.dispose();
-    }
-
-    public void readMap(String filename) {
-        // logic for reading map
-        
     }
 
     /**
