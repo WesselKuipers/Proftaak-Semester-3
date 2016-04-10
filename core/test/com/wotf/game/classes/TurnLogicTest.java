@@ -58,4 +58,14 @@ public class TurnLogicTest {
         turnlogic.endTurn();
         assertEquals(2, turnlogic.getActiveTeamIndex());
     }
+    
+    /*@Test
+    public void testlowerTeamCount() {
+        // Lowers the amount of teams. This is an int.
+        // Lower the teamcount by 1.
+        turnlogic.lowerTeamCount();
+        // Test if the initial size of 3 is reduced to 2.
+        // There is no getter so we can't actually test this..
+        assertEquals(2, turnlogic.getTotalTeams());
+    }*/
 }
