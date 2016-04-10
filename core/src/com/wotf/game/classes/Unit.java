@@ -23,7 +23,6 @@ public class Unit extends Group {
     private Vector2 acceleration;
     private TextureRegion unitStand;
 
-    private float speed = 50 * 2;
     private Vector2 velocity = new Vector2();
     private boolean moveRight;
 
