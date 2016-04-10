@@ -1,8 +1,6 @@
 package com.wotf.game;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.wotf.gui.view.MainMenu;
 
 /**
@@ -10,9 +8,6 @@ import com.wotf.gui.view.MainMenu;
  * allowing the application to easily have multiple screens
  */
 public class WotFGame extends Game {
-
-    SpriteBatch batch;
-    Texture img;
     WotFGame game;
 
     /**
