@@ -8,7 +8,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Main data structure used to contain all data required to start and run a game session
+ * Main data structure used to contain all data required to start and run a game
+ * session
  */
 public class Game {
 
@@ -99,7 +100,7 @@ public class Game {
      * @return the active team used by the active team index
      */
     public Team getActiveTeam() {
-        if(teams.isEmpty()) {
+        if (teams.isEmpty()) {
             return null;
         }
         return teams.get(turnLogic.getActiveTeamIndex());
@@ -120,19 +121,24 @@ public class Game {
         map.calculateWind();
         turnLogic.beginTurn();
         Team activeTeam = getActiveTeam();
-        GameStage gameStage = (GameStage) activeTeam.getActiveUnit().getStage();
-        gameStage.setKeyboardFocus(activeTeam.getActiveUnit());
-        gameStage.setCameraFocusToActor(activeTeam.getActiveUnit(), true);
-        
-        Item i = WEAPONS_ARMORY.get(0);
-        activeTeam.getActiveUnit().selectWeapon(i);
+
+        if (activeTeam.getActiveUnit().getHealth() != 0) {
+            GameStage gameStage = (GameStage) activeTeam.getActiveUnit().getStage();
+            gameStage.setKeyboardFocus(activeTeam.getActiveUnit());
+            gameStage.setCameraFocusToActor(activeTeam.getActiveUnit(), true);
+
+            Item i = WEAPONS_ARMORY.get(0);
+            activeTeam.getActiveUnit().selectWeapon(i);
+        } else {
+            endTurn();
+        }
     }
 
     /**
-     * Method to end a turn in the game.
-     * First call the endTurn method of the active team and turn logic,
-     * After that select the new active team and set the active index of the team to keyboard and camera focus.
-     * Last check whether team and its units are still alive.
+     * Method to end a turn in the game. First call the endTurn method of the
+     * active team and turn logic, After that select the new active team and set
+     * the active index of the team to keyboard and camera focus. Last check
+     * whether team and its units are still alive.
      */
     public void endTurn() {
         Team activeTeam = getActiveTeam();
@@ -140,7 +146,7 @@ public class Game {
         turnLogic.endTurn();
         List<Team> teamsToRemove = new ArrayList<>();
         List<Unit> unitsToRemove = new ArrayList<>();
-        
+
         // TODO: Remove units and teams based on health and remaining unit count
         // When unit has lower or equal than 0 health, remove the unit from the team
         for (Team team : teams) {
@@ -149,29 +155,29 @@ public class Game {
                 if (unit.getHealth() <= 0) {
                     unitsToRemove.add(unit);
                     unitsAlive--;
-                }  
+                }
             }
             // Remove team when no units are alive
             if (unitsAlive <= 0) {
                 teamsToRemove.add(team);
             }
         }
-        
+
         for (int i = 0; i < unitsToRemove.size(); i++) {
-            for(Team t : teams) {
+            for (Team t : teams) {
                 t.removeUnit(unitsToRemove.get(i));
             }
         }
-        
+
         teams.removeAll(teamsToRemove);
         for (int i = 0; i < teamsToRemove.size(); i++) {
             turnLogic.lowerTeamCount();
         }
-        
+
         // Game over
         if (teams.size() <= teamsToRemove.size()) {
             turnLogic.gameOverState();
-        } 
+        }
     }
 
     /**
