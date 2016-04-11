@@ -40,8 +40,10 @@ public class GameSettings {
      * Sets all variables to the default rules
      */
     public GameSettings() {
-        WEAPONS_ARMORY = new ArrayList<>();
-        fillWeapons();
+        if (WEAPONS_ARMORY == null) {
+            WEAPONS_ARMORY = new ArrayList<>();
+            fillWeapons();
+        }
 
         teams = new ArrayList<>();
 
