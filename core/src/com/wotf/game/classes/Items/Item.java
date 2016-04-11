@@ -22,6 +22,7 @@ public abstract class Item extends Actor {
     private float power;
     private int blastRadius;
     private Sprite weaponSprite;
+
     private Projectile bullet;
     private int damage;
 
@@ -58,6 +59,13 @@ public abstract class Item extends Actor {
      */
     public Item(String nm, float pw, Sprite weaponSprite, Sprite bulletSprite) {
         this(nm, pw, 1, 25, weaponSprite, bulletSprite);
+    }
+    
+     /**
+     * @return stprite image of the weapon
+     */
+    public Sprite getWeaponSprite() {
+        return weaponSprite;
     }
 
     /**

@@ -57,10 +57,12 @@ public class GameSettings {
      * Not dynamic list atm. will be replaced with user input in later itt.
      */
     private void fillWeapons() {
-        Sprite sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
+        Sprite bullet_sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
+        Sprite weapon_sprite = new Sprite(new Texture(Gdx.files.internal("Bazooka.png")));
         
-        WEAPONS_ARMORY.add(new Bazooka("Bazooka", 10, 30, 40, sprite, sprite));
-        WEAPONS_ARMORY.add(new Bazooka("Grenade", 10, 10, 40, sprite, sprite));
+        
+        WEAPONS_ARMORY.add(new Bazooka("Bazooka", 10, 30, 40, weapon_sprite, bullet_sprite));
+        WEAPONS_ARMORY.add(new Bazooka("Grenade", 10, 10, 40, weapon_sprite, bullet_sprite));
     }
     /**
      * Returns the max turns of the game
