@@ -95,7 +95,7 @@ public class GameSettingsTest {
     @Test
     public void testgetFallingDamage() {
         // The default falling damage is set to true check if this is true.
-        assertEquals(true, dsettings.isFallingDamage());
+        assertTrue(dsettings.isFallingDamage());
     }
 
     @Test

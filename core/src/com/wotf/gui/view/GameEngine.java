@@ -24,6 +24,7 @@ public class GameEngine implements Screen {
     private GameStage stage;
     private List<Team> teams;
     private GameSettings gameSettings;
+    private Map map;
 
     /**
      * Constructor of GameEngine
@@ -38,9 +39,10 @@ public class GameEngine implements Screen {
     * @param game Game that will be launched
     * @param gameSettings Settings associated with this game
     */
-    public GameEngine(WotFGame game, GameSettings gameSettings) {
+    public GameEngine(WotFGame game, GameSettings gameSettings, Map map) {
         this.game = game;
         this.gameSettings = gameSettings;
+        this.map = map;
     }
 
     /**
@@ -52,7 +54,6 @@ public class GameEngine implements Screen {
         List<Player> players = new ArrayList<>();
         players.add(new Player("127.0.0.1", "DefaultPlayer"));
 
-        Map map = new Map("maps/STONES.PNG");
         map.setWaterLevel(30);
         
         /* Debug map:

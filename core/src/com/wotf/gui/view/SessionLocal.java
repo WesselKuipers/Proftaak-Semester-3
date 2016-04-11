@@ -13,8 +13,10 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
@@ -22,15 +24,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.utils.Array;
 import com.wotf.game.WotFGame;
 import com.wotf.game.classes.GameSettings;
+import com.wotf.game.classes.Map;
 import com.wotf.game.classes.Team;
 import java.util.ArrayList;
 
 /**
  * Screen that shows the local sessions menu
+ *
  * @author Gebruiker
  */
 public class SessionLocal implements Screen {
@@ -41,10 +47,12 @@ public class SessionLocal implements Screen {
     private Skin skin;
     private final ArrayList<Team> teamList;
     private final GameSettings gameSettings;
+    private Image map1;
 
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting
-     * @param game 
+     *
+     * @param game
      */
     public SessionLocal(WotFGame game) {
         this.game = game;
@@ -54,10 +62,11 @@ public class SessionLocal implements Screen {
 
     /**
      * Returns a NinePatch object based on the given image
+     *
      * @param fname Filename of the image
      * @param left Left edge of NinePatch
      * @param right Right edge of NinePatch
-     * @param bottom Bottom edge of NinePatch 
+     * @param bottom Bottom edge of NinePatch
      * @param top Top edge of NinePatch
      * @return Resulting NinePatch
      */
@@ -109,7 +118,7 @@ public class SessionLocal implements Screen {
                 teamList.add(teamalpha);
                 gameSettings.addTeam(teamalpha);
                 teams.clear();
-                teams.setItems(teamList);
+                teams.setItems(teamList.toArray());
                 teams.invalidateHierarchy();
             }
         });
@@ -127,7 +136,7 @@ public class SessionLocal implements Screen {
                 //teambeta.addPlayer(new Player("127.0.0.1", "BetaPlayer"));
                 teamList.add(teambeta);
                 gameSettings.addTeam(teambeta);
-                teams.setItems(teamList);
+                teams.setItems(teamList.toArray());
             }
         });
         teamselecttable.add(teambeta).padBottom(10).width(150).height(50);
@@ -143,7 +152,7 @@ public class SessionLocal implements Screen {
                 //teamgamma.addPlayer(new Player("127.0.0.1", "GammaPlayer"));
                 teamList.add(teamgamma);
                 gameSettings.addTeam(teamgamma);
-                teams.setItems(teamList);
+                teams.setItems(teamList.toArray());
             }
         });
         teamselecttable.add(teamgamma).width(150).height(50);
@@ -230,11 +239,23 @@ public class SessionLocal implements Screen {
         for (FileHandle entry : dirHandle.list()) {
             mapslist.add(entry.toString());
         }
-        Image map1 = new Image(new Texture("maps/STONES.PNG"));
+        
+        map1 = new Image(new Texture(mapslist.get(0)));
+        map1.setWidth(400);
+        map1.setHeight(200);
+        //mapstable.addActor(map1);
         mapstable.add(map1).width(400).height(200).padBottom(5);
         mapstable.row();
         SelectBox chooseMap = new SelectBox(skin);
-        chooseMap.setItems(mapslist);
+        chooseMap.setItems(mapslist.toArray());
+        chooseMap.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                map1 = new Image(new Texture(mapslist.get(chooseMap.getSelectedIndex())));
+                map1.invalidate();
+                // Table image is not updating for some reason. Does it need to be redrawn? Or the Stage?
+            }
+        });
         mapstable.add(chooseMap).width(400);
         mapstable.setPosition(30, 360);
         mapstable.setHeight(320);
@@ -262,14 +283,15 @@ public class SessionLocal implements Screen {
                 if (teamList.size() < 2) {
                     return;
                 }
-
                 // Selected MaxTime to an integer.
                 gameSettings.setMaxTime(Integer.parseInt(timerbox.getSelected().toString()));
 
                 // Selected TurnTime to an integer.
                 gameSettings.setTurnTime(Integer.parseInt(turntimebox.getSelected().toString()));
 
-                game.setScreen(new GameEngine(game, gameSettings));
+                // Create the map
+                Map map = new Map(chooseMap.getSelected().toString());
+                game.setScreen(new GameEngine(game, gameSettings, map));
             }
         });
 
