@@ -7,9 +7,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.Array;
 import com.wotf.game.classes.Items.Item;
 import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
@@ -85,8 +88,12 @@ public class Unit extends Group {
 
                     if (team.selectItem(WEAPONS_ARMORY.get(0))) {
                         Item w = WEAPONS_ARMORY.get(0);
+                        Unit.this.clearChildren();
                         selectWeapon(w);
-
+                        Image weaponImage = new Image(w.getWeaponSprite());
+                        weaponImage.setPosition(Unit.this.getX(), Unit.this.getY());
+                        Unit.this.addActor(weaponImage);
+                       
                         System.out.println("BAZOOKA");
                     } else {
                         System.out.println("Selected weapon not found");
@@ -241,6 +248,8 @@ public class Unit extends Group {
 
         // Draws the name and current health of the unit above its sprite
         font.draw(batch, String.format("%s (%d)", name, health), getX(), getY() + getHeight() + 20);
+        
+        this.drawChildren(batch, parentAlpha);
     }
 
     /**
@@ -252,6 +261,12 @@ public class Unit extends Group {
         super.act(delta);
         sprite.setRegion(getFrame(delta));
         updateJump();
+        
+        //make weapons move with the unit
+        Array<Actor> children = this.getChildren();
+        if (children.size > 0) {
+            children.first().setPosition(Unit.this.getX(), Unit.this.getY());
+        }
         
         // Units with 0 health automatically get cleaned up at the end of the turn
         // We assume units are dead if they end up out of bounds
