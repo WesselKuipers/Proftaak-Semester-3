@@ -180,7 +180,7 @@ public class GameStage extends Stage {
     public boolean keyDown(int keyCode) {
 
         OrthographicCamera cam = (OrthographicCamera) getCamera();
-
+        
         switch (keyCode) {
             // Camera controls (position)
             case Keys.NUMPAD_2:

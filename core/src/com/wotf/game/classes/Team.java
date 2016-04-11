@@ -35,7 +35,6 @@ public class Team {
      * @param color
      */
     public Team(String name, Color color) {
-        Sprite sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
         items = new HashMap<>();
         items.put( WEAPONS_ARMORY.get(0), 99);
 
