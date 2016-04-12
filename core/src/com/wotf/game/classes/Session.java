@@ -5,7 +5,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Session contains the data structure containing the list of teams, players and gameSettings
+ * Session contains the data structure containing the list of teams, players and
+ * gameSettings
  */
 public class Session {
 
@@ -15,6 +16,7 @@ public class Session {
 
     /**
      * Initializes a session using the information of the hosting player
+     *
      * @param host Player indicating which player is the host
      */
     public Session(Player host) {
@@ -23,6 +25,15 @@ public class Session {
         this.players = new ArrayList<>();
     }
 
+    /**
+     * Constructor without any graphics Made for the unit testing.
+     */
+    public Session(Player host, boolean any){
+        this.gameSettings = new GameSettings(true);
+        this.host = host;
+        this.players = new ArrayList<>();
+    }
+    
     /**
      * @return The host of this session
      */
@@ -39,6 +50,7 @@ public class Session {
 
     /**
      * Adds a player to the list of players
+     *
      * @param p Player to add
      */
     public void addPlayer(Player p) {
@@ -46,9 +58,10 @@ public class Session {
     }
 
     /**
-     * Removes a player from the list of players
-     * Will kick the player from the lobby afterwards
-     * @param p Player to remove 
+     * Removes a player from the list of players Will kick the player from the
+     * lobby afterwards
+     *
+     * @param p Player to remove
      */
     public void removePlayer(Player p) {
         players.remove(p);

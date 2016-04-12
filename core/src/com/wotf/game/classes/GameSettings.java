@@ -15,7 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Contains the settings used to determine some of the rules the game has to follow
+ * Contains the settings used to determine some of the rules the game has to
+ * follow
  */
 public class GameSettings {
 
@@ -36,8 +37,7 @@ public class GameSettings {
     private boolean suddenDeath;
 
     /**
-     * Main constructor for GameSettings
-     * Sets all variables to the default rules
+     * Main constructor for GameSettings Sets all variables to the default rules
      */
     public GameSettings() {
         if (WEAPONS_ARMORY == null) {
@@ -56,25 +56,42 @@ public class GameSettings {
     }
 
     /**
+     * Constructor without any graphics Made for the unit testing.
+     */
+    public GameSettings(boolean any) {
+        teams = new ArrayList<>();
+        
+        maxTurns = 30;
+        maxTime = 30 * 60;
+        turnTime = 30;
+        withdrawTime = 3;
+        fallingDamage = true;
+        suddenDeath = true;
+    }
+
+    /**
      * Not dynamic list atm. will be replaced with user input in later itt.
      */
     private void fillWeapons() {
         Sprite bullet_sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
         Sprite weapon_sprite = new Sprite(new Texture(Gdx.files.internal("Bazooka.png")));
-        
-        
+
         WEAPONS_ARMORY.add(new Bazooka("Bazooka", 10, 30, 40, weapon_sprite, bullet_sprite));
         WEAPONS_ARMORY.add(new Bazooka("Grenade", 10, 10, 40, weapon_sprite, bullet_sprite));
     }
+
     /**
      * Returns the max turns of the game
+     *
      * @return int of max turns
      */
     public int getMaxTurns() {
         return maxTurns;
     }
+
     /**
      * Sets the max turns of the game
+     *
      * @param maxTurns int to set the max turns
      */
     public void setMaxTurns(int maxTurns) {
@@ -83,6 +100,7 @@ public class GameSettings {
 
     /**
      * Sets the max time of the game
+     *
      * @return int of the max time of the game
      */
     public int getMaxTime() {
@@ -91,64 +109,81 @@ public class GameSettings {
 
     /**
      * Sets max time of the game
+     *
      * @param maxTime int to set the max time of the game
      */
     public void setMaxTime(int maxTime) {
         this.maxTime = maxTime;
     }
+
     /**
      * Gets the time of a turn
+     *
      * @return int of time of a turn
      */
     public int getTurnTime() {
         return turnTime;
     }
+
     /**
      * Sets the time of a turn
+     *
      * @param turnTime int to set time of a turn
      */
     public void setTurnTime(int turnTime) {
         this.turnTime = turnTime;
     }
+
     /**
-     * Withdraw time is when a unit fired a weapon, he gets time moving after firing.
-     * Returns the withdraw time
+     * Withdraw time is when a unit fired a weapon, he gets time moving after
+     * firing. Returns the withdraw time
+     *
      * @return int of the withdraw time
      */
     public int getWithdrawTime() {
         return withdrawTime;
     }
+
     /**
-     * Withdraw time is when a unit fired a weapon, he gets time moving after firing.
-     * Sets the withdraw time
+     * Withdraw time is when a unit fired a weapon, he gets time moving after
+     * firing. Sets the withdraw time
+     *
      * @param withdrawTime sets the withdraw time
      */
     public void setWithdrawTime(int withdrawTime) {
         this.withdrawTime = withdrawTime;
     }
+
     /**
      * Falling damage is when a unit is falling down.
+     *
      * @return boolean if falling down
      */
     public boolean isFallingDamage() {
         return fallingDamage;
     }
+
     /**
      * Falling damage is when a unit is falling down.
+     *
      * @param fallingDamage set true/false if falling down
      */
     public void setFallingDamage(boolean fallingDamage) {
         this.fallingDamage = fallingDamage;
     }
+
     /**
      * Returns if game is a sudden death match
+     *
      * @return boolean if game is a sudden death match
      */
     public boolean isSuddenDeath() {
         return suddenDeath;
     }
+
     /**
      * Setting sudden death match
+     *
      * @param suddenDeath boolean if game is sudden death
      */
     public void setSuddenDeath(boolean suddenDeath) {
@@ -157,29 +192,36 @@ public class GameSettings {
 
     /**
      * Add team to the game
+     *
      * @param name of the team
      * @param color of the team
      */
     public void addTeam(String name, Color color) {
         teams.add(new Team(name, color));
     }
+
     /**
      * Add team to the game
+     *
      * @param team as object to add to game
      */
     public void addTeam(Team team) {
         // Temporary overload for the default debug game instance
         teams.add(team);
     }
+
     /**
      * Remove team to the game
+     *
      * @param t as object to remove from game
      */
     public void removeTeam(Team t) {
         teams.remove(t);
     }
+
     /**
      * Get teams of the game
+     *
      * @return list of teams in current game
      */
     public List<Team> getTeams() {

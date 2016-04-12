@@ -239,24 +239,30 @@ public class SessionLocal implements Screen {
         for (FileHandle entry : dirHandle.list()) {
             mapslist.add(entry.toString());
         }
-        
+
         map1 = new Image(new Texture(mapslist.get(0)));
+        map1.setPosition(20, 70);
         map1.setWidth(400);
-        map1.setHeight(200);
-        //mapstable.addActor(map1);
-        mapstable.add(map1).width(400).height(200).padBottom(5);
-        mapstable.row();
+        map1.setHeight(230);
+        mapstable.addActor(map1);
         SelectBox chooseMap = new SelectBox(skin);
         chooseMap.setItems(mapslist.toArray());
         chooseMap.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                mapstable.removeActor(map1);
                 map1 = new Image(new Texture(mapslist.get(chooseMap.getSelectedIndex())));
+                map1.setPosition(20, 70);
+                map1.setWidth(400);
+                map1.setHeight(230);
                 map1.invalidate();
+                mapstable.addActor(map1);
                 // Table image is not updating for some reason. Does it need to be redrawn? Or the Stage?
             }
         });
-        mapstable.add(chooseMap).width(400);
+        chooseMap.setWidth(400);
+        chooseMap.setPosition(20, 20);
+        mapstable.addActor(chooseMap);
         mapstable.setPosition(30, 360);
         mapstable.setHeight(320);
         mapstable.setWidth(440);

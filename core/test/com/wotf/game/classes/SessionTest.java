@@ -17,11 +17,12 @@ public class SessionTest {
 
     private Session session;
     private Player playerRemco;
+    private Player host;
 
     @Before
     public void initSession() {
-        Player host = new Player("127.0.0.1", "DinoHost");
-        session = new Session(host);
+        host = new Player("127.0.0.1", "DinoHost");
+        session = new Session(host, true);
         playerRemco = new Player("127.0.0.1", "RemcoPlayer");
         session.addPlayer(playerRemco);
     }

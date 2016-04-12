@@ -7,6 +7,7 @@ package com.wotf.game.classes;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector2;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -22,7 +23,7 @@ public class TeamTest {
     private Player player;
 
     @Before
-    public void initTurnLogic() {
+    public void initTeam() {
         /**
          * Constructor of Team, Initialize lists and set active unit index to
          * zero.
@@ -30,12 +31,12 @@ public class TeamTest {
          * @param name
          * @param color
          */
-        gamesettings = new GameSettings();
+        gamesettings = new GameSettings(true);
         player = new Player("127.0.0.1", "Wessel");
+        team = new Team("Alpha", Color.BLACK, true);
         team.addPlayer(player);
-        team.addUnit("AlphaUnit", 50);
-        team.addUnit("AlphaUnit2", 80);
-        team = new Team("Alpha", Color.BLACK);
+        team.addUnit("AlphaUnit", 50, new Vector2(40, 80), true);
+        team.addUnit("AlphaUnit2", 80, new Vector2(90, 80), true);
         gamesettings.addTeam(team);
     }
 
@@ -77,8 +78,8 @@ public class TeamTest {
          */
         // Remove the first created player.
         team.removePlayer(player);
-        // Test if the size is 1 again now.
-        assertEquals(1, team.getPlayers().size());
+        // Test if the size is 0 again now.
+        assertEquals(0, team.getPlayers().size());
     }
 
     @Test
@@ -132,7 +133,7 @@ public class TeamTest {
          * @return all the units of team
          */
         // I added one unit so the size should be one.
-        assertEquals(1, team.getUnits());
+        assertEquals(2, team.getUnits().size());
     }
 
     @Test
@@ -167,8 +168,8 @@ public class TeamTest {
          */
         // Get a unit.
         Unit unit = team.getUnit(0);
-        // Remote the taken unit.
-        team.removeUnit(unit);
+        // Remove the taken unit.
+        team.removeUnit(unit, true);
         // Test if the list size is 0 now.
         assertEquals(1, team.getPlayers().size());
     }

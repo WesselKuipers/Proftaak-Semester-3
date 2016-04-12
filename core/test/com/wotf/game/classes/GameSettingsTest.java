@@ -19,7 +19,7 @@ public class GameSettingsTest {
 
     @Before
     public void initGameSettings() {
-        dsettings = new GameSettings();
+        dsettings = new GameSettings(true);
     }
 
     @Test

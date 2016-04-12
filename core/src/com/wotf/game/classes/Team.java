@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,8 +17,8 @@ import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 
 /**
- * Team contains data that represent a team
- * Contains a list of players, list of units, a list of items including ammo, a name and a team colour
+ * Team contains data that represent a team Contains a list of players, list of
+ * units, a list of items including ammo, a name and a team colour
  */
 public class Team {
 
@@ -36,7 +37,24 @@ public class Team {
      */
     public Team(String name, Color color) {
         items = new HashMap<>();
-        items.put( WEAPONS_ARMORY.get(0), 99);
+        items.put(WEAPONS_ARMORY.get(0), 99);
+
+        this.name = name;
+        this.color = color;
+
+        //Instantiating list of items
+        players = new ArrayList<>();
+        units = new ArrayList<>();
+
+        // Select first unit of team as active unit
+        this.activeUnitIndex = 0;
+    }
+
+    /**
+     * Constructor without any graphics Made for the unit testing.
+     */
+    public Team(String name, Color color, boolean any) {
+        items = null;
 
         this.name = name;
         this.color = color;
@@ -58,6 +76,7 @@ public class Team {
 
     /**
      * Adds a player to the team
+     *
      * @param p player
      */
     public void addPlayer(Player p) {
@@ -83,6 +102,7 @@ public class Team {
 
     /**
      * Set the name of the team
+     *
      * @param name
      */
     public void setName(String name) {
@@ -98,6 +118,7 @@ public class Team {
 
     /**
      * set the color of team
+     *
      * @param color color of team
      */
     public void setColor(Color color) {
@@ -128,6 +149,7 @@ public class Team {
 
     /**
      * Add a unit to the team
+     *
      * @param name name of the unit
      * @param health health of the unit
      */
@@ -136,20 +158,36 @@ public class Team {
     }
 
     /**
-     * When unit is killed (health is zero or lower), 
-     * remove the actor and unit from team
+     * FOR TESTING. Use WITHOUT the boolean.
+     */
+    public void addUnit(String name, int health, Vector2 position, boolean any) {
+        units.add(new Unit(name, health, this, position, true));
+    }
+
+    /**
+     * When unit is killed (health is zero or lower), remove the actor and unit
+     * from team
      *
      * @param unit to be removed
      */
     public void removeUnit(Unit unit) {
         if (unit != null && units.contains(unit)) {
-            GameStage gameStage = (GameStage)unit.getStage();
+            GameStage gameStage = (GameStage) unit.getStage();
             for (Actor actor : gameStage.getActors()) {
                 if (actor == unit) {
                     actor.remove();
                     units.remove(unit);
                 }
             }
+        }
+    }
+
+    /**
+     * FOR TESTING. Use WITHOUT the boolean.
+     */
+    public void removeUnit(Unit unit, boolean any) {
+        if (unit != null && units.contains(unit)) {
+            units.remove(unit);
         }
     }
 
@@ -184,6 +222,7 @@ public class Team {
 
     /**
      * select an item that is foudn inside the teamlist
+     *
      * @param item item that needs to be selected
      * @return the selected item
      */
@@ -193,6 +232,7 @@ public class Team {
 
     /**
      * Check if the item excists inside the team's item list
+     *
      * @param item item to check for
      * @return return the item that is found inside the team
      */
@@ -209,6 +249,7 @@ public class Team {
 
     /**
      * Decrease the item amount for the selected item
+     *
      * @param item selected
      * @param amount to increase
      */
@@ -238,6 +279,7 @@ public class Team {
 
     /**
      * Check if item contains an amount
+     *
      * @param item
      * @return item
      */

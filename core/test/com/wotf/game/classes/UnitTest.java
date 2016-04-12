@@ -28,10 +28,10 @@ public class UnitTest {
     @Before
     public void initItem() {
         // In team there is a static list which is made inside the GameSettings constructor..
-        GameSettings gs = new GameSettings();
-        team = new Team("Alpha", Color.BLUE);
-        unit = new Unit("Unit1", 100, team, new Vector2(40, 80));
-        bazooka = new Bazooka("Bazooka", 50, 40, 100, null, null);
+        GameSettings gs = new GameSettings(true);
+        team = new Team("Alpha", Color.BLUE, true);
+        unit = new Unit("Unit1", 100, team, new Vector2(40, 80), true);
+        //bazooka = new Bazooka("Bazooka", 50, 40, 100, null, null);
     }
 
     @Test
@@ -84,8 +84,8 @@ public class UnitTest {
          * @param amount to decrease health
          */
         unit.decreaseHealth(40);
-        // Test if the unit now has 120 - 40 which should be 80.
-        assertEquals(80, unit.getHealth());
+        // Test if the unit now has 100 - 40 which should be 60.
+        assertEquals(60, unit.getHealth());
     }
 
     @Test
@@ -139,6 +139,8 @@ public class UnitTest {
         assertNull(unit.getBounds());
     }
 
+    // This Test WILL fail. There is an internal method called "PositionChanged()" 
+    // This method changes values of a sprite, but a sprite is a graphical object which is not used in the testcases. This doesn't work.
     @Test
     public void testSpawn() {
         /**
@@ -152,6 +154,9 @@ public class UnitTest {
         assertEquals(newposition, unit.getPosition());
     }
 
+    // The Test FAILS because there is nothing it returns. In this example I took the position. 
+    // The position will be set, but this happens in the act of the stage. This means this method can't get there.
+    // The question is, will we use a temporarily method to set the position just for the testing? Or one which will return the new position on X?
     @Test
     public void testJump() {
         /**
