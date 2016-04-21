@@ -314,8 +314,12 @@ public class Unit extends Group {
      *
      * Then the act calls the updateJump().
      */
-    public void jump() {
-        System.out.println("V= " + velocity.x);
+    public void jump() {        
+        // Jumping once
+        if(velocity.x != 0 && velocity.y != 0){
+            return;
+        }
+        
         float nextX;
 
         if (moveRight) {
