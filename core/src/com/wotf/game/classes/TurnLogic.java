@@ -46,19 +46,59 @@ public class TurnLogic {
     }
     
     /**
+     * 
+     * @return the current turn
+     */
+    public int getTurn() {
+        return turn;
+    }
+    
+    /**
+     * set the total teams
+     * @param totalTeams 
+     */
+    public void setTotalTeams(int totalTeams) {
+        this.totalTeams = totalTeams;
+    }
+    
+    /**
+     * 
+     * @return the total teams
+     */
+    public int getTotalTeams() {
+        return totalTeams;
+    }
+
+    /**
+     * 
+     * @return the current turn state
+     */
+    public TurnState getState() {
+        return currentState;
+    }
+    
+    /**
+     * Set the current state
+     * @param state
+     */
+    public void setState(TurnState state) {
+        this.currentState = state;
+    }
+    
+    /**
+     * 
+     * @return get the active team index
+     */
+    public int getActiveTeamIndex() {
+        return turn % totalTeams;
+    }
+    
+    /**
      * update the elapsed time by adding the deltatime of the game
      * @param deltaTime
      */
     public void update(float deltaTime) {
         elapsedTime = elapsedTime + deltaTime;
-    }
-    
-    /**
-     * 
-     * @return the current turn state
-     */
-    public TurnState getTurnState() {
-        return currentState;
     }
     
     /**
@@ -68,7 +108,7 @@ public class TurnLogic {
     public void endTurn() {
         this.elapsedTime = 0;
         this.turn++;
-        this.currentState = TurnState.WITHDRAW;
+        setState(TurnState.WITHDRAW);
     }
     
     /**
@@ -77,30 +117,6 @@ public class TurnLogic {
      */
     public void beginTurn() {
         this.elapsedTime = 0;
-        this.currentState = TurnState.PLAYING;
-    }
-
-    /**
-     * 
-     * @return the current turn
-     */
-    public int getTurn() {
-        return turn;
-    }
-
-    /**
-     * 
-     * @return get the active team index
-     */
-    public int getActiveTeamIndex() {
-        return turn % totalTeams;
-    }
-    
-    public void gameOverState() {
-        this.currentState = TurnState.GAMEOVER;
-    }
-    
-    public void lowerTeamCount() {
-        totalTeams--;
+        setState(TurnState.PLAYING);
     }
 }

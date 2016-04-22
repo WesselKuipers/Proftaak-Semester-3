@@ -3,6 +3,7 @@ package com.wotf.game.classes;
 import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 import com.wotf.game.classes.Items.Item;
+import com.wotf.game.classes.TurnLogic.TurnState;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -119,16 +120,26 @@ public class Game {
      */
     public void beginTurn() {
         map.calculateWind();
-        turnLogic.beginTurn();
+        
         Team activeTeam = getActiveTeam();
+        turnLogic.beginTurn();
+        activeTeam.beginTurn();
+        setActiveUnit(activeTeam);
+    }
+    
+    /**
+     * Set the controls to the active unit
+     * @param team the current active team
+     */
+    private void setActiveUnit(Team team) {
+        if (team.getActiveUnit().getHealth() > 0) {
+            GameStage gameStage = (GameStage) team.getActiveUnit().getStage();
+            gameStage.setKeyboardFocus(team.getActiveUnit());
+            gameStage.setCameraFocusToActor(team.getActiveUnit(), true);
 
-        if (activeTeam.getActiveUnit().getHealth() != 0) {
-            GameStage gameStage = (GameStage) activeTeam.getActiveUnit().getStage();
-            gameStage.setKeyboardFocus(activeTeam.getActiveUnit());
-            gameStage.setCameraFocusToActor(activeTeam.getActiveUnit(), true);
-
+            // select first weapon
             Item i = WEAPONS_ARMORY.get(0);
-            activeTeam.getActiveUnit().selectWeapon(i);
+            team.getActiveUnit().selectWeapon(i);
         } else {
             endTurn();
         }
@@ -145,38 +156,35 @@ public class Game {
         activeTeam.endTurn();
         turnLogic.endTurn();
         List<Team> teamsToRemove = new ArrayList<>();
-        List<Unit> unitsToRemove = new ArrayList<>();
-
-        // TODO: Remove units and teams based on health and remaining unit count
-        // When unit has lower or equal than 0 health, remove the unit from the team
-        for (Team team : teams) {
-            int unitsAlive = team.getUnits().size();
-            for (Unit unit : team.getUnits()) {
-                if (unit.getHealth() <= 0) {
-                    unitsToRemove.add(unit);
-                    unitsAlive--;
-                }
-            }
+        
+        for(Team team : teams) {
             // Remove team when no units are alive
-            if (unitsAlive <= 0) {
+            if (team.getUnits().size() <= 0) {
                 teamsToRemove.add(team);
             }
         }
-
-        for (int i = 0; i < unitsToRemove.size(); i++) {
-            for (Team t : teams) {
-                t.removeUnit(unitsToRemove.get(i));
-            }
-        }
-
+        turnLogic.setTotalTeams(turnLogic.getTotalTeams() - teamsToRemove.size());
         teams.removeAll(teamsToRemove);
-        for (int i = 0; i < teamsToRemove.size(); i++) {
-            turnLogic.lowerTeamCount();
-        }
-
+        
         // Game over
         if (teams.size() <= teamsToRemove.size()) {
-            turnLogic.gameOverState();
+            turnLogic.setState(TurnState.GAMEOVER);
+        }
+    }
+    
+    public void update(Float deltaTime) {
+        turnLogic.update(deltaTime);
+        
+        // If unit hasn't fired yet after the turn time, end the current round and start a new one 
+        if (turnLogic.getElapsedTime() >= gameSettings.getTurnTime()) {
+            endTurn();
+        }
+        
+        // When the player has passed 
+        if(turnLogic.getState() == TurnState.WITHDRAW) {
+            if(turnLogic.getElapsedTime() >= gameSettings.getWithdrawTime()) {
+                beginTurn();
+            }
         }
     }
 

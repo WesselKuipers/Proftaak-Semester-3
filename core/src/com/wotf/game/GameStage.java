@@ -148,19 +148,8 @@ public class GameStage extends Stage {
         super.act();
         float delta = Gdx.graphics.getDeltaTime();
 
-        game.getTurnLogic().update(delta);
-
-        if (game.getTurnLogic().getElapsedTime() >= game.getGameSettings().getTurnTime()) {
-            game.endTurn();
-            game.beginTurn();
-        }
-
-        if(game.getTurnLogic().getTurnState() == TurnState.WITHDRAW) {
-            if(game.getTurnLogic().getElapsedTime() >= game.getGameSettings().getWithdrawTime()) {
-                game.beginTurn();
-            }
-        }
-	
+        game.update(delta);
+        
         // if focusedActor is set to an actor, we want the camera to follow it
         // otherwise, call the update() method on camera normally
         if (focusedActor != null) {
@@ -213,26 +202,7 @@ public class GameStage extends Stage {
 
             // Unit selection
             case Keys.TAB:
-                int selectedPlayerIndex = 0;
-                int i = 0;
-
-                Team activeTeam = game.getActiveTeam();
-
-                for (Unit u : activeTeam.getUnits()) {
-                    if (u == this.getKeyboardFocus()) {
-                        selectedPlayerIndex = i + 1;
-                    }
-                    i++;
-                }
-
-                selectedPlayerIndex = (selectedPlayerIndex >= activeTeam.getUnits().size()) ? 0 : selectedPlayerIndex;
-
-                for (Actor actor : this.getActors()) {
-                    if (activeTeam.getUnit(selectedPlayerIndex) == actor) {
-                        this.setKeyboardFocus(actor);
-                        setCameraFocusToActor(actor, true);
-                    }
-                }
+                game.getActiveTeam().setNextActiveUnit();
                 break;
 
             // Debug key for killing current unit
@@ -261,7 +231,7 @@ public class GameStage extends Stage {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         Vector3 rel = getCamera().unproject(new Vector3(screenX, screenY, 0));
         
-        if (game.getTurnLogic().getTurnState() == TurnState.PLAYING) {
+        if (game.getTurnLogic().getState() == TurnState.PLAYING) {
             System.out.println(String.format("Touchdown event (%d, %d) button %d", screenX, screenY, button));
             System.out.println(String.format("Relative Touchdown event (%f, %f) button %d", rel.x, rel.y, button));
 
@@ -317,12 +287,9 @@ public class GameStage extends Stage {
         font.draw(guiBatch, String.format("Camera coords [%s], zoom %f", getCamera().position.toString(), ((OrthographicCamera) getCamera()).zoom), 0, this.getHeight() - 80);
         font.draw(guiBatch, "Time remaining: " + (game.getGameSettings().getTurnTime() - (int) game.getTurnLogic().getElapsedTime()), 0, this.getHeight() - 100);
         font.draw(guiBatch, String.format("FPS: %d", Gdx.graphics.getFramesPerSecond()), 0, this.getHeight() - 120);
-        if (game.getTurnLogic().getTurnState() == TurnState.GAMEOVER) {
-            game.endTurn();
-            game.getTurnLogic().gameOverState();
+        if (game.getTurnLogic().getState() == TurnState.GAMEOVER) {
             font.draw(guiBatch, "GAME OVER", this.getWidth() / 2, this.getHeight() / 2);
         }
-        
         
         guiBatch.end();
     }
