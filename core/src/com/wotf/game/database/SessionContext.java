@@ -35,8 +35,13 @@ public class SessionContext extends EntityContext<Session> {
      * @throws SQLException 
      */
     public Session GetLastAddedSession() throws SQLException {
-        String query = "SELECT MAX(ID) FROM session";
-        return GetEntityFromRecord(DBCon.executeResultSet(query));
+        String query = "SELECT MAX(ID) AS ID FROM session";
+        ResultSet result = DBCon.executeResultSet(query);
+        int id = 0;
+        while(result.next()) {
+         id = result.getInt("ID");
+        }
+        return GetById(id);
     }
 
     /**
@@ -110,8 +115,11 @@ public class SessionContext extends EntityContext<Session> {
 
     @Override
     protected Session GetEntityFromRecord(ResultSet record) throws SQLException {
-        Session session = new Session(new PlayerContext().GetById(record.getInt("HostID")), record.getString("RoomName"), record.getInt("MaxPlayersSession"));
+        Session session = null;
+        while(record.next()){        
+        session = new Session(new PlayerContext().GetById(record.getInt("HostID")), record.getString("RoomName"), record.getInt("MaxPlayersSession"));
         session.setID(record.getInt("ID"));
+        }
         return session;
     }
 
