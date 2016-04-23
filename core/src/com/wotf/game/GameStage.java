@@ -290,6 +290,9 @@ public class GameStage extends Stage {
         if (game.getTurnLogic().getState() == TurnState.GAMEOVER) {
             font.draw(guiBatch, "GAME OVER", this.getWidth() / 2, this.getHeight() / 2);
         }
+        font.draw(guiBatch, "Wind: " + game.getMap().getWind().toString(), 0, this.getHeight() - 140);
+        
+        
         
         guiBatch.end();
     }
@@ -414,31 +417,30 @@ public class GameStage extends Stage {
     }
 
     /**
-     * @author Jip Boesenkool Function which handles the logic to fire a bullet,
+     * @author Jip Boesenkool 
+     * Function which handles the use case to fire a bullet,
      * Get's called by mouseClick event. Trigger MUST BE inside game stage, else
      * mouse Click wont get the right coordinates.
      * @param screenX Unprojected mouse position.x
      * @param screenY Unprojected mouse position.y
      */
     private void bulletLogic(int screenX, int screenY) {
-
-        // TODO: get wind from turnLogic, Generate wind each turn.
-        // Jip Boesenkool - 29-030'16
-        Vector2 wind = new Vector2(0f, 0f);
-
+        //get wind force from map
+        Vector2 wind = game.getMap().getWind();
+        //get gravity force from map (Const atm)
         double gravity = game.getMap().getGravityModifier();
-
-        //System.out.println( (game.getActiveTeam().getActiveUnit()).getName() );
-        
+        //get mouseposition to determine what direction the bullet must fly
         Vector2 mousePos = new Vector2(screenX, screenY);
+        
+        //trigger the fire method in unit which holds the gun
         (game.getActiveTeam().getActiveUnit()).fire(
                 mousePos,
                 wind,
                 gravity
         );
         
+        //make camera follow bullet
         focusedActor = (Actor)( game.getActiveTeam().getActiveUnit().getWeapon().getBullet() );
-        
     }
 
     /**

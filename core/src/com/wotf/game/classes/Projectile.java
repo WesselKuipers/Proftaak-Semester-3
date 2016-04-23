@@ -39,7 +39,7 @@ public class Projectile extends Actor {
     /**
      * /**
      * Projectile constructor to initialize visual appearence of the bullet.
-     * @param sprite 
+     * @param sprite Bullet sprite
      */
     public Projectile( Sprite sprite ) {
         //graphics
@@ -193,6 +193,15 @@ public class Projectile extends Actor {
             return;
         }
         
+        terrainCollision( terrain );
+    }
+    
+    
+    /**
+     * Function to check if bullet has collided with the terrain.
+     * @param terrain Nested boolean array [x][y] which determines if pixel is activated or not.
+     */
+    private void terrainCollision( boolean[][] terrain ){
         // Terrain and unit collision
         if (terrain[(int) getX()][(int) getY()] || checkUnitCollision()) {
             // Projectile collided with terrain
