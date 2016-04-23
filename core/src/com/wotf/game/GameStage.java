@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -46,13 +47,15 @@ public class GameStage extends Stage {
     private Pixmap pixmap;
 
     private Actor focusedActor; // if this is set to an actor
-                                // have the camera follow it automatically, otherwise set it to null
+    // have the camera follow it automatically, otherwise set it to null
 
-    
     /**
-     * Constructor for GameStage that initializes everything required for the game to run
-     * Generates the initial texture based on the data contained within Map
-     * @param game Game data structure to base initial variables on (settings, map, etc)
+     * Constructor for GameStage that initializes everything required for the
+     * game to run Generates the initial texture based on the data contained
+     * within Map
+     *
+     * @param game Game data structure to base initial variables on (settings,
+     * map, etc)
      */
     public GameStage(Game game) {
         super(new ScreenViewport());
@@ -149,7 +152,7 @@ public class GameStage extends Stage {
         float delta = Gdx.graphics.getDeltaTime();
 
         game.update(delta);
-        
+
         // if focusedActor is set to an actor, we want the camera to follow it
         // otherwise, call the update() method on camera normally
         if (focusedActor != null) {
@@ -169,7 +172,7 @@ public class GameStage extends Stage {
     public boolean keyDown(int keyCode) {
 
         OrthographicCamera cam = (OrthographicCamera) getCamera();
-        
+
         switch (keyCode) {
             // Camera controls (position)
             case Keys.NUMPAD_2:
@@ -219,8 +222,9 @@ public class GameStage extends Stage {
     }
 
     /**
-     * Click event for the stage
-     * Handles the logic for using the currently selected item
+     * Click event for the stage Handles the logic for using the currently
+     * selected item
+     *
      * @param screenX X-coordinate of the cursor
      * @param screenY Y-coordinate of the cursor
      * @param pointer The pointer of the event
@@ -230,7 +234,7 @@ public class GameStage extends Stage {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         Vector3 rel = getCamera().unproject(new Vector3(screenX, screenY, 0));
-        
+
         if (game.getTurnLogic().getState() == TurnState.PLAYING) {
             System.out.println(String.format("Touchdown event (%d, %d) button %d", screenX, screenY, button));
             System.out.println(String.format("Relative Touchdown event (%f, %f) button %d", rel.x, rel.y, button));
@@ -241,7 +245,7 @@ public class GameStage extends Stage {
             } else if (button == Input.Buttons.RIGHT) {
                 explode((int) rel.x, (int) rel.y, 30, 0);
             }
-            
+
             game.endTurn();
         }
         return true;
@@ -290,7 +294,7 @@ public class GameStage extends Stage {
         if (game.getTurnLogic().getState() == TurnState.GAMEOVER) {
             font.draw(guiBatch, "GAME OVER", this.getWidth() / 2, this.getHeight() / 2);
         }
-        
+
         guiBatch.end();
     }
 
@@ -321,16 +325,17 @@ public class GameStage extends Stage {
     }
 
     /**
-     * Calculates an explosion at position X and Y using specified radius
-     * Sets all solid pixels that were detected within the radius to false and
+     * Calculates an explosion at position X and Y using specified radius Sets
+     * all solid pixels that were detected within the radius to false and
      * updates the terrain accordingly Iterates through all units that got hit
      *
      * @param x X-position of the explosion
      * @param y Y-position of the explosion (0 = bottom)
      * @param radius Length of the radius in pixels
-     * @param damage Amount of damage the explosion does should it collide with a Unit
+     * @param damage Amount of damage the explosion does should it collide with
+     * a Unit
      */
-    public void explode(int x, int y, int radius, int damage ) {
+    public void explode(int x, int y, int radius, int damage){
         boolean[][] terrain = game.getMap().getTerrain();
         List<Unit> collidedUnits = new ArrayList<>();
 
@@ -369,9 +374,8 @@ public class GameStage extends Stage {
         // Iterates through all of the collided units and decreases their health
         // based on the damage caused by the explosion
         for (Unit u : collidedUnits) {
-            u.decreaseHealth( damage );
+            u.decreaseHealth(damage);
         }
-
         game.getMap().setTerrain(terrain);
         updateTerrain();
     }
@@ -429,16 +433,15 @@ public class GameStage extends Stage {
         double gravity = game.getMap().getGravityModifier();
 
         //System.out.println( (game.getActiveTeam().getActiveUnit()).getName() );
-        
         Vector2 mousePos = new Vector2(screenX, screenY);
         (game.getActiveTeam().getActiveUnit()).fire(
                 mousePos,
                 wind,
                 gravity
         );
-        
-        focusedActor = (Actor)( game.getActiveTeam().getActiveUnit().getWeapon().getBullet() );
-        
+
+        focusedActor = (Actor) (game.getActiveTeam().getActiveUnit().getWeapon().getBullet());
+
     }
 
     /**
