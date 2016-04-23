@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.wotf.game.classes.Items.*;
 import com.wotf.game.classes.Items.Item;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,7 @@ import java.util.List;
  * Contains the settings used to determine some of the rules the game has to
  * follow
  */
-public class GameSettings {
+public class GameSettings implements Serializable{
 
     /**
      * List of weapons in the game
@@ -29,12 +30,15 @@ public class GameSettings {
      */
     private final List<Team> teams;
 
+    private int mapindex;
+    private String mapname;
     private int maxTurns;
     private int maxTime;
     private int turnTime;
     private int withdrawTime;
     private boolean fallingDamage;
     private boolean suddenDeath;
+    private boolean physics;
 
     /**
      * Main constructor for GameSettings Sets all variables to the default rules
@@ -53,6 +57,7 @@ public class GameSettings {
         withdrawTime = 3;
         fallingDamage = true;
         suddenDeath = true;
+        physics = true;
     }
 
     /**
@@ -80,6 +85,60 @@ public class GameSettings {
         WEAPONS_ARMORY.add(new Bazooka("Grenade", 10, 10, 40, weapon_sprite, bullet_sprite));
     }
 
+    /**
+     * Sets the index of the map with the settings
+     * 
+     * @param mapindex 
+     */
+    public void setMapIndex(int mapindex){
+        this.mapindex = mapindex;
+    }
+    
+    /**
+     * Gets the index of the map
+     * 
+     * @return the index of the name
+     */
+    public int getMapIndex(){
+        return mapindex;
+    }
+    
+        /**
+     * Sets the name of the map with the settings
+     * 
+     * @param mapname 
+     */
+    public void setMapName(String mapname){
+        this.mapname = mapname;
+    }
+    
+    /**
+     * Gets the name of the map
+     * 
+     * @return the String of the name
+     */
+    public String getMapName(){
+        return mapname;
+    }
+    
+    /**
+     * Sets the physics of the game
+     * 
+     * @param physics 
+     */
+    public void setPhysics(boolean physics) {
+        this.physics = physics;
+    }
+    
+    /**
+     * Returns the physics of the game
+     * 
+     * @return boolean if the physics are turned on or not.
+     */
+    public boolean getPhysics(){
+        return physics;
+    }
+    
     /**
      * Returns the max turns of the game
      *

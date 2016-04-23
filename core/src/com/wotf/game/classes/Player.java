@@ -1,9 +1,11 @@
 package com.wotf.game.classes;
 
+import java.io.Serializable;
+
 /**
  * Represents a player connected in the session
  */
-public class Player {
+public class Player implements Serializable{
 
     private final String ip;
     private String name;

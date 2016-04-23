@@ -1,5 +1,12 @@
 package com.wotf.game.classes;
 
+import com.wotf.gui.view.ISessionSettings;
+import fontyspublisher.IRemotePropertyListener;
+import fontyspublisher.RemotePublisher;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -8,32 +15,60 @@ import java.util.List;
  * Session contains the data structure containing the list of teams, players and
  * gameSettings
  */
-public class Session {
+public class Session extends UnicastRemoteObject implements ISessionSettings {
 
-    private final GameSettings gameSettings;
-    private final Player host;
-    private final List<Player> players;
+    private GameSettings gameSettings;
+    private Player host;
+    private List<Player> players;
+    private Registry registry;
+    private RemotePublisher publisher;
+
+    public Session() throws RemoteException {
+    }
+
+    ;
 
     /**
      * Initializes a session using the information of the hosting player
      *
      * @param host Player indicating which player is the host
      */
-    public Session(Player host) {
+    public Session(Player host) throws RemoteException {
+        this();
         this.gameSettings = new GameSettings();
         this.host = host;
         this.players = new ArrayList<>();
+        publisher = new RemotePublisher();
+        publisher.registerProperty("sessionsettingsprop");
+        publisher.registerProperty("startgameprop");
+        createNewRegistry();
+    }
+
+    public void createNewRegistry() throws RemoteException {
+        registry = LocateRegistry.createRegistry(5555);
+        registry.rebind("SessionSettings", this);
     }
 
     /**
      * Constructor without any graphics Made for the unit testing.
      */
-    public Session(Player host, boolean any){
+    public Session(Player host, boolean any) throws RemoteException {
         this.gameSettings = new GameSettings(true);
         this.host = host;
         this.players = new ArrayList<>();
     }
-    
+
+    @Override
+    public GameSettings getGameSettings() {
+        return gameSettings;
+    }
+
+    public void setGameSettings(GameSettings settings) throws RemoteException {
+        GameSettings oldsettings = this.gameSettings;
+        this.gameSettings = settings;
+        publisher.inform("sessionsettingsprop", oldsettings, this.gameSettings);
+    }
+
     /**
      * @return The host of this session
      */
@@ -71,7 +106,18 @@ public class Session {
     /**
      * Initializes the game screen
      */
-    public void startGame() {
+    public void startGame() throws RemoteException {
         // TODO: handle code for creating game object
     }
+
+    @Override
+    public void subscribeRemoteListener(IRemotePropertyListener listener, String property) throws RemoteException {
+        publisher.subscribeRemoteListener(listener, property);
+    }
+
+    @Override
+    public void unsubscribeRemoteListener(IRemotePropertyListener listener, String property) throws RemoteException {
+        publisher.unsubscribeRemoteListener(listener, property);
+    }
+
 }

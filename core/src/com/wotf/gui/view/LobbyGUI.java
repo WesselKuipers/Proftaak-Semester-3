@@ -19,6 +19,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.wotf.game.WotFGame;
 import com.wotf.game.classes.Lobby;
+import com.wotf.game.classes.Player;
+import com.wotf.game.classes.Session;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Screen that shows the lobby GUI
@@ -29,15 +35,19 @@ public class LobbyGUI implements Screen {
     private Stage stage;
     private Skin skin;
     private List sessions;
+    private ArrayList<Session> sessionlist;
     private final Lobby lobby;
+    private Player player;
 
     /**
      * Creates a new instance of the LobbyGUI based on the game.
      *
      * @param game so we can switch the screen of the 'current' game
      */
-    public LobbyGUI(WotFGame game) {
+    public LobbyGUI(WotFGame game, Player player) {
         this.game = game;
+        this.player = player;
+        sessionlist = new ArrayList<>();
         lobby = new Lobby();
     }
 
@@ -65,8 +75,8 @@ public class LobbyGUI implements Screen {
      * with the given position. There is a table around each section. There is a
      * list of players which shows the ping of the players. There is a list of
      * sessions which shows all the sessions There are buttons to create a
-     * session, join a session and to exit the LobbyGUI screen.
-     * Called when this screen becomes the current screen for a {@link Game}.
+     * session, join a session and to exit the LobbyGUI screen. Called when this
+     * screen becomes the current screen for a {@link Game}.
      */
     @Override
     public void show() {
@@ -90,6 +100,10 @@ public class LobbyGUI implements Screen {
         Label wotflabel = new Label("War of the Figures", skin);
         wotflabel.setPosition(Gdx.graphics.getWidth() / 2 - wotflabel.getWidth() / 2, 740);
         stage.addActor(wotflabel);
+
+        Label currentPlayer = new Label(player.getIp() + " " + player.getName(), skin);
+        currentPlayer.setPosition(Gdx.graphics.getWidth() / 2 - currentPlayer.getWidth() / 2, 680);
+        stage.addActor(currentPlayer);
 
         Label sessionslabel = new Label("Sessions", skin);
         sessionstable.add(sessionslabel).padRight(20);
@@ -130,6 +144,30 @@ public class LobbyGUI implements Screen {
         join.setHeight(60);
         join.setPosition(30, 30);
         stage.addActor(join);
+        // Dummy session to connect to.
+        //////////////////////////////
+        /*Session session;
+        try {
+            session = new Session(player);
+            sessionlist.add(session);
+            sessions.setItems(sessionlist.toArray());
+        } catch (RemoteException ex) {
+            Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        */
+        join.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                try {
+                    // HostIP address should be filled in here.
+                    Session selhost = (Session) sessions.getSelected();
+
+                    game.setScreen(new SessionOnlinePlayer(game, selhost));
+                } catch (RemoteException ex) {
+                    Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
 
         TextButton makesession = new TextButton("Make Session", skin); // Use the initialized skin
         makesession.setColor(Color.BLACK);
@@ -137,6 +175,19 @@ public class LobbyGUI implements Screen {
         makesession.setHeight(60);
         makesession.setPosition(350, 30);
         stage.addActor(makesession);
+        makesession.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                try {
+                    // Logic for making session.
+                    Session session = new Session(player);
+
+                    game.setScreen(new SessionOnlineHost(game, session));
+                } catch (RemoteException ex) {
+                    Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
 
     }
 

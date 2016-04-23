@@ -15,18 +15,19 @@ import java.util.Map.Entry;
 import com.wotf.game.classes.Items.Item;
 import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
+import java.io.Serializable;
 
 /**
  * Team contains data that represent a team Contains a list of players, list of
  * units, a list of items including ammo, a name and a team colour
  */
-public class Team {
+public class Team implements Serializable{
 
     private String name;
-    private Color color;
-    private final List<Player> players;
-    private final List<Unit> units;
-    private final Map<Item, Integer> items; // The integer represents the ammo remaining
+    private transient Color color;
+    private transient final List<Player> players;
+    private transient final List<Unit> units;
+    private transient final Map<Item, Integer> items; // The integer represents the ammo remaining
     private int activeUnitIndex;
 
     /**
