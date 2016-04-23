@@ -7,6 +7,7 @@ import java.io.Serializable;
  */
 public class Player implements Serializable{
 
+    private int ID;
     private final String ip;
     private String name;
 
@@ -42,6 +43,14 @@ public class Player implements Serializable{
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
     }
 
 }

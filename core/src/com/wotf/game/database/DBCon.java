@@ -12,9 +12,9 @@ public class DBCon {
     private static Connection connection;
 
     // TODO: 6-3-2016 Refactor this so that the username and password are loaded from a file instead of being hard-coded
-    private static final String ConnectionPath = "ourConnectionString"; // example oracle string: "jdbc:oracle:thin:@localhost:1521:XE";
-    private static final String Username = "username";
-    private static final String Password = "password";
+    private static final String ConnectionPath = "jdbc:mysql://athena01.fhict.local/dbi335437"; // example oracle string: "jdbc:oracle:thin:@localhost:1521:XE";
+    private static final String Username = "dbi335437";
+    private static final String Password = "slZprf8XkD";
 
     private static final String NumericDefault = "0";
 

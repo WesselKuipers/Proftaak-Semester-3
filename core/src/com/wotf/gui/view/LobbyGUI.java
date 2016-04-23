@@ -23,6 +23,9 @@ import com.wotf.game.classes.Player;
 import com.wotf.game.classes.Session;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import com.wotf.game.database.PlayerContext;
+import com.wotf.game.database.SessionContext;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,17 +41,29 @@ public class LobbyGUI implements Screen {
     private ArrayList<Session> sessionlist;
     private final Lobby lobby;
     private Player player;
+    private final SessionContext sessionContext;
+    private final PlayerContext playerContext;
 
     /**
      * Creates a new instance of the LobbyGUI based on the game.
      *
      * @param game so we can switch the screen of the 'current' game
+     * @param player
+     * @throws java.sql.SQLException
      */
-    public LobbyGUI(WotFGame game, Player player) {
+
+    public LobbyGUI(WotFGame game, Player player) throws SQLException {
         this.game = game;
         this.player = player;
         sessionlist = new ArrayList<>();
         lobby = new Lobby();
+        sessionContext = new SessionContext();
+        playerContext = new PlayerContext();
+
+        // Getting session out of database and sets it in lobby
+        for (Session session : sessionContext.GetAll()) {
+            lobby.addSession(session);
+        }
     }
 
     /**
@@ -90,12 +105,18 @@ public class LobbyGUI implements Screen {
 
         sessionstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"))));
         playerstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"))));
+        String[] playerlist = null;
+        try {
+            playerlist = new String[playerContext.GetAll().size()];
+            int i = 0;
 
-        String[] playerlist = new String[4];
-        playerlist[0] = "Wessel";
-        playerlist[1] = "Dino";
-        playerlist[2] = "Lars";
-        playerlist[3] = "Rens";
+            for (Player player : playerContext.GetAll()) {
+                playerlist[i] = player.getName();
+                i++;
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         Label wotflabel = new Label("War of the Figures", skin);
         wotflabel.setPosition(Gdx.graphics.getWidth() / 2 - wotflabel.getWidth() / 2, 740);
@@ -108,7 +129,7 @@ public class LobbyGUI implements Screen {
         Label sessionslabel = new Label("Sessions", skin);
         sessionstable.add(sessionslabel).padRight(20);
         sessionstable.row();
-        sessions.setItems(lobby.getSessions());
+        sessions.setItems(lobby.getSessions().toArray());
         sessionstable.add(sessions).minWidth(250).height(200);
         sessionstable.setPosition(30, 260);
         sessionstable.setWidth(300);
@@ -180,7 +201,7 @@ public class LobbyGUI implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 try {
                     // Logic for making session.
-                    Session session = new Session(player);
+                    Session session = new Session(player, "Roomname", 10);
 
                     game.setScreen(new SessionOnlineHost(game, session));
                 } catch (RemoteException ex) {

@@ -16,6 +16,7 @@ import com.wotf.game.classes.Items.Item;
 import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 import java.io.Serializable;
+import java.util.Iterator;
 
 /**
  * Team contains data that represent a team Contains a list of players, list of
@@ -29,6 +30,7 @@ public class Team implements Serializable{
     private transient final List<Unit> units;
     private transient final Map<Item, Integer> items; // The integer represents the ammo remaining
     private int activeUnitIndex;
+    private Unit activeUnit;
 
     /**
      * Constructor of Team, Initialize lists and set active unit index to zero.
@@ -46,9 +48,6 @@ public class Team implements Serializable{
         //Instantiating list of items
         players = new ArrayList<>();
         units = new ArrayList<>();
-
-        // Select first unit of team as active unit
-        this.activeUnitIndex = 0;
     }
 
     /**
@@ -63,9 +62,6 @@ public class Team implements Serializable{
         //Instantiating list of items
         players = new ArrayList<>();
         units = new ArrayList<>();
-
-        // Select first unit of team as active unit
-        this.activeUnitIndex = 0;
     }
 
     /**
@@ -137,7 +133,7 @@ public class Team implements Serializable{
      * @return active unit by active unit index
      */
     public Unit getActiveUnit() {
-        return units.get(activeUnitIndex);
+        return activeUnit;
     }
 
     /**
@@ -191,34 +187,56 @@ public class Team implements Serializable{
             units.remove(unit);
         }
     }
-
+    
     /**
-     *
-     * @return active unit index
+     * Begin turn for team
+     * If its the first time for the team and there's no active unit set it to the first
+     * After that get next active unit
      */
-    public int getActiveUnitIndex() {
-        return activeUnitIndex;
+    public void beginTurn() {
+        if (activeUnit == null) {
+            activeUnit = units.get(0);
+        }
+        setNextActiveUnit();
     }
 
     /**
-     * end turn for team, add new active unit index for team
+     * end turn for team
+     * When unit has lower or equal than 0 health, remove the unit from the team
      */
     public void endTurn() {
+        List<Unit> unitsToRemove = new ArrayList<>();
+        for (Unit unit : units) {
+            if (unit.getHealth() <= 0) {
+                unitsToRemove.add(unit);
+            }
+        }
+        for (int i = 0; i < unitsToRemove.size(); i++) {
+            removeUnit(unitsToRemove.get(i));
+        }
+    }
+    
+    /**
+     * Set the next active unit in the team
+     */
+    public void setNextActiveUnit() {
+        int activeUnitIndex = units.indexOf(activeUnit);
+        
         // Change the active unit index if its not at the end of the list
         if (activeUnitIndex < (units.size() - 1)) {
             activeUnitIndex++;
         } else {
             activeUnitIndex = 0;
         }
+        activeUnit = units.get(activeUnitIndex);
     }
 
     /**
-     * TODO: Set active unit
-     *
-     * @param u unit
+     * Set active unit
+     * @param unit unit
      */
-    public void setActiveUnit(Unit u) {
-        //TODO
+    public void setActiveUnit(Unit unit) {
+        this.activeUnit = unit;
     }
 
     /**

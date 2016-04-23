@@ -102,11 +102,7 @@ public class MainMenu implements Screen {
         online.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                try {
-                    game.setScreen(new UsernameInput(game));
-                } catch (UnknownHostException ex) {
-                    Logger.getLogger(MainMenu.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                game.setScreen(new Username(game));
             }
         });
         stage.addActor(online);
