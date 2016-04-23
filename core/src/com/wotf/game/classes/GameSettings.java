@@ -60,7 +60,7 @@ public class GameSettings {
      */
     public GameSettings(boolean any) {
         teams = new ArrayList<>();
-        
+
         maxTurns = 30;
         maxTime = 30 * 60;
         turnTime = 30;
@@ -71,13 +71,20 @@ public class GameSettings {
 
     /**
      * Not dynamic list atm. will be replaced with user input in later itt.
+     * TODO!
      */
     private void fillWeapons() {
         Sprite bullet_sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
-        Sprite weapon_sprite = new Sprite(new Texture(Gdx.files.internal("Bazooka.png")));
+        Sprite bazooka_sprite = new Sprite(new Texture(Gdx.files.internal("Bazooka.png")));
+        Sprite grenade_sprite = new Sprite(new Texture(Gdx.files.internal("grenade.png")));
+        Sprite clusterbomb_sprite = new Sprite(new Texture(Gdx.files.internal("clusterbomb.png")));
+        Sprite nuke_sprite = new Sprite(new Texture(Gdx.files.internal("nuclearbomb.png")));
+        Sprite remote_sprite = new Sprite(new Texture(Gdx.files.internal("remote.png")));
 
-        WEAPONS_ARMORY.add(new Bazooka("Bazooka", 10, 30, 40, weapon_sprite, bullet_sprite));
-        WEAPONS_ARMORY.add(new Bazooka("Grenade", 10, 10, 40, weapon_sprite, bullet_sprite));
+        WEAPONS_ARMORY.add(new Bazooka("Bazooka", 10, 30, 40, bazooka_sprite, bullet_sprite));
+        WEAPONS_ARMORY.add(new Bazooka("Nuke", 10, 10, 40, remote_sprite, nuke_sprite));
+        WEAPONS_ARMORY.add(new Bazooka("Grenade", 10, 10, 40, grenade_sprite, grenade_sprite));
+        WEAPONS_ARMORY.add(new Bazooka("Clusterbomb", 10, 10, 40, clusterbomb_sprite, grenade_sprite));
     }
 
     /**
