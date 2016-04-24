@@ -54,7 +54,7 @@ public class LobbyGUI implements Screen {
         playerContext = new PlayerContext();
 
         // Getting session out of database and sets it in lobby
-        for (Session session : sessionContext.GetAll()) {
+        for (Session session : sessionContext.getAll()) {
             lobby.addSession(session);
         }
     }
@@ -100,10 +100,10 @@ public class LobbyGUI implements Screen {
         playerstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"))));
         String[] playerlist = null;
         try {
-            playerlist = new String[playerContext.GetAll().size()];
+            playerlist = new String[playerContext.getAll().size()];
             int i = 0;
 
-            for (Player player : playerContext.GetAll()) {
+            for (Player player : playerContext.getAll()) {
                 playerlist[i] = player.getName();
                 i++;
             }
