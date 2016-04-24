@@ -190,6 +190,7 @@ public class LobbyGUI implements Screen {
 
                     game.setScreen(new SessionOnlinePlayer(game, selhost));
                 } catch (RemoteException ex) {
+                    PlayerContext.delete(player);
                     Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
@@ -212,6 +213,7 @@ public class LobbyGUI implements Screen {
                     // If it gets to here, add the session to the DB.
                     SessionContext.insert(session);
                 } catch (RemoteException ex) {
+                    PlayerContext.delete(player);
                     Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
