@@ -125,8 +125,11 @@ public class PlayerContext extends EntityContext<Player> {
 
     @Override
     protected Player getEntityFromRecord(ResultSet record) throws SQLException {
-        Player player = new Player(record.getString("IPAddress"), record.getString("IngameName"));
-        player.setID(record.getInt("ID"));
+        Player player = null;
+        while (record.next()) {
+            player = new Player(record.getString("IPAddress"), record.getString("IngameName"));
+            player.setID(record.getInt("ID"));
+        }
         return player;
     }
 
