@@ -8,6 +8,7 @@ package com.wotf.game.classes;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -22,7 +23,7 @@ import com.wotf.game.GameStage;
 public class Projectile extends Actor {
 
     private final Sprite sprite;
-
+    
     //projectile trajectory variables
     private float angle;
     private Vector2 velocity;

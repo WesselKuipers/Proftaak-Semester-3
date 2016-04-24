@@ -84,37 +84,26 @@ public class Unit extends Group {
                 if (keycode == Keys.UP) {
                     jump();
                 }
-
-                //switching between weapons
+// <editor-fold defaultstate="collapsed" desc=" switching between weapons ">
                 if (keycode == Keys.NUM_1) {
-                    // In Team's weaponlist choose weapon cooresponding to numbers & make weapon activated
-
-                    if (team.selectItem(WEAPONS_ARMORY.get(0))) {
-                        Item w = WEAPONS_ARMORY.get(0);
-                        Unit.this.clearChildren();
-                        selectWeapon(w);
-                        Image weaponImage = new Image(w.getWeaponSprite());
-                        weaponImage.setPosition(Unit.this.getX(), Unit.this.getY());
-                        Unit.this.addActor(weaponImage);
-
-                        System.out.println("BAZOOKA");
-                    } else {
-                        System.out.println("Selected weapon not found");
-                    }
+                    selecting_weapon(0);
                 }
-
                 if (keycode == Keys.NUM_2) {
-                    // In Team's weaponlist choose weapon cooresponding to numbers & make weapon activated
-                    if (team.selectItem(WEAPONS_ARMORY.get(1))) {
-                        Item w = WEAPONS_ARMORY.get(1);
-                        selectWeapon(w);
-
-                        System.out.println("GRENADE");
-                    } else {
-                        System.out.println("Selected weapon not found");
-                    }
+                    selecting_weapon(1);
                 }
-
+                if (keycode == Keys.NUM_3) {
+                    selecting_weapon(2);
+                }
+                if (keycode == Keys.NUM_4) {
+                    selecting_weapon(3);
+                }
+                if (keycode == Keys.NUM_5) {
+                    selecting_weapon(4);
+                }
+                if (keycode == Keys.NUM_6) {
+                    selecting_weapon(5);
+                }
+// </editor-fold>
                 return true;
             }
         });
@@ -137,7 +126,7 @@ public class Unit extends Group {
     /**
      * Constructor without any graphics Made for the unit testing.
      */
-    public Unit(String name, int health, Team team, Vector2 position, boolean any){
+    public Unit(String name, int health, Team team, Vector2 position, boolean any) {
         this.name = name;
         this.health = health;
         this.team = team;
@@ -145,9 +134,26 @@ public class Unit extends Group {
         this.sprite = null;
         moveRight = true;
     }
-     
-            
-     /**
+
+    /**
+     * first function in selecting a weapon from the list of weapons
+     *
+     * @param number number of the weapon that needs to be found
+     */
+    public void selecting_weapon(int number) {
+        if (team.selectItem(WEAPONS_ARMORY.get(number))) {
+            Item w = WEAPONS_ARMORY.get(number);
+            Unit.this.clearChildren();
+            selectWeapon(w);
+            Image weaponImage = new Image(w.getWeaponSprite());
+            weaponImage.setPosition(Unit.this.getX(), Unit.this.getY());
+            Unit.this.addActor(weaponImage);
+        } else {
+            System.out.println("Selected weapon not found");
+        }
+    }
+
+    /**
      * Selects a given weapon and adds it to the stage
      *
      * @param i Item object that you want to select
@@ -459,6 +465,7 @@ public class Unit extends Group {
      */
     public void fire(Vector2 mousePos, Vector2 wind, double gravity) {
         weapon.activate(this.position, mousePos, wind, gravity);
+        destroyWeapon();
     }
 
     /**

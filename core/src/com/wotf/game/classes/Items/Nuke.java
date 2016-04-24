@@ -5,8 +5,6 @@
  */
 package com.wotf.game.classes.Items;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 
@@ -14,7 +12,7 @@ import com.badlogic.gdx.math.Vector2;
  *
  * @author chaos
  */
-public class Clusterbomb extends Throwables {
+public class Nuke extends MissileLauncher {
 
     /* Sprite clusterbomb_sprite = new Sprite(new Texture(Gdx.files.internal("clusterbomb.png")));
     
@@ -22,8 +20,7 @@ public class Clusterbomb extends Throwables {
     int pw = 10;
     int rad= 30;
     int damage = 30;*/
-    
-    public Clusterbomb(String nm, int pw, int rad, int damage, Sprite weaponSprite, Sprite bulletSprite) {
+    public Nuke(String nm, int pw, int rad, int damage, Sprite weaponSprite, Sprite bulletSprite) {
         super(nm, pw, rad, damage, weaponSprite, bulletSprite);
     }
 
