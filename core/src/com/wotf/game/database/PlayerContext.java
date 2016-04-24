@@ -85,7 +85,7 @@ public class PlayerContext extends EntityContext<Player> {
      * @param player to add in the database
      * @return true/false if added was succesfull
      */
-    public boolean Insert(Player player) {
+    public static boolean Insert(Player player) {
         String query = "INSERT INTO player (IngameName, IPAddress) VALUES (?, ?)";
         List<Object> parameters = new ArrayList<>();
         parameters.add(player.getName());
@@ -115,7 +115,7 @@ public class PlayerContext extends EntityContext<Player> {
      * @param player to delete in database
      * @return true/false if update was succesfull
      */
-    public boolean Delete(Player player) {
+    public static boolean Delete(Player player) {
         String query = "DELETE FROM player WHERE ID = ?";
         List<Object> parameters = new ArrayList<>();
         parameters.add(player.getID());

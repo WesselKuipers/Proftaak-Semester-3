@@ -41,6 +41,7 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
         this.gameSettings = new GameSettings();
         this.host = host;
         this.players = new ArrayList<>();
+        players.add(host);
         this.maxPlayersSession = maxPlayersSession;
         this.roomName = roomName;
         publisher = new RemotePublisher();

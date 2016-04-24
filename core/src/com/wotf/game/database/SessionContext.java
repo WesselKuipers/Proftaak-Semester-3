@@ -80,10 +80,10 @@ public class SessionContext extends EntityContext<Session> {
      * @param session to add in the database
      * @return true/false if added was succesfull
      */
-    public boolean Insert(Session session) {
-        String query = "INSERT INTO event (HostID, RoomName, MaxPlayersSession) VALUES (?, ?, ?)";
+    public static boolean Insert(Session session) {
+        String query = "INSERT INTO SESSION (HostID, RoomName, MaxPlayersSession) VALUES (?, ?, ?)";
         List<Object> parameters = new ArrayList<>();
-        parameters.add(session.getPlayers().get(0).getID());
+        parameters.add(session.getHost().getID());
         parameters.add((session.getRoomName() != null) ? session.getRoomName() : "Roomname is not entered");
         parameters.add(session.getMaxPlayersSession());
 
@@ -108,7 +108,7 @@ public class SessionContext extends EntityContext<Session> {
      * @param session to delete in database
      * @return true/false if update was succesfull
      */
-    public boolean Delete(Session session) {
+    public static boolean Delete(Session session) {
         String query = "DELETE FROM session WHERE ID = ?";
         List<Object> parameters = new ArrayList<>();
         parameters.add(session.getID());

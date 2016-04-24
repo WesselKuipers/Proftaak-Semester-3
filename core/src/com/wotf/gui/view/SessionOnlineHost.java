@@ -35,6 +35,7 @@ import com.wotf.game.classes.Player;
 import com.wotf.game.classes.Session;
 import com.wotf.game.classes.SessionManager;
 import com.wotf.game.classes.Team;
+import com.wotf.game.database.SessionContext;
 import fontyspublisher.IRemotePropertyListener;
 import java.beans.PropertyChangeEvent;
 import java.rmi.AccessException;
@@ -389,6 +390,8 @@ public class SessionOnlineHost implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 game.setScreen(new MainMenu(game));
+                // If it gets to here remove the session from the DB.
+                SessionContext.Delete(session);
             }
         });
 

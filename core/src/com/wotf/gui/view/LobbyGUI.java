@@ -156,6 +156,8 @@ public class LobbyGUI implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 game.setScreen(new MainMenu(game));
+                // The player has exited the LobbyGUI. It should remove the current player from the Database.
+                PlayerContext.Delete(player);
             }
         });
 
@@ -201,9 +203,11 @@ public class LobbyGUI implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 try {
                     // Logic for making session.
-                    Session session = new Session(player, "Roomname", 10);
+                    Session session = new Session(player, "Room", 8);
 
                     game.setScreen(new SessionOnlineHost(game, session));
+                    // If it gets to here, add the session to the DB.
+                    SessionContext.Insert(session);
                 } catch (RemoteException ex) {
                     Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }

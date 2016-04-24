@@ -44,7 +44,7 @@ public class Username implements Screen {
         Gdx.input.setInputProcessor(stage);// Make the stage consume events
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
-        TextField username = new TextField("djdino56", skin);
+        TextField username = new TextField("Your username", skin);
         username.setWidth(300);
         username.setHeight(60);
         username.setPosition(500, 400);
