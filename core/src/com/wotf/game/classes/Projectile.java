@@ -8,6 +8,7 @@ package com.wotf.game.classes;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -22,7 +23,7 @@ import com.wotf.game.GameStage;
 public class Projectile extends Actor {
 
     private final Sprite sprite;
-
+    
     //projectile trajectory variables
     private float angle;
     private Vector2 velocity;
@@ -39,7 +40,7 @@ public class Projectile extends Actor {
     /**
      * /**
      * Projectile constructor to initialize visual appearence of the bullet.
-     * @param sprite 
+     * @param sprite Bullet sprite
      */
     public Projectile( Sprite sprite ) {
         //graphics
@@ -193,6 +194,15 @@ public class Projectile extends Actor {
             return;
         }
         
+        terrainCollision( terrain );
+    }
+    
+    
+    /**
+     * Function to check if bullet has collided with the terrain.
+     * @param terrain Nested boolean array [x][y] which determines if pixel is activated or not.
+     */
+    private void terrainCollision( boolean[][] terrain ){
         // Terrain and unit collision
         if (terrain[(int) getX()][(int) getY()] || checkUnitCollision()) {
             // Projectile collided with terrain
