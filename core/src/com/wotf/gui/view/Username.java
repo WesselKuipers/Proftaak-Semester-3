@@ -67,8 +67,8 @@ public class Username implements Screen {
                     try {
 
                         player = new Player(InetAddress.getLocalHost().getHostAddress(), username.getText());
-                        playerContext.Insert(player);
-                        player = playerContext.GetLastAddedPlayer();
+                        playerContext.insert(player);
+                        player = playerContext.getLastAddedPlayer();
 
                     } catch (SQLException | UnknownHostException ex) {
                         Logger.getLogger(Username.class.getName()).log(Level.SEVERE, null, ex);

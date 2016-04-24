@@ -26,25 +26,20 @@ public class SessionContext extends EntityContext<Session> {
      * @return Session of the found ID
      * @throws SQLException if no session was found
      */
-    public Session GetById(int id) throws SQLException {
+    public Session getById(int id) throws SQLException {
         String query = "SELECT * FROM session WHERE ID = ?";
         List<Object> parameters = new ArrayList<>();
         parameters.add(id);
-        return GetEntityFromRecord(DBCon.executeResultSet(query, parameters));
+        return getEntityFromRecord(DBCon.executeResultSet(query, parameters));
     }
     /**
      * Get last Session added in the database
      * @return last added Session
      * @throws SQLException 
      */
-    public Session GetLastAddedSession() throws SQLException {
-        String query = "SELECT MAX(ID) AS ID FROM session";
-        ResultSet result = DBCon.executeResultSet(query);
-        int id = 0;
-        while(result.next()) {
-         id = result.getInt("ID");
-        }
-        return GetById(id);
+    public Session getLastAddedSession() throws SQLException {
+        String query = "SELECT MAX(ID) FROM session";
+        return getEntityFromRecord(DBCon.executeResultSet(query));
     }
 
     /**
@@ -53,24 +48,24 @@ public class SessionContext extends EntityContext<Session> {
      * @return Session host by player ID
      * @throws SQLException 
      */
-    public Session GetByHostId(int id) throws SQLException {
+    public Session getByHostId(int id) throws SQLException {
         String query = "SELECT * FROM session WHERE HostID = ?";
         List<Object> parameters = new ArrayList<>();
         parameters.add(id);
-        return GetEntityFromRecord(DBCon.executeResultSet(query, parameters));
+        return getEntityFromRecord(DBCon.executeResultSet(query, parameters));
     }
     /**
      * Get all Sessions
      * @return list of all sessions
      * @throws SQLException 
      */
-    public List<Session> GetAll() throws SQLException {
+    public List<Session> getAll() throws SQLException {
         String query = "SELECT * FROM session ORDER BY ID";
         ResultSet res = DBCon.executeResultSet(query);
         List<Session> sessions = new ArrayList<>();
 
         while (res.next()) {
-            sessions.add(GetById(res.getInt("ID")));
+            sessions.add(getById(res.getInt("ID")));
         }
 
         return sessions;
@@ -80,8 +75,8 @@ public class SessionContext extends EntityContext<Session> {
      * @param session to add in the database
      * @return true/false if added was succesfull
      */
-    public static boolean Insert(Session session) {
-        String query = "INSERT INTO SESSION (HostID, RoomName, MaxPlayersSession) VALUES (?, ?, ?)";
+    public static boolean insert(Session session) {
+        String query = "INSERT INTO event (HostID, RoomName, MaxPlayersSession) VALUES (?, ?, ?)";
         List<Object> parameters = new ArrayList<>();
         parameters.add(session.getHost().getID());
         parameters.add((session.getRoomName() != null) ? session.getRoomName() : "Roomname is not entered");
@@ -94,7 +89,7 @@ public class SessionContext extends EntityContext<Session> {
      * @param session to update in database
      * @return true/false if update was succesfull
      */
-    public boolean Update(Session session) {
+    public boolean update(Session session) {
         String query = "UPDATE session SET RoomName = ?, MaxPlayersSession = ? WHERE ID = ?";
         List<Object> parameters = new ArrayList<>();
         parameters.add(session.getRoomName());
@@ -108,7 +103,7 @@ public class SessionContext extends EntityContext<Session> {
      * @param session to delete in database
      * @return true/false if update was succesfull
      */
-    public static boolean Delete(Session session) {
+    public static boolean delete(Session session) {
         String query = "DELETE FROM session WHERE ID = ?";
         List<Object> parameters = new ArrayList<>();
         parameters.add(session.getID());
@@ -117,16 +112,14 @@ public class SessionContext extends EntityContext<Session> {
     }
 
     @Override
-    protected Session GetEntityFromRecord(ResultSet record) throws SQLException {
+    protected Session getEntityFromRecord(ResultSet record) throws SQLException  {
         Session session = null;
-        while(record.next()){        
-            try {
-                session = new Session(new PlayerContext().GetById(record.getInt("HostID")), record.getString("RoomName"), record.getInt("MaxPlayersSession"));
-                session.setID(record.getInt("ID"));
-            } catch (RemoteException ex) {
-                Logger.getLogger(SessionContext.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        try {
+            session = new Session(new PlayerContext().getById(record.getInt("HostID")), record.getString("RoomName"), record.getInt("MaxPlayersSession"));
+        } catch (RemoteException ex) {
+            Logger.getLogger(SessionContext.class.getName()).log(Level.SEVERE, null, ex);
         }
+        session.setID(record.getInt("ID"));
         return session;
     }
 
