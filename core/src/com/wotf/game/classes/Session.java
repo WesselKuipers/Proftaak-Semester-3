@@ -141,4 +141,9 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
         publisher.unsubscribeRemoteListener(listener, property);
     }
 
+    @Override
+    public String toString() {
+        return host.getName() + " " + host.getIp();
+    }
+
 }
