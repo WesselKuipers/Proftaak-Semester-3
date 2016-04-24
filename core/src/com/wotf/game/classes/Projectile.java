@@ -194,7 +194,11 @@ public class Projectile extends Actor {
             return;
         }
         
-        terrainCollision( terrain );
+        // checking collision with units
+        ((GameStage) getStage()).isCollidedWithUnit((int) getX(), (int)getY());
+        
+        // checking collision with terrain
+        terrainCollision();
     }
     
     
@@ -202,9 +206,11 @@ public class Projectile extends Actor {
      * Function to check if bullet has collided with the terrain.
      * @param terrain Nested boolean array [x][y] which determines if pixel is activated or not.
      */
-    private void terrainCollision( boolean[][] terrain ){
+    private void terrainCollision() {
         // Terrain and unit collision
-        if (terrain[(int) getX()][(int) getY()] || checkUnitCollision()) {
+        if (((GameStage) getStage()).getGame().getMap()
+            .isPixelSolid((int) getX(), (int) getY())) {
+            
             // Projectile collided with terrain
             System.out.println("Bullet collided at " + this.getX() + " " + this.getY());
 
@@ -222,21 +228,5 @@ public class Projectile extends Actor {
         return this.getX() - this.getWidth() > gameMap.getWidth()
                 || this.getX() + this.getWidth() < 0
                 || this.getY() + this.getHeight() < 0;
-    }
-    
-    /**
-     * Function to check if projectile collided with any of the units
-     * @return True if a collision as detected, false otherwise.
-     */
-    private boolean checkUnitCollision() {
-        for (Team t : ((GameStage) getStage()).getGame().getTeams()) {
-            for (Unit u : t.getUnits()) {
-                if (u.getBounds().contains(this.position)) {
-                    return true;
-                }
-            }
-        }
-        
-        return false;
     }
 }

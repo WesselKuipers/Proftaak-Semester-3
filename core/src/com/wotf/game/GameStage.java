@@ -30,7 +30,6 @@ import java.util.List;
 /**
  * Extension of Stage that contains a game session
  *
- * @author Wessel
  */
 public class GameStage extends Stage {
 
@@ -41,12 +40,8 @@ public class GameStage extends Stage {
     private final SpriteBatch guiBatch;
     private final BitmapFont font;
 
-    private Texture terrainTexture;
-    private final Texture backgroundTexture;
-    private Pixmap pixmap;
-
     private Actor focusedActor; // if this is set to an actor
-    // have the camera follow it automatically, otherwise set it to null
+                                // have the camera follow it automatically, otherwise set it to null
 
     /**
      * Constructor for GameStage that initializes everything required for the
@@ -66,15 +61,6 @@ public class GameStage extends Stage {
 
         font = new BitmapFont();
         font.setColor(Color.BLACK);
-
-        Pixmap bgPixmap = new Pixmap(this.game.getMap().getWidth(), this.game.getMap().getHeight(), Pixmap.Format.RGBA8888);
-        System.out.println(game.getMap().getWidth() + "" + game.getMap().getHeight() + "");
-        bgPixmap.setColor(Color.PURPLE);
-        bgPixmap.fill();
-        backgroundTexture = new Texture(bgPixmap);
-        bgPixmap.dispose();
-
-        terrainTexture = game.getMap().getLandscapeTexture();
     }
 
     /**
@@ -82,16 +68,26 @@ public class GameStage extends Stage {
      * actors Spawns the units at random collision-free locations
      */
     public void init() {
-        boolean[][] terrain = game.getMap().getTerrain();
+        // spawning users and adding them as actors
+        spawnUnits();
+
+        getCamera().update();
+        game.beginTurn();
+    }
+
+    /**
+     * Iterates through every team's units and determines a random spawn location
+     * 
+     * Spawn location is determined by the highest available pixel above
+     * a solid pixel at a randomly generated X-coordinate.
+     * 
+     */
+    public void spawnUnits() {
+        boolean[][] terrain = game.getMap().getTerrain();        
 
         // Adds every unit as an actor to this stage
         for (Team team : game.getTeams()) {
             for (Unit unit : team.getUnits()) {
-
-                // Spawns a unit in a random location (X axis)
-                Vector2 ranLocation = new Vector2(MathUtils.random(0, game.getMap().getWidth() - unit.getWidth()), 80);
-                unit.spawn(ranLocation);
-
                 // Generates a random X position and attempts to find the highest collision-free position
                 // and spawns the unit at that position, will continue looping until a position has been found
                 boolean spawned = false;
@@ -127,9 +123,6 @@ public class GameStage extends Stage {
                 this.addActor(unit);
             }
         }
-
-        getCamera().update();
-        game.beginTurn();
     }
 
     /**
@@ -259,6 +252,9 @@ public class GameStage extends Stage {
         batch.setProjectionMatrix(getCamera().combined);
         batch.begin();
 
+        Texture backgroundTexture = game.getMap().getBackgroundTexture();
+        Texture terrainTexture = game.getMap().getLandscapeTexture();
+        
         batch.draw(backgroundTexture, 0, 0, 0, 0,
                 backgroundTexture.getWidth(), backgroundTexture.getHeight(),
                 1f, 1f, 0, 0, 0,
@@ -273,10 +269,13 @@ public class GameStage extends Stage {
         batch.end();
 
         super.draw();
+        
+        // guiBatch is primarily used to display text and miscellaneous graphics
         guiBatch.begin();
 
         font.draw(guiBatch, "Debug variables:", 0, this.getHeight());
         font.draw(guiBatch, "Actors amount: " + this.getActors().size, 0, this.getHeight() - 20);
+        
         if (this.game.getActiveTeam().getActiveUnit() != null) {
             font.draw(guiBatch,
                     String.format("Active actor: %s XY[%f, %f]",
@@ -286,41 +285,19 @@ public class GameStage extends Stage {
                     0,
                     this.getHeight() - 40);
         }
+        
         font.draw(guiBatch, String.format("Mouse position: screen [%d, %d], viewport %s", Gdx.input.getX(), game.getMap().getHeight() - Gdx.input.getY(), getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0))), 0, this.getHeight() - 60);
         font.draw(guiBatch, String.format("Camera coords [%s], zoom %f", getCamera().position.toString(), ((OrthographicCamera) getCamera()).zoom), 0, this.getHeight() - 80);
         font.draw(guiBatch, "Time remaining: " + (game.getGameSettings().getTurnTime() - (int) game.getTurnLogic().getElapsedTime()), 0, this.getHeight() - 100);
         font.draw(guiBatch, String.format("FPS: %d", Gdx.graphics.getFramesPerSecond()), 0, this.getHeight() - 120);
+        
         if (game.getTurnLogic().getState() == TurnState.GAMEOVER) {
             font.draw(guiBatch, "GAME OVER", this.getWidth() / 2, this.getHeight() / 2);
         }
+        
         font.draw(guiBatch, "Wind: " + game.getMap().getWind().toString(), 0, this.getHeight() - 140);
+        
         guiBatch.end();
-    }
-
-    /**
-     * Updates the terrain texture based on the terrain array in game map
-     */
-    public void updateTerrain() {
-        boolean terrain[][] = game.getMap().getTerrain();
-
-        pixmap = new Pixmap(terrain.length, terrain[0].length, Pixmap.Format.RGBA8888);
-
-        if (!terrainTexture.getTextureData().isPrepared()) {
-            terrainTexture.getTextureData().prepare();
-        }
-
-        Pixmap oldPixmap = terrainTexture.getTextureData().consumePixmap();
-
-        for (int x = 0; x < terrain.length; x++) {
-            for (int y = 0; y < terrain[1].length; y++) {
-                if (terrain[x][y]) {
-                    pixmap.drawPixel(x, y, oldPixmap.getPixel(x, y));
-                }
-            }
-        }
-
-        terrainTexture = new Texture(pixmap);
-        oldPixmap.dispose();
     }
 
     /**
@@ -334,13 +311,16 @@ public class GameStage extends Stage {
      * @param damage Amount of damage the explosion does should it collide with
      * a Unit
      */
-    public void explode(int x, int y, int radius, int damage){
-        boolean[][] terrain = game.getMap().getTerrain();
+    public void explode(int x, int y, int radius, int damage) {
+        // calls radius destruction method in game map
+        // which will update the boolean[][] and the terrain texture
+        game.getMap().destroyRadius(x, y, radius);
+        
         List<Unit> collidedUnits = new ArrayList<>();
 
         for (int xPos = x - radius; xPos <= x + radius; xPos++) {
             for (int yPos = y - radius; yPos <= y + radius; yPos++) {
-                // scan square area around radius to determine which pixels to destroy
+                // scan square area around radius to determine which pixels are within the radius
                 if (Math.pow(xPos - x, 2) + Math.pow(yPos - y, 2) < radius * radius) {
                     // Iterate through every team and unit
                     // and add it to the list of collided Units if its bounding box contains explosion Xs and Ys
@@ -354,45 +334,34 @@ public class GameStage extends Stage {
                             }
                         }
                     }
-
-                    // Check if the position is in bounds of the array, if not, skip this iteration
-                    if (!(xPos >= 0 && yPos >= 0 && xPos < terrain.length && yPos < terrain[0].length)) {
-                        continue;
-                    }
-
-                    // if the pixel at (xPos, yPos) is solid, set it to false
-                    if (terrain[xPos][yPos]) {
-                        // Additional checks can be done here
-                        terrain[xPos][yPos] = false;
-                    }
                 }
             }
         }
 
-        // TODO: Pass through correct/proper damage value?
         // Iterates through all of the collided units and decreases their health
         // based on the damage caused by the explosion
         for (Unit u : collidedUnits) {
             u.decreaseHealth(damage);
         }
-        game.getMap().setTerrain(terrain);
-        updateTerrain();
     }
 
     /**
-     * Checks if a pixel at a given coordinate is set to solid or not
-     *
+     * Checks if a pixel at a given coordinate collides with a unit or not
      * @param x X-coordinate in world map
      * @param y Y-coordinate in world map
-     * @return True if pixel is solid, false if not
-     */
-    public boolean isPixelSolid(int x, int y) {
-        boolean[][] terrain = this.game.getMap().getTerrain();
-        if (!(x >= 0 && y >= 0 && x < terrain.length && y < terrain[0].length)) {
-            // Out of bounds
-            return false;
+     * @return True if pixel if a collision was detected, false if not
+     */    
+    public boolean isCollidedWithUnit(int x, int y) {
+
+        for (Team t : game.getTeams()) {
+            for (Unit u : t.getUnits()) {
+                if (u.getBounds().contains(x, y)) {
+                    return true;
+                }
+            }
         }
-        return terrain[x][y];
+        
+        return false;
     }
 
     /**
@@ -420,25 +389,28 @@ public class GameStage extends Stage {
      * @author Jip Boesenkool 
      * Function which handles the use case to fire a bullet,
      * Get's called by mouseClick event. Trigger MUST BE inside game stage, else
-     * mouse Click wont get the right coordinates.
+     * mouse Click won't get the right coordinates.
      * @param screenX Unprojected mouse position.x
      * @param screenY Unprojected mouse position.y
      */
     private void bulletLogic(int screenX, int screenY) {
-        //get wind force from map
+        // get wind force from map
         Vector2 wind = game.getMap().getWind();
-        //get gravity force from map (Const atm)
+        
+        // get gravity force from map (Const atm)
         double gravity = game.getMap().getGravityModifier();
-        //get mouseposition to determine what direction the bullet must fly
+        
+        // get mouseposition to determine what direction the bullet must fly
         Vector2 mousePos = new Vector2(screenX, screenY);
         
-        //trigger the fire method in unit which holds the gun
+        // trigger the fire method in unit which holds the gun
         (game.getActiveTeam().getActiveUnit()).fire(
                 mousePos,
                 wind,
                 gravity
         );
-        //make camera follow bullet
+        
+        // make camera follow bullet
         focusedActor = (Actor)( game.getActiveTeam().getActiveUnit().getWeapon().getBullet() );
     }
 

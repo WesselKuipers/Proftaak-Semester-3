@@ -367,18 +367,21 @@ public class Unit extends Group {
         positionChanged();
 
         if (!moveRight) {
-            boolean isSolidX = ((GameStage) getStage()).isPixelSolid((int) position.x - 1, (int) position.y);
+            boolean isSolidX = ((GameStage) getStage()).getGame().getMap()
+                                .isPixelSolid((int) position.x - 1, (int) position.y);
             if (isSolidX) {
                 velocity.x = 0;
             }
         } else {
-            boolean isSolidX = ((GameStage) getStage()).isPixelSolid((int) position.x + 15, (int) position.y);
+            boolean isSolidX = ((GameStage) getStage()).getGame().getMap()
+                                .isPixelSolid((int) position.x + 15, (int) position.y);
             if (isSolidX) {
                 velocity.x = 0;
             }
         }
 
-        boolean isSolidY = ((GameStage) getStage()).isPixelSolid((int) position.x, (int) position.y - 1);
+        boolean isSolidY = ((GameStage) getStage()).getGame().getMap()
+                            .isPixelSolid((int) position.x, (int) position.y - 1);
         if (isSolidY) {
             velocity.y = 0;
         }
