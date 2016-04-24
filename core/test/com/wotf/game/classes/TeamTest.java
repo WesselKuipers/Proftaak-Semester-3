@@ -6,7 +6,6 @@
 package com.wotf.game.classes;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -177,19 +176,20 @@ public class TeamTest {
     @Test
     public void testgetActiveUnitIndex() {
         /**
-         *
+         * TODO: removed getActiveUnitIndex
          * @return active unit index
          */
-        assertEquals(0, team.getActiveUnitIndex());
+        assertEquals(0, team.getActiveUnit());
     }
 
     @Test
     public void testendTurn() {
         /**
+         * TODO: removed getActiveUnitIndex
          * end turn for team, add new active unit index for team
          */
         team.endTurn();
         // If we end the turn, the active unit index will be set +1. So AlphaUnit2 will now be active.
-        assertEquals(1, team.getActiveUnitIndex());
+        assertEquals(1, team.getActiveUnit());
     }
 }
