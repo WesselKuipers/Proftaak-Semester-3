@@ -37,9 +37,14 @@ public class SessionContext extends EntityContext<Session> {
      * @return last added Session
      * @throws SQLException 
      */
-    public Session getLastAddedSession() throws SQLException {
-        String query = "SELECT MAX(ID) FROM session";
-        return getEntityFromRecord(DBCon.executeResultSet(query));
+    public Session getLastAddedSession() throws SQLException {        
+        String query = "SELECT MAX(ID) AS ID FROM session";
+        ResultSet result = DBCon.executeResultSet(query);
+        int id = 0;
+        while(result.next()) {
+         id = result.getInt("ID");
+        }
+        return getById(id);
     }
 
     /**
