@@ -40,7 +40,10 @@ public class Team implements Serializable{
      */
     public Team(String name, Color color) {
         items = new HashMap<>();
-        items.put(WEAPONS_ARMORY.get(0), 99);
+        for(Item i : WEAPONS_ARMORY){
+            items.put(i, 99);
+        }
+        //items.put(WEAPONS_ARMORY.get(0), 99);
 
         this.name = name;
         this.color = color;

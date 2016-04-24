@@ -8,6 +8,7 @@ package com.wotf.game.classes;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -22,7 +23,7 @@ import com.wotf.game.GameStage;
 public class Projectile extends Actor {
 
     private final Sprite sprite;
-
+    
     //projectile trajectory variables
     private float angle;
     private Vector2 velocity;
@@ -39,7 +40,7 @@ public class Projectile extends Actor {
     /**
      * /**
      * Projectile constructor to initialize visual appearence of the bullet.
-     * @param sprite 
+     * @param sprite Bullet sprite
      */
     public Projectile( Sprite sprite ) {
         //graphics
@@ -193,8 +194,23 @@ public class Projectile extends Actor {
             return;
         }
         
+        // checking collision with units
+        ((GameStage) getStage()).isCollidedWithUnit((int) getX(), (int)getY());
+        
+        // checking collision with terrain
+        terrainCollision();
+    }
+    
+    
+    /**
+     * Function to check if bullet has collided with the terrain.
+     * @param terrain Nested boolean array [x][y] which determines if pixel is activated or not.
+     */
+    private void terrainCollision() {
         // Terrain and unit collision
-        if (terrain[(int) getX()][(int) getY()] || checkUnitCollision()) {
+        if (((GameStage) getStage()).getGame().getMap()
+            .isPixelSolid((int) getX(), (int) getY())) {
+            
             // Projectile collided with terrain
             System.out.println("Bullet collided at " + this.getX() + " " + this.getY());
 
@@ -212,21 +228,5 @@ public class Projectile extends Actor {
         return this.getX() - this.getWidth() > gameMap.getWidth()
                 || this.getX() + this.getWidth() < 0
                 || this.getY() + this.getHeight() < 0;
-    }
-    
-    /**
-     * Function to check if projectile collided with any of the units
-     * @return True if a collision as detected, false otherwise.
-     */
-    private boolean checkUnitCollision() {
-        for (Team t : ((GameStage) getStage()).getGame().getTeams()) {
-            for (Unit u : t.getUnits()) {
-                if (u.getBounds().contains(this.position)) {
-                    return true;
-                }
-            }
-        }
-        
-        return false;
     }
 }

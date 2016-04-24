@@ -16,7 +16,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
@@ -27,23 +26,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.badlogic.gdx.utils.Array;
 import com.wotf.game.WotFGame;
 import com.wotf.game.classes.GameSettings;
 import com.wotf.game.classes.Map;
-import com.wotf.game.classes.Player;
 import com.wotf.game.classes.Session;
 import com.wotf.game.classes.SessionManager;
 import com.wotf.game.classes.Team;
 import com.wotf.game.database.SessionContext;
-import fontyspublisher.IRemotePropertyListener;
-import java.beans.PropertyChangeEvent;
-import java.rmi.AccessException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -391,7 +382,7 @@ public class SessionOnlineHost implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 game.setScreen(new MainMenu(game));
                 // If it gets to here remove the session from the DB.
-                SessionContext.Delete(session);
+                SessionContext.delete(session);
             }
         });
 

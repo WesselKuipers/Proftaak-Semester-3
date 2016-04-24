@@ -61,7 +61,7 @@ public class LobbyGUI implements Screen {
         playerContext = new PlayerContext();
 
         // Getting session out of database and sets it in lobby
-        for (Session session : sessionContext.GetAll()) {
+        for (Session session : sessionContext.getAll()) {
             lobby.addSession(session);
         }
     }
@@ -107,10 +107,10 @@ public class LobbyGUI implements Screen {
         playerstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"))));
         String[] playerlist = null;
         try {
-            playerlist = new String[playerContext.GetAll().size()];
+            playerlist = new String[playerContext.getAll().size()];
             int i = 0;
 
-            for (Player player : playerContext.GetAll()) {
+            for (Player player : playerContext.getAll()) {
                 playerlist[i] = player.getName();
                 i++;
             }
@@ -157,7 +157,7 @@ public class LobbyGUI implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 game.setScreen(new MainMenu(game));
                 // The player has exited the LobbyGUI. It should remove the current player from the Database.
-                PlayerContext.Delete(player);
+                PlayerContext.delete(player);
             }
         });
 
@@ -210,7 +210,7 @@ public class LobbyGUI implements Screen {
 
                     game.setScreen(new SessionOnlineHost(game, session));
                     // If it gets to here, add the session to the DB.
-                    SessionContext.Insert(session);
+                    SessionContext.insert(session);
                 } catch (RemoteException ex) {
                     Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
