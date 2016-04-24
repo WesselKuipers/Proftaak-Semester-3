@@ -43,7 +43,7 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
     public void getSessionRegistry() {
         // REGISTER AREA
         try {
-            registry = LocateRegistry.getRegistry("192.168.0.113", 5555);
+            registry = LocateRegistry.getRegistry(session.getHost().getIp(), 5555);
             regsettings = (ISessionSettings) registry.lookup("SessionSettings");
             gamesettings = (GameSettings) regsettings.getGameSettings();
             session.setGameSettings(gamesettings);

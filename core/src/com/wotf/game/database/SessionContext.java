@@ -109,9 +109,9 @@ public class SessionContext extends EntityContext<Session> {
      * @return true/false if update was succesfull
      */
     public static boolean Delete(Session session) {
-        String query = "DELETE FROM session WHERE ID = ?";
+        String query = "DELETE FROM session WHERE HostID = ?";
         List<Object> parameters = new ArrayList<>();
-        parameters.add(session.getID());
+        parameters.add(session.getHost().getID());
         
         return DBCon.executeUpdate(query, parameters) >= 1;
     }

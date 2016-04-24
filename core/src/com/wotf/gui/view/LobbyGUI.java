@@ -181,6 +181,9 @@ public class LobbyGUI implements Screen {
         join.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                if(sessions.getSelected() == null){
+                    return;
+                }
                 try {
                     // HostIP address should be filled in here.
                     Session selhost = (Session) sessions.getSelected();
