@@ -320,8 +320,12 @@ public class Unit extends Group {
      *
      * Then the act calls the updateJump().
      */
-    public void jump() {
-        System.out.println("V= " + velocity.x);
+    public void jump() {        
+        // Jumping once
+        if(velocity.x != 0 && velocity.y != 0){
+            return;
+        }
+        
         float nextX;
 
         if (moveRight) {
@@ -348,7 +352,7 @@ public class Unit extends Group {
         if (acceleration == null) {
             return;
         }
-
+       
         float delta = Gdx.graphics.getDeltaTime();
 
         //keep old position to change rotation of object
@@ -369,18 +373,18 @@ public class Unit extends Group {
         if (!moveRight) {
             boolean isSolidX = ((GameStage) getStage()).isPixelSolid((int) position.x - 1, (int) position.y);
             if (isSolidX) {
-                velocity.x = 0;
+                velocity = new Vector2(0,0);
             }
         } else {
             boolean isSolidX = ((GameStage) getStage()).isPixelSolid((int) position.x + 15, (int) position.y);
             if (isSolidX) {
-                velocity.x = 0;
+                velocity = new Vector2(0,0);
             }
         }
 
         boolean isSolidY = ((GameStage) getStage()).isPixelSolid((int) position.x, (int) position.y - 1);
         if (isSolidY) {
-            velocity.y = 0;
+            velocity = new Vector2(0,0);
         }
         sprite.setRotation(angle);
     }

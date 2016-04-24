@@ -19,9 +19,10 @@ public class PlayerContext extends EntityContext<Player> {
 
     /**
      * Get player by ID
+     *
      * @param id of the player
      * @return player with ID found in the database
-     * @throws SQLException 
+     * @throws SQLException
      */
     public Player GetById(int id) throws SQLException {
         String query = "SELECT * FROM player WHERE ID = ?";
@@ -29,20 +30,29 @@ public class PlayerContext extends EntityContext<Player> {
         parameters.add(id);
         return GetEntityFromRecord(DBCon.executeResultSet(query, parameters));
     }
-     /**
+
+    /**
      * Get last Player added in the database
+     *
      * @return last added Player
-     * @throws SQLException 
+     * @throws SQLException
      */
     public Player GetLastAddedPlayer() throws SQLException {
-        String query = "SELECT MAX(ID) FROM player";
-        return GetEntityFromRecord(DBCon.executeResultSet(query));
+        String query = "SELECT MAX(ID) AS ID FROM player";
+        ResultSet result = DBCon.executeResultSet(query);
+        int id = 0;
+        while (result.next()) {
+            id = result.getInt("ID");
+        }
+        return GetById(id);
     }
+
     /**
      * Get player by IP address
+     *
      * @param ip of the player
      * @return player found with that ip address
-     * @throws SQLException 
+     * @throws SQLException
      */
     public Player GetByIP(String ip) throws SQLException {
         String query = "SELECT * FROM player WHERE IPAddress = ?";
@@ -50,10 +60,12 @@ public class PlayerContext extends EntityContext<Player> {
         parameters.add(ip);
         return GetEntityFromRecord(DBCon.executeResultSet(query, parameters));
     }
+
     /**
      * Get all players
+     *
      * @return list of all players
-     * @throws SQLException 
+     * @throws SQLException
      */
     public List<Player> GetAll() throws SQLException {
         String query = "SELECT * FROM player ORDER BY ID";
@@ -66,8 +78,10 @@ public class PlayerContext extends EntityContext<Player> {
 
         return players;
     }
+
     /**
      * Insert player the database
+     *
      * @param player to add in the database
      * @return true/false if added was succesfull
      */
@@ -79,8 +93,10 @@ public class PlayerContext extends EntityContext<Player> {
 
         return DBCon.executeUpdate(query, parameters) >= 1;
     }
+
     /**
      * Update player in the database
+     *
      * @param player to update in database
      * @return true/false if update was succesfull
      */
@@ -89,26 +105,31 @@ public class PlayerContext extends EntityContext<Player> {
         List<Object> parameters = new ArrayList<>();
         parameters.add(player.getName());
         parameters.add(player.getID());
-        
+
         return DBCon.executeUpdate(query, parameters) >= 1;
     }
+
     /**
      * Delete player in the database
+     *
      * @param player to delete in database
      * @return true/false if update was succesfull
      */
     public boolean Delete(Player player) {
-       String query = "DELETE FROM player WHERE ID = ?";
+        String query = "DELETE FROM player WHERE ID = ?";
         List<Object> parameters = new ArrayList<>();
         parameters.add(player.getID());
-        
+
         return DBCon.executeUpdate(query, parameters) >= 1;
     }
 
     @Override
     protected Player GetEntityFromRecord(ResultSet record) throws SQLException {
-        Player player = new Player(record.getString("IPAddress"), record.getString("IngameName"));
-        player.setID(record.getInt("ID"));
+        Player player = null;
+        while (record.next()) {
+            player = new Player(record.getString("IPAddress"), record.getString("IngameName"));
+            player.setID(record.getInt("ID"));
+        }
         return player;
     }
 
