@@ -14,5 +14,5 @@ import java.sql.SQLException;
  */
 public abstract class EntityContext<T>
 {
-    protected abstract T GetEntityFromRecord(ResultSet record) throws SQLException ;
+    protected abstract T getEntityFromRecord(ResultSet record) throws SQLException ;
 }
