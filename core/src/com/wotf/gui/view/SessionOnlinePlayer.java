@@ -253,7 +253,7 @@ public class SessionOnlinePlayer implements Screen {
         mapstable.addActor(map1);
         chooseMap = new SelectBox(skin);
         chooseMap.setItems(mapslist.toArray());
-
+        chooseMap.setSelected(session.getGameSettings().getMapName());
         chooseMap.setWidth(400);
         chooseMap.setPosition(20, 20);
         mapstable.addActor(chooseMap);
@@ -266,6 +266,9 @@ public class SessionOnlinePlayer implements Screen {
         teamstable.setPosition(730, 360);
         teamstable.add(teamslabel);
         teamstable.row();
+        teamList.clear();
+        teamList.addAll(session.getGameSettings().getTeams());
+        teams.setItems(teamList.toArray());
         teamstable.add(teams).width(200);
         teamstable.setWidth(300);
         teamstable.setHeight(320);

@@ -283,7 +283,6 @@ public class SessionOnlineHost implements Screen {
                 try {
                     gameSettings.setMaxTime(Integer.parseInt(timerbox.getSelected().toString()));
                     session.setGameSettings(gameSettings);
-                    session.startGame();
                 } catch (RemoteException ex) {
                     Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
                 }
