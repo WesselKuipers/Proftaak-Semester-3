@@ -22,6 +22,7 @@ public class SessionContext extends EntityContext<Session> {
 
     /**
      * Get Session by ID
+     *
      * @param id ID of the session
      * @return Session of the found ID
      * @throws SQLException if no session was found
@@ -32,26 +33,29 @@ public class SessionContext extends EntityContext<Session> {
         parameters.add(id);
         return getEntityFromRecord(DBCon.executeResultSet(query, parameters));
     }
+
     /**
      * Get last Session added in the database
+     *
      * @return last added Session
-     * @throws SQLException 
+     * @throws SQLException
      */
-    public Session getLastAddedSession() throws SQLException {        
+    public Session getLastAddedSession() throws SQLException {
         String query = "SELECT MAX(ID) AS ID FROM session";
         ResultSet result = DBCon.executeResultSet(query);
         int id = 0;
-        while(result.next()) {
-         id = result.getInt("ID");
+        while (result.next()) {
+            id = result.getInt("ID");
         }
         return getById(id);
     }
 
     /**
      * Get Session by HosID
+     *
      * @param id of the host
      * @return Session host by player ID
-     * @throws SQLException 
+     * @throws SQLException
      */
     public Session getByHostId(int id) throws SQLException {
         String query = "SELECT * FROM session WHERE HostID = ?";
@@ -59,10 +63,12 @@ public class SessionContext extends EntityContext<Session> {
         parameters.add(id);
         return getEntityFromRecord(DBCon.executeResultSet(query, parameters));
     }
+
     /**
      * Get all Sessions
+     *
      * @return list of all sessions
-     * @throws SQLException 
+     * @throws SQLException
      */
     public List<Session> getAll() throws SQLException {
         String query = "SELECT * FROM session ORDER BY ID";
@@ -75,8 +81,10 @@ public class SessionContext extends EntityContext<Session> {
 
         return sessions;
     }
+
     /**
      * Insert session the database
+     *
      * @param session to add in the database
      * @return true/false if added was succesfull
      */
@@ -89,8 +97,10 @@ public class SessionContext extends EntityContext<Session> {
 
         return DBCon.executeUpdate(query, parameters) >= 1;
     }
+
     /**
      * Update session in the database
+     *
      * @param session to update in database
      * @return true/false if update was succesfull
      */
@@ -100,11 +110,13 @@ public class SessionContext extends EntityContext<Session> {
         parameters.add(session.getRoomName());
         parameters.add(session.getMaxPlayersSession());
         parameters.add(session.getID());
-        
+
         return DBCon.executeUpdate(query, parameters) >= 1;
     }
+
     /**
      * Delete session in the database
+     *
      * @param session to delete in database
      * @return true/false if update was succesfull
      */
@@ -112,19 +124,21 @@ public class SessionContext extends EntityContext<Session> {
         String query = "DELETE FROM session WHERE ID = ?";
         List<Object> parameters = new ArrayList<>();
         parameters.add(session.getID());
-        
+
         return DBCon.executeUpdate(query, parameters) >= 1;
     }
 
     @Override
-    protected Session getEntityFromRecord(ResultSet record) throws SQLException  {
+    protected Session getEntityFromRecord(ResultSet record) throws SQLException {
         Session session = null;
-        try {
-            session = new Session(new PlayerContext().getById(record.getInt("HostID")), record.getString("RoomName"), record.getInt("MaxPlayersSession"));
-        } catch (RemoteException ex) {
-            Logger.getLogger(SessionContext.class.getName()).log(Level.SEVERE, null, ex);
+        while (record.next()) {
+            try {
+                session = new Session(new PlayerContext().getById(record.getInt("HostID")), record.getString("RoomName"), record.getInt("MaxPlayersSession"));
+            } catch (RemoteException ex) {
+                Logger.getLogger(SessionContext.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            session.setID(record.getInt("ID"));
         }
-        session.setID(record.getInt("ID"));
         return session;
     }
 
