@@ -53,7 +53,7 @@ public class GameSettings implements Serializable{
 
         maxTurns = 30;
         maxTime = 30 * 60;
-        turnTime = 30;
+        turnTime = 40;
         withdrawTime = 3;
         fallingDamage = true;
         suddenDeath = true;

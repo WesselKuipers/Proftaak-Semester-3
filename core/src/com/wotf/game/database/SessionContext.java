@@ -89,7 +89,7 @@ public class SessionContext extends EntityContext<Session> {
      * @return true/false if added was succesfull
      */
     public static boolean insert(Session session) {
-        String query = "INSERT INTO event (HostID, RoomName, MaxPlayersSession) VALUES (?, ?, ?)";
+        String query = "INSERT INTO session (HostID, RoomName, MaxPlayersSession) VALUES (?, ?, ?)";
         List<Object> parameters = new ArrayList<>();
         parameters.add(session.getHost().getID());
         parameters.add((session.getRoomName() != null) ? session.getRoomName() : "Roomname is not entered");
@@ -121,10 +121,9 @@ public class SessionContext extends EntityContext<Session> {
      * @return true/false if update was succesfull
      */
     public static boolean delete(Session session) {
-        String query = "DELETE FROM session WHERE ID = ?";
+        String query = "DELETE FROM session WHERE HostID = ?";
         List<Object> parameters = new ArrayList<>();
-        parameters.add(session.getID());
-
+        parameters.add(session.getHost().getID());
         return DBCon.executeUpdate(query, parameters) >= 1;
     }
 

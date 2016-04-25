@@ -43,12 +43,13 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
     public void getSessionRegistry() {
         // REGISTER AREA
         try {
-            registry = LocateRegistry.getRegistry("192.168.0.113", 5555);
+            registry = LocateRegistry.getRegistry(session.getHost().getIp(), 5555);
             regsettings = (ISessionSettings) registry.lookup("SessionSettings");
             gamesettings = (GameSettings) regsettings.getGameSettings();
-            session.setGameSettings(gamesettings);
-            GUI.updateTeamList(session);
             regsettings.subscribeRemoteListener(this, "sessionsettingsprop");
+            // Hou er rekening mee dat de inform van hieruit niet doorgevoerd wordt.
+            // Dit is puur om de gamesettings te zetten. De Session klasse kan alleen de inform afgeven.
+            session.setGameSettings(gamesettings);
             //regsettings.subscribeRemoteListener(this, "startgameprop");
         } catch (RemoteException ex) {
             System.out.println("Client: Cannot locate registry");
@@ -61,6 +62,10 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
 
     public Session getSession() {
         return session;
+    }
+    
+    public void removeRegistry(){
+        registry = null;
     }
 
     @Override
@@ -84,7 +89,6 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
         /*if (evt.getPropertyName().equals("startgameprop")) {
             //GUI.dispose();
         }*/
-
     }
 
 }
