@@ -56,7 +56,6 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
     }
 
     public void removeRegistry() throws NoSuchObjectException{
-        //registry = null;
         UnicastRemoteObject.unexportObject(registry, true);
     }
     

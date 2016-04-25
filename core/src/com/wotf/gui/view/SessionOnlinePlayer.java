@@ -44,6 +44,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -289,9 +290,13 @@ public class SessionOnlinePlayer implements Screen {
         exit.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                manager.removeRegistry();
-                game.setScreen(new MainMenu(game));
-                PlayerContext.delete(player);
+                try {
+                    manager.removeRegistry();
+                    game.setScreen(new LobbyGUI(game, player));
+                    PlayerContext.delete(player);
+                } catch (SQLException ex) {
+                    Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
 
