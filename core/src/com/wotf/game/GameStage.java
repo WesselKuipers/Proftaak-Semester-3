@@ -288,14 +288,15 @@ public class GameStage extends Stage {
         
         font.draw(guiBatch, String.format("Mouse position: screen [%d, %d], viewport %s", Gdx.input.getX(), game.getMap().getHeight() - Gdx.input.getY(), getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0))), 0, this.getHeight() - 60);
         font.draw(guiBatch, String.format("Camera coords [%s], zoom %f", getCamera().position.toString(), ((OrthographicCamera) getCamera()).zoom), 0, this.getHeight() - 80);
-        font.draw(guiBatch, "Time remaining: " + (game.getGameSettings().getTurnTime() - (int) game.getTurnLogic().getElapsedTime()), 0, this.getHeight() - 100);
-        font.draw(guiBatch, String.format("FPS: %d", Gdx.graphics.getFramesPerSecond()), 0, this.getHeight() - 120);
+        font.draw(guiBatch, "Turn Time remaining: " + (game.getGameSettings().getTurnTime() - (int) game.getTurnLogic().getElapsedTime()), 0, this.getHeight() - 100);
+        font.draw(guiBatch, "Time remaining: " + (game.getGameSettings().getMaxTime() - (int) game.getTurnLogic().getMaxElapsedTime()), 0, this.getHeight() - 120);
+        font.draw(guiBatch, String.format("FPS: %d", Gdx.graphics.getFramesPerSecond()), 0, this.getHeight() - 140);
         
         if (game.getTurnLogic().getState() == TurnState.GAMEOVER) {
             font.draw(guiBatch, "GAME OVER", this.getWidth() / 2, this.getHeight() / 2);
         }
         
-        font.draw(guiBatch, "Wind: " + game.getMap().getWind().toString(), 0, this.getHeight() - 140);
+        font.draw(guiBatch, "Wind: " + game.getMap().getWind().toString(), 0, this.getHeight() - 160);
         
         guiBatch.end();
     }
