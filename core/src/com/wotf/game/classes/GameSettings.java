@@ -181,7 +181,7 @@ public class GameSettings implements Serializable{
      * @param maxTime int to set the max time of the game
      */
     public void setMaxTime(int maxTime) {
-        this.maxTime = maxTime;
+        this.maxTime = maxTime * 60;
     }
 
     /**

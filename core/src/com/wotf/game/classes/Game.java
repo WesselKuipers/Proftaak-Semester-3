@@ -181,10 +181,16 @@ public class Game {
         }
         
         // When the player has passed 
-        if(turnLogic.getState() == TurnState.WITHDRAW) {
+        if (turnLogic.getState() == TurnState.WITHDRAW) {
             if(turnLogic.getElapsedTime() >= gameSettings.getWithdrawTime()) {
                 beginTurn();
             }
+        }
+        
+        // If max time has exceeded end the game
+        if (turnLogic.getMaxElapsedTime() >= gameSettings.getMaxTime()) {
+            endTurn();
+            turnLogic.setState(TurnState.GAMEOVER);
         }
     }
 
