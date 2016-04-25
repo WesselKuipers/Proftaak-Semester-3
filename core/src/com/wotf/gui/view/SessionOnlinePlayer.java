@@ -236,7 +236,7 @@ public class SessionOnlinePlayer implements Screen {
         Label timerlabel = new Label("Timer :", skin);
         settingstable.add(timerlabel).width(120);
         timerbox.setItems(timervals);
-        String timerstr = Integer.toString(session.getGameSettings().getMaxTime());
+        String timerstr = Integer.toString(session.getGameSettings().getMaxTime()/60);
         timerbox.setSelected(timerstr);
         settingstable.add(timerbox).width(180);
 
@@ -378,7 +378,7 @@ public class SessionOnlinePlayer implements Screen {
     public void updateSelectedItems(Session managersession) {
         if (managersession.getGameSettings() != null) {
             // MaxTime selected
-            String maxtime = Integer.toString(managersession.getGameSettings().getMaxTime());
+            String maxtime = Integer.toString(managersession.getGameSettings().getMaxTime()/60);
             timerbox.setSelected(maxtime);
             // TurnTime selected
             String turntime = Integer.toString(managersession.getGameSettings().getTurnTime());
