@@ -3,6 +3,7 @@ package com.wotf.game.classes;
 import com.wotf.gui.view.ISessionSettings;
 import fontyspublisher.IRemotePropertyListener;
 import fontyspublisher.RemotePublisher;
+import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -47,7 +48,6 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
         publisher = new RemotePublisher();
         publisher.registerProperty("sessionsettingsprop");
         publisher.registerProperty("startgameprop");
-        createNewRegistry();
     }
 
     public void createNewRegistry() throws RemoteException {
@@ -55,6 +55,11 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
         registry.rebind("SessionSettings", this);
     }
 
+    public void removeRegistry() throws NoSuchObjectException{
+        //registry = null;
+        UnicastRemoteObject.unexportObject(registry, true);
+    }
+    
     /**
      * Constructor without any graphics Made for the unit testing.
      */

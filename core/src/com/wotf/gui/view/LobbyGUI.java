@@ -177,7 +177,7 @@ public class LobbyGUI implements Screen {
                 try {
                     // HostIP address should be filled in here.
                     Session selhost = (Session) sessions.getSelected();
-
+                    
                     game.setScreen(new SessionOnlinePlayer(game, selhost, player));
                 } catch (RemoteException ex) {
                     PlayerContext.delete(player);
@@ -198,8 +198,8 @@ public class LobbyGUI implements Screen {
                 try {
                     // Logic for making session.
                     Session session = new Session(player, "Room", 8);
-
-                    game.setScreen(new SessionOnlineHost(game, session));
+                    session.createNewRegistry();
+                    game.setScreen(new SessionOnlineHost(game, session, player));
                     // If it gets to here, add the session to the DB.
                     SessionContext.insert(session);
                 } catch (RemoteException ex) {

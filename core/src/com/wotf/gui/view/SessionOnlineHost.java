@@ -29,12 +29,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.wotf.game.WotFGame;
 import com.wotf.game.classes.GameSettings;
 import com.wotf.game.classes.Map;
+import com.wotf.game.classes.Player;
 import com.wotf.game.classes.Session;
 import com.wotf.game.classes.SessionManager;
 import com.wotf.game.classes.Team;
 import com.wotf.game.database.SessionContext;
+import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,6 +60,7 @@ public class SessionOnlineHost implements Screen {
     private Registry registry;
     private ISessionSettings regsettings;
     private SessionManager manager;
+    private Player player;
 
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting
@@ -64,9 +68,10 @@ public class SessionOnlineHost implements Screen {
      * @param game
      * @param session
      */
-    public SessionOnlineHost(WotFGame game, Session session) throws RemoteException {
+    public SessionOnlineHost(WotFGame game, Session session, Player player) throws RemoteException {
         this.game = game;
         this.session = session;
+        this.player = player;
         gameSettings = new GameSettings();
         teamList = new ArrayList<>();
     }
@@ -379,9 +384,18 @@ public class SessionOnlineHost implements Screen {
         exit.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new MainMenu(game));
-                // If it gets to here remove the session from the DB.
-                SessionContext.delete(session);
+                try {
+                    // If it gets to here remove the session from the DB.
+                    session.removeRegistry();
+                    SessionContext.delete(session);
+                    session = null;
+                    
+                    game.setScreen(new LobbyGUI(game, player));
+                } catch (SQLException ex) {
+                    Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (NoSuchObjectException ex) {
+                    Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
 

@@ -71,7 +71,7 @@ public class SessionOnlinePlayer implements Screen {
     private SelectBox chooseMap;
     private Table mapstable;
     private ArrayList<Texture> maptextures;
-    private Player curplayer;
+    private Player player;
 
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting
@@ -79,8 +79,8 @@ public class SessionOnlinePlayer implements Screen {
      * @param game
      * @param session
      */
-    public SessionOnlinePlayer(WotFGame game, Session session, Player curplayer) throws RemoteException {
-        this.curplayer = curplayer;
+    public SessionOnlinePlayer(WotFGame game, Session session, Player player) throws RemoteException {
+        this.player = player;
         this.game = game;
         gameSettings = new GameSettings();
         teamList = new ArrayList<>();
@@ -291,7 +291,7 @@ public class SessionOnlinePlayer implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 manager.removeRegistry();
                 game.setScreen(new MainMenu(game));
-                PlayerContext.delete(curplayer);
+                PlayerContext.delete(player);
             }
         });
 
