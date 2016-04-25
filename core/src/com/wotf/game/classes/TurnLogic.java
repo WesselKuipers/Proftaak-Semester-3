@@ -20,6 +20,7 @@ public class TurnLogic {
     
     public TurnState currentState;
     private float elapsedTime;
+    private float maxElapsedTime;
     private int turn;
     private int totalTeams;
 
@@ -32,6 +33,7 @@ public class TurnLogic {
      */
     public TurnLogic(int totalTeams) {
         this.elapsedTime = 0;
+        this.maxElapsedTime = 0;
         this.turn = 0;
         this.totalTeams = totalTeams;
         this.currentState = TurnState.PLAYING;
@@ -43,6 +45,14 @@ public class TurnLogic {
      */
     public float getElapsedTime() {
         return Math.round(elapsedTime);
+    }
+    
+    /**
+     * 
+     * @return the elapsed time
+     */
+    public float getMaxElapsedTime() {
+        return Math.round(maxElapsedTime);
     }
     
     /**
@@ -99,6 +109,7 @@ public class TurnLogic {
      */
     public void update(float deltaTime) {
         elapsedTime = elapsedTime + deltaTime;
+        maxElapsedTime = maxElapsedTime + deltaTime;
     }
     
     /**
