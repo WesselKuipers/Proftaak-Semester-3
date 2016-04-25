@@ -23,7 +23,6 @@ import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 public class Unit extends Group {
 
     private float angle;
-    private float force = 3f;
     private Vector2 acceleration;
     private TextureRegion unitStand;
 
@@ -69,6 +68,7 @@ public class Unit extends Group {
         this.setBounds(getX(), getY(), sprite.getWidth(), sprite.getHeight());
         this.setWidth(sprite.getWidth());
         this.setHeight(sprite.getHeight());
+        setAcceleration(9.8);
 
         // Input listener for every unit
         addListener(new InputListener() {
@@ -76,13 +76,15 @@ public class Unit extends Group {
             public boolean keyDown(InputEvent event, int keycode) {
                 if (keycode == Keys.RIGHT) {
                     moveRight = true;
+                    jump();
                 }
 
                 if (keycode == Keys.LEFT) {
                     moveRight = false;
+                    jump();
                 }
                 if (keycode == Keys.UP) {
-                    jump();
+                    //return;
                 }
 // <editor-fold defaultstate="collapsed" desc=" switching between weapons ">
                 if (keycode == Keys.NUM_1) {
@@ -320,12 +322,12 @@ public class Unit extends Group {
      *
      * Then the act calls the updateJump().
      */
-    public void jump() {        
+    public void jump() {
         // Jumping once
-        if(velocity.x != 0 && velocity.y != 0){
+        if (velocity.x != 0 && velocity.y != 0) {
             return;
         }
-        
+
         float nextX;
 
         if (moveRight) {
@@ -335,8 +337,7 @@ public class Unit extends Group {
         }
 
         setAngle(position, new Vector2(nextX, position.y + 20));
-        setAcceleration(9.8);
-        setVelocity(force);
+        setVelocity(3f);
     }
 
     /**
@@ -349,10 +350,7 @@ public class Unit extends Group {
      * possible the unit can move to the point?
      */
     public void updateJump() {
-        if (acceleration == null) {
-            return;
-        }
-       
+
         float delta = Gdx.graphics.getDeltaTime();
 
         //keep old position to change rotation of object
@@ -370,26 +368,42 @@ public class Unit extends Group {
         this.setPosition(position.x, position.y);
         positionChanged();
 
-        if (!moveRight) {
-            boolean isSolidX = ((GameStage) getStage()).getGame().getMap()
-                                .isPixelSolid((int) position.x - 1, (int) position.y);
-            if (isSolidX) {
-                velocity = new Vector2(0,0);
-            }
+        if (velocity.x != 0) {
+            checkSolidX();
         } else {
-            boolean isSolidX = ((GameStage) getStage()).getGame().getMap()
-                                .isPixelSolid((int) position.x + 15, (int) position.y);
-            if (isSolidX) {
-                velocity = new Vector2(0,0);
-            }
+            checkSolidY();
         }
 
-        boolean isSolidY = ((GameStage) getStage()).getGame().getMap()
-                            .isPixelSolid((int) position.x, (int) position.y - 1);
-        if (isSolidY) {
-            velocity = new Vector2(0,0);
-        }
         sprite.setRotation(angle);
+    }
+
+    public void checkSolidX() {
+        boolean isSolidX = false;
+        if (!moveRight) {
+            isSolidX = ((GameStage) getStage()).getGame().getMap()
+                    .isPixelSolid((int) position.x - 1, (int) position.y);
+            if (isSolidX) {
+                velocity = new Vector2(0, 0);
+            }
+        } else {
+            isSolidX = ((GameStage) getStage()).getGame().getMap()
+                    .isPixelSolid((int) position.x + 15, (int) position.y);
+            if (isSolidX) {
+                velocity = new Vector2(0, 0);
+            }
+        }
+    }
+
+    public void checkSolidY() {
+        boolean isSolidY = false;
+        isSolidY = ((GameStage) getStage()).getGame().getMap()
+                .isPixelSolid((int) position.x, (int) position.y - 5);
+        if (isSolidY) {
+            velocity = new Vector2(0, 0);
+            System.out.println("SOLID" + position.x + "=" + position.y);
+        } else {
+            System.out.println("NOT SOLID" + position.x + "=" + position.y);
+        }
     }
 
     /**
@@ -408,9 +422,9 @@ public class Unit extends Group {
     }
 
     /**
-     * Calculate the acceleration per/turn by external forces.
+     * Calculate the acceleration per/turn.
      *
-     * @param gravity Downwards pulling force.
+     * @param gravity Downwards pulling.
      */
     private void setAcceleration(double gravity) {
         acceleration = new Vector2();
