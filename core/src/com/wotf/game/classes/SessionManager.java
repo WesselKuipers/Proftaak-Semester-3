@@ -63,6 +63,10 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
     public Session getSession() {
         return session;
     }
+    
+    public void removeRegistry(){
+        registry = null;
+    }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) throws RemoteException {

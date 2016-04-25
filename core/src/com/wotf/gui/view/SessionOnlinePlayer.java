@@ -35,6 +35,7 @@ import com.wotf.game.classes.Player;
 import com.wotf.game.classes.Session;
 import com.wotf.game.classes.SessionManager;
 import com.wotf.game.classes.Team;
+import com.wotf.game.database.PlayerContext;
 import fontyspublisher.IRemotePropertyListener;
 import java.beans.PropertyChangeEvent;
 import java.rmi.AccessException;
@@ -70,6 +71,7 @@ public class SessionOnlinePlayer implements Screen {
     private SelectBox chooseMap;
     private Table mapstable;
     private ArrayList<Texture> maptextures;
+    private Player curplayer;
 
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting
@@ -77,7 +79,8 @@ public class SessionOnlinePlayer implements Screen {
      * @param game
      * @param session
      */
-    public SessionOnlinePlayer(WotFGame game, Session session) throws RemoteException {
+    public SessionOnlinePlayer(WotFGame game, Session session, Player curplayer) throws RemoteException {
+        this.curplayer = curplayer;
         this.game = game;
         gameSettings = new GameSettings();
         teamList = new ArrayList<>();
@@ -143,10 +146,6 @@ public class SessionOnlinePlayer implements Screen {
         mapstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 220, 220, 160, 160)));
         teamselecttable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 100, 100, 160, 160)));
 
-        Label hostlabel = new Label(session.getHost().getIp() + " " + session.getHost().getName(), skin);
-        hostlabel.setPosition(30, 30);
-        stage.addActor(hostlabel);
-
         Label selectteamlabel = new Label("Team selection", skin);
         teamselecttable.add(selectteamlabel).padBottom(15);
         teamselecttable.row();
@@ -175,7 +174,7 @@ public class SessionOnlinePlayer implements Screen {
 
         Label iplabel = new Label("IP :", skin);
         settingstable.add(iplabel).width(120);
-        Label ipvallabel = new Label("127.0.0.1", skin);
+        Label ipvallabel = new Label(session.getHost().getIp(), skin);
         settingstable.add(ipvallabel).width(180);
         settingstable.row();
 
@@ -290,7 +289,9 @@ public class SessionOnlinePlayer implements Screen {
         exit.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                manager.removeRegistry();
                 game.setScreen(new MainMenu(game));
+                PlayerContext.delete(curplayer);
             }
         });
 

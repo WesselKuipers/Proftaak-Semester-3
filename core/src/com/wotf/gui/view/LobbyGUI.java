@@ -167,17 +167,7 @@ public class LobbyGUI implements Screen {
         join.setHeight(60);
         join.setPosition(30, 30);
         stage.addActor(join);
-        // Dummy session to connect to.
-        //////////////////////////////
-        /*Session session;
-        try {
-            session = new Session(player);
-            sessionlist.add(session);
-            sessions.setItems(sessionlist.toArray());
-        } catch (RemoteException ex) {
-            Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        */
+
         join.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -188,7 +178,7 @@ public class LobbyGUI implements Screen {
                     // HostIP address should be filled in here.
                     Session selhost = (Session) sessions.getSelected();
 
-                    game.setScreen(new SessionOnlinePlayer(game, selhost));
+                    game.setScreen(new SessionOnlinePlayer(game, selhost, player));
                 } catch (RemoteException ex) {
                     PlayerContext.delete(player);
                     Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
