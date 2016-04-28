@@ -357,7 +357,7 @@ public class Unit extends Group {
         checkSolid();
         this.setPosition(position.x, position.y);
         positionChanged();
-        sprite.setRotation(angle);
+        //sprite.setRotation(angle);
     }
 
     public void checkSolid() {
