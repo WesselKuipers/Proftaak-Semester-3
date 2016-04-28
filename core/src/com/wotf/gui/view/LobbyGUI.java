@@ -208,6 +208,13 @@ public class LobbyGUI implements Screen {
                 }
             }
         });
+        
+        TextButton refresh = new TextButton("Refresh", skin); // Use the initialized skin
+        refresh.setColor(Color.BLACK);
+        refresh.setWidth(100);
+        refresh.setHeight(30);
+        refresh.setPosition(30, 680);
+        stage.addActor(refresh);
 
     }
 

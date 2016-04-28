@@ -57,6 +57,18 @@ public class Username implements Screen {
         join.setPosition(500, 300);
         stage.addActor(join);
 
+        TextButton main = new TextButton("Back to main menu", skin); // Use the initialized skin
+        main.setColor(Color.BLACK);
+        main.setWidth(300);
+        main.setHeight(60);
+        main.setPosition(500, 200);
+        stage.addActor(main);
+        main.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new MainMenu(game));
+            }
+        });
         join.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -74,7 +86,7 @@ public class Username implements Screen {
                         Logger.getLogger(Username.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                
+
                 try {
                     game.setScreen(new LobbyGUI(game, player));
                 } catch (SQLException ex) {
