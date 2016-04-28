@@ -25,19 +25,14 @@ public class Unit extends Group {
     private float angle;
     private Vector2 acceleration;
     private TextureRegion unitStand;
-
     private Vector2 velocity = new Vector2();
-    private boolean moveRight;
-
+    public boolean moveRight;
     private int health;
     private String name;
-
     private Sprite sprite;
     private Vector2 position;
-
     private Item weapon;
     private Team team;
-
     // Font is used for displaying name and health
     private static BitmapFont font;
 
@@ -82,9 +77,6 @@ public class Unit extends Group {
                 if (keycode == Keys.LEFT) {
                     moveRight = false;
                     jump();
-                }
-                if (keycode == Keys.UP) {
-                    //return;
                 }
 // <editor-fold defaultstate="collapsed" desc=" switching between weapons ">
                 if (keycode == Keys.NUM_1) {
@@ -134,7 +126,7 @@ public class Unit extends Group {
         this.team = team;
         this.position = position;
         this.sprite = null;
-        moveRight = true;
+        this.moveRight = true;
     }
 
     /**
@@ -296,7 +288,7 @@ public class Unit extends Group {
     public void act(float delta) {
         super.act(delta);
         sprite.setRegion(getFrame(delta));
-        updateJump();
+        updateJump(delta);
 
         //make weapons move with the unit
         Array<Actor> children = this.getChildren();
@@ -327,16 +319,15 @@ public class Unit extends Group {
         if (velocity.x != 0 && velocity.y != 0) {
             return;
         }
-
-        float nextX;
+        Vector2 nextPos;
 
         if (moveRight) {
-            nextX = position.x + 20;
+            nextPos = new Vector2(position.x + 20, position.y + 20);
         } else {
-            nextX = position.x - 20;
+            nextPos = new Vector2(position.x - 20, position.y + 20);
         }
 
-        setAngle(position, new Vector2(nextX, position.y + 20));
+        setAngle(position, nextPos);
         setVelocity(3f);
     }
 
@@ -348,11 +339,10 @@ public class Unit extends Group {
      *
      * After changing the position we look for a solid point on the map. Is it
      * possible the unit can move to the point?
+     *
+     * @param delta
      */
-    public void updateJump() {
-
-        float delta = Gdx.graphics.getDeltaTime();
-
+    public void updateJump(float delta) {
         //keep old position to change rotation of object
         Vector2 oldPos = position.cpy();
 
@@ -364,21 +354,27 @@ public class Unit extends Group {
         velocity.x += acceleration.x * delta;
         velocity.y += acceleration.y * delta;
 
-        //System.out.println(velocity.toString());
+        checkSolid();
         this.setPosition(position.x, position.y);
         positionChanged();
-
-        if (velocity.x != 0) {
-            checkSolidX();
-        } else {
-            checkSolidY();
-        }
-
         sprite.setRotation(angle);
     }
 
-    public void checkSolidX() {
+    public void checkSolid() {
         boolean isSolidX = false;
+
+        if (velocity.y >= -2) {
+            if (((GameStage) getStage()).getGame().getMap()
+                    .isPixelSolid((int) position.x, (int) position.y)) {
+                velocity = new Vector2();
+            }
+        } else {
+            if (((GameStage) getStage()).getGame().getMap()
+                    .isPixelSolid((int) position.x, (int) position.y - 10)) {
+                velocity = new Vector2();
+            }
+        }
+
         if (!moveRight) {
             isSolidX = ((GameStage) getStage()).getGame().getMap()
                     .isPixelSolid((int) position.x - 1, (int) position.y);
@@ -387,22 +383,10 @@ public class Unit extends Group {
             }
         } else {
             isSolidX = ((GameStage) getStage()).getGame().getMap()
-                    .isPixelSolid((int) position.x + 15, (int) position.y);
+                    .isPixelSolid((int) position.x + 16, (int) position.y);
             if (isSolidX) {
                 velocity = new Vector2(0, 0);
             }
-        }
-    }
-
-    public void checkSolidY() {
-        boolean isSolidY = false;
-        isSolidY = ((GameStage) getStage()).getGame().getMap()
-                .isPixelSolid((int) position.x, (int) position.y - 5);
-        if (isSolidY) {
-            velocity = new Vector2(0, 0);
-            System.out.println("SOLID" + position.x + "=" + position.y);
-        } else {
-            System.out.println("NOT SOLID" + position.x + "=" + position.y);
         }
     }
 
