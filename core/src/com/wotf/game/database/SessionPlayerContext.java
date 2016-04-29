@@ -23,18 +23,18 @@ public class SessionPlayerContext {
      * @return List of players in a session
      * @throws SQLException 
      */
-    public List<Player> getPlayersFromSession(Session session) throws SQLException {
+    public ArrayList<Player> getPlayersFromSession(Session session) throws SQLException {
         PlayerContext _context = new PlayerContext();
 
         String query = "SELECT * FROM session_participant WHERE SessionID = ? ORDER BY PlayerID";
-        List<Object> parameters = new ArrayList<>();
+        ArrayList<Object> parameters = new ArrayList<>();
         parameters.add(session.getID());
 
         ResultSet res = DBCon.executeResultSet(query, parameters);
-        List<Player> players = new ArrayList<>();
+        ArrayList<Player> players = new ArrayList<>();
 
         while (res.next()) {
-            players.add(_context.getById(res.getInt("ID")));
+            players.add(_context.getById(res.getInt("PlayerID")));
         }
 
         return players;

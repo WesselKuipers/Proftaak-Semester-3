@@ -88,12 +88,12 @@ public class SessionContext extends EntityContext<Session> {
      * @param session to add in the database
      * @return true/false if added was succesfull
      */
-    public static boolean insert(Session session) {
+    public boolean insert(Session session) {
         String query = "INSERT INTO session (HostID, RoomName, MaxPlayersSession) VALUES (?, ?, ?)";
         List<Object> parameters = new ArrayList<>();
         parameters.add(session.getHost().getID());
         parameters.add((session.getRoomName() != null) ? session.getRoomName() : "Roomname is not entered");
-        parameters.add(session.getMaxPlayersSession());
+        parameters.add(session.getGameSettings().getMaxPlayersSession());
 
         return DBCon.executeUpdate(query, parameters) >= 1;
     }
@@ -108,7 +108,7 @@ public class SessionContext extends EntityContext<Session> {
         String query = "UPDATE session SET RoomName = ?, MaxPlayersSession = ? WHERE ID = ?";
         List<Object> parameters = new ArrayList<>();
         parameters.add(session.getRoomName());
-        parameters.add(session.getMaxPlayersSession());
+        parameters.add(session.getGameSettings().getMaxPlayersSession());
         parameters.add(session.getID());
 
         return DBCon.executeUpdate(query, parameters) >= 1;
@@ -120,7 +120,7 @@ public class SessionContext extends EntityContext<Session> {
      * @param session to delete in database
      * @return true/false if update was succesfull
      */
-    public static boolean delete(Session session) {
+    public boolean delete(Session session) {
         String query = "DELETE FROM session WHERE HostID = ?";
         List<Object> parameters = new ArrayList<>();
         parameters.add(session.getHost().getID());

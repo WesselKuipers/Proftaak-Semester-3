@@ -47,7 +47,6 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
         this.roomName = roomName;
         publisher = new RemotePublisher();
         publisher.registerProperty("sessionsettingsprop");
-        publisher.registerProperty("startgameprop");
     }
 
     public void createNewRegistry() throws RemoteException {
@@ -55,10 +54,10 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
         registry.rebind("SessionSettings", this);
     }
 
-    public void removeRegistry() throws NoSuchObjectException{
+    public void removeRegistry() throws NoSuchObjectException {
         UnicastRemoteObject.unexportObject(registry, true);
     }
-    
+
     /**
      * Constructor without any graphics Made for the unit testing.
      */
@@ -116,7 +115,7 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
     public String getRoomName() {
         return roomName;
     }
-    
+
     public int getID() {
         return ID;
     }
@@ -125,9 +124,6 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
         this.ID = ID;
     }
 
-    public int getMaxPlayersSession() {
-        return maxPlayersSession;
-    }
     /**
      * Initializes the game screen
      */

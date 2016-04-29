@@ -36,6 +36,7 @@ import com.wotf.game.classes.Session;
 import com.wotf.game.classes.SessionManager;
 import com.wotf.game.classes.Team;
 import com.wotf.game.database.PlayerContext;
+import com.wotf.game.database.SessionPlayerContext;
 import fontyspublisher.IRemotePropertyListener;
 import java.beans.PropertyChangeEvent;
 import java.rmi.AccessException;
@@ -46,6 +47,8 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,6 +60,7 @@ import java.util.logging.Logger;
 public class SessionOnlinePlayer implements Screen {
 
     private List teams;
+    private List players;
     private final WotFGame game;
     private Stage stage;
     private Skin skin;
@@ -66,6 +70,7 @@ public class SessionOnlinePlayer implements Screen {
     private Session session;
     private SessionManager manager;
     private ArrayList<String> mapslist;
+    private ArrayList<Player> playerList;
     private SelectBox turntimebox;
     private SelectBox physicsbox;
     private SelectBox timerbox;
@@ -73,6 +78,8 @@ public class SessionOnlinePlayer implements Screen {
     private Table mapstable;
     private ArrayList<Texture> maptextures;
     private Player player;
+    private Timer timer;
+    private SelectBox maxplayerbox;
 
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting
@@ -94,9 +101,26 @@ public class SessionOnlinePlayer implements Screen {
         turntimebox = new SelectBox(skin);
         physicsbox = new SelectBox(skin);
         maptextures = new ArrayList<>();
+        playerList = new ArrayList<>();
         setMapsList();
         // This manager will be used to connect to the registry of the host.
         manager = new SessionManager(session, this);
+        addPlayerToDB();
+        getPlayersOfSession();
+    }
+
+    public void getPlayersOfSession() {
+        try {
+            SessionPlayerContext sp = new SessionPlayerContext();
+            playerList = sp.getPlayersFromSession(manager.getSession());
+        } catch (SQLException ex) {
+            Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void addPlayerToDB() {
+        SessionPlayerContext sp = new SessionPlayerContext();
+        sp.insert(player, manager.getSession());
     }
 
     public void setMapsList() {
@@ -138,14 +162,26 @@ public class SessionOnlinePlayer implements Screen {
     public void show() {
         // If we pick the new session from SessionManager, we got all the current gamesettings ready in this object.
         session = manager.getSession();
+
+        players = new List(skin);
+
         // Alle teams en labels hiervoor.
         Table teamstable = new Table();
         mapstable = new Table();
         Table settingstable = new Table();
         Table teamselecttable = new Table();
-        teamstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 150, 150, 160, 160)));
+        Table playerstable = new Table();
+        teamstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 130, 130, 160, 160)));
         mapstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 220, 220, 160, 160)));
         teamselecttable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 100, 100, 160, 160)));
+        playerstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 125, 125, 160, 160)));
+
+        players.setItems(playerList.toArray());
+        playerstable.add(players);
+        playerstable.setWidth(250);
+        playerstable.setHeight(320);
+        playerstable.setPosition(1020, 360);
+        stage.addActor(playerstable);
 
         Label selectteamlabel = new Label("Team selection", skin);
         teamselecttable.add(selectteamlabel).padBottom(15);
@@ -197,8 +233,15 @@ public class SessionOnlinePlayer implements Screen {
 
         Label playerslabel = new Label("Players :", skin);
         settingstable.add(playerslabel).width(120);
-        Label playersvallabel = new Label("2/10", skin);
-        settingstable.add(playersvallabel).width(180);
+        String[] maxplayervals = new String[4];
+        maxplayervals[0] = "2";
+        maxplayervals[1] = "3";
+        maxplayervals[2] = "4";
+        maxplayervals[3] = "5";
+        maxplayerbox = new SelectBox(skin);
+        maxplayerbox.setItems(maxplayervals);
+        maxplayerbox.setSelected(Integer.toString(session.getGameSettings().getMaxPlayersSession()));
+        settingstable.add(maxplayerbox).width(180);
         settingstable.row();
 
         Label speedslabel = new Label("Speeds :", skin);
@@ -237,7 +280,7 @@ public class SessionOnlinePlayer implements Screen {
         Label timerlabel = new Label("Timer :", skin);
         settingstable.add(timerlabel).width(120);
         timerbox.setItems(timervals);
-        String timerstr = Integer.toString(session.getGameSettings().getMaxTime()/60);
+        String timerstr = Integer.toString(session.getGameSettings().getMaxTime() / 60);
         timerbox.setSelected(timerstr);
         settingstable.add(timerbox).width(180);
 
@@ -270,7 +313,7 @@ public class SessionOnlinePlayer implements Screen {
         teamList.addAll(session.getGameSettings().getTeams());
         teams.setItems(teamList.toArray());
         teamstable.add(teams).width(200);
-        teamstable.setWidth(300);
+        teamstable.setWidth(260);
         teamstable.setHeight(320);
         stage.addActor(teamstable);
 
@@ -292,6 +335,7 @@ public class SessionOnlinePlayer implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 try {
                     manager.removeRegistry();
+                    timer.cancel();
                     game.setScreen(new LobbyGUI(game, player));
                     PlayerContext.delete(player);
                 } catch (SQLException ex) {
@@ -300,6 +344,20 @@ public class SessionOnlinePlayer implements Screen {
             }
         });
 
+        SessionPlayerContext sc = new SessionPlayerContext();
+        timer = new Timer("PlayerRefresh");
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    playerList = sc.getPlayersFromSession(session);
+                    players.setItems(playerList.toArray());
+                } catch (SQLException ex) {
+                    Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
+                    timer.cancel();
+                }
+            }
+        }, 0, 7000);
     }
 
     /**
@@ -383,7 +441,8 @@ public class SessionOnlinePlayer implements Screen {
     public void updateSelectedItems(Session managersession) {
         if (managersession.getGameSettings() != null) {
             // MaxTime selected
-            String maxtime = Integer.toString(managersession.getGameSettings().getMaxTime()/60);
+
+            String maxtime = Integer.toString(managersession.getGameSettings().getMaxTime() / 60);
             timerbox.setSelected(maxtime);
             // TurnTime selected
             String turntime = Integer.toString(managersession.getGameSettings().getTurnTime());
@@ -391,6 +450,9 @@ public class SessionOnlinePlayer implements Screen {
             // Physics selected
             String physics = Boolean.toString(managersession.getGameSettings().getPhysics());
             physicsbox.setSelected(physics);
+            // Maxplayers selected
+            String maxplayers = Integer.toString(managersession.getGameSettings().getMaxPlayersSession());
+            maxplayerbox.setSelected(maxplayers);
         }
     }
 

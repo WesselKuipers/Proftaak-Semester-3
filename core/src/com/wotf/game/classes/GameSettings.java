@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.wotf.game.classes.Items.*;
 import com.wotf.game.classes.Items.Item;
 import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,7 @@ import java.util.List;
  * Contains the settings used to determine some of the rules the game has to
  * follow
  */
-public class GameSettings implements Serializable{
+public class GameSettings implements Serializable {
 
     /**
      * List of weapons in the game
@@ -36,6 +37,7 @@ public class GameSettings implements Serializable{
     private int maxTime;
     private int turnTime;
     private int withdrawTime;
+    private int maxPlayersSession;
     private boolean fallingDamage;
     private boolean suddenDeath;
     private boolean physics;
@@ -52,7 +54,7 @@ public class GameSettings implements Serializable{
         teams = new ArrayList<>();
 
         maxTurns = 30;
-        maxTime = 30 * 60;
+        maxTime = 60 * 60;
         turnTime = 40;
         withdrawTime = 3;
         fallingDamage = true;
@@ -81,10 +83,10 @@ public class GameSettings implements Serializable{
     private void fillWeapons() {
         Sprite bullet_sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
         Sprite bazooka_sprite = new Sprite(new Texture(Gdx.files.internal("Bazooka.png")));
-        
+
         Sprite grenade_sprite = new Sprite(new Texture(Gdx.files.internal("grenade.png")));
         Sprite clusterbomb_sprite = new Sprite(new Texture(Gdx.files.internal("clusterbomb.png")));
-        
+
         Sprite nuke_sprite = new Sprite(new Texture(Gdx.files.internal("nuclearbomb.png")));
         Sprite remote_sprite = new Sprite(new Texture(Gdx.files.internal("remote.png")));
 
@@ -96,58 +98,66 @@ public class GameSettings implements Serializable{
 
     /**
      * Sets the index of the map with the settings
-     * 
-     * @param mapindex 
+     *
+     * @param mapindex
      */
-    public void setMapIndex(int mapindex){
+    public void setMapIndex(int mapindex) {
         this.mapindex = mapindex;
     }
-    
+
     /**
      * Gets the index of the map
-     * 
+     *
      * @return the index of the name
      */
-    public int getMapIndex(){
+    public int getMapIndex() {
         return mapindex;
     }
-    
-        /**
+
+    /**
      * Sets the name of the map with the settings
-     * 
-     * @param mapname 
+     *
+     * @param mapname
      */
-    public void setMapName(String mapname){
+    public void setMapName(String mapname) {
         this.mapname = mapname;
     }
-    
+
     /**
      * Gets the name of the map
-     * 
+     *
      * @return the String of the name
      */
-    public String getMapName(){
+    public String getMapName() {
         return mapname;
     }
-    
+
     /**
      * Sets the physics of the game
-     * 
-     * @param physics 
+     *
+     * @param physics
      */
     public void setPhysics(boolean physics) {
         this.physics = physics;
     }
-    
+
     /**
      * Returns the physics of the game
-     * 
+     *
      * @return boolean if the physics are turned on or not.
      */
-    public boolean getPhysics(){
+    public boolean getPhysics() {
         return physics;
     }
-    
+
+    public void setMaxPlayersSession(int maxplayers) throws RemoteException {
+        this.maxPlayersSession = maxplayers;
+    }
+
+    public int getMaxPlayersSession() {
+        return maxPlayersSession;
+    }
+
     /**
      * Returns the max turns of the game
      *

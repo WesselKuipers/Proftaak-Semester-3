@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
@@ -34,11 +35,14 @@ import com.wotf.game.classes.Session;
 import com.wotf.game.classes.SessionManager;
 import com.wotf.game.classes.Team;
 import com.wotf.game.database.SessionContext;
+import com.wotf.game.database.SessionPlayerContext;
 import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,10 +54,12 @@ import java.util.logging.Logger;
 public class SessionOnlineHost implements Screen {
 
     private List teams;
+    private List players;
     private final WotFGame game;
     private Stage stage;
     private Skin skin;
     private final ArrayList<Team> teamList;
+    private ArrayList<Player> playerList;
     private final GameSettings gameSettings;
     private Image map1;
     private Session session;
@@ -61,6 +67,8 @@ public class SessionOnlineHost implements Screen {
     private ISessionSettings regsettings;
     private SessionManager manager;
     private Player player;
+    private Timer timer;
+    private SelectBox maxplayerbox;
 
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting
@@ -74,6 +82,23 @@ public class SessionOnlineHost implements Screen {
         this.player = player;
         gameSettings = new GameSettings();
         teamList = new ArrayList<>();
+        playerList = new ArrayList<>();
+        addPlayerToDB();
+        getPlayersOfSession();
+    }
+
+    public void getPlayersOfSession() {
+        try {
+            SessionPlayerContext sp = new SessionPlayerContext();
+            playerList = sp.getPlayersFromSession(session);
+        } catch (SQLException ex) {
+            Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void addPlayerToDB() {
+        SessionPlayerContext sp = new SessionPlayerContext();
+        sp.insert(player, session);
     }
 
     /**
@@ -109,86 +134,111 @@ public class SessionOnlineHost implements Screen {
         //System.out.println(Gdx.files.internal("maps"));
         skin = new Skin(Gdx.files.internal("uiskin.json"));
         teams = new List(skin);
+        players = new List(skin);
 
         // Alle teams en labels hiervoor.
         Table teamstable = new Table();
         Table mapstable = new Table();
         Table settingstable = new Table();
         Table teamselecttable = new Table();
-        teamstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 150, 150, 160, 160)));
+        Table playerstable = new Table();
+        teamstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 130, 130, 160, 160)));
         mapstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 220, 220, 160, 160)));
         teamselecttable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 100, 100, 160, 160)));
+        playerstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 125, 125, 160, 160)));
 
         Label hostlabel = new Label(session.getHost().getIp() + " " + session.getHost().getName(), skin);
         hostlabel.setPosition(30, 30);
         stage.addActor(hostlabel);
 
+        players.setItems(playerList.toArray());
+        playerstable.add(players);
+        playerstable.setWidth(250);
+        playerstable.setHeight(320);
+        playerstable.setPosition(1020, 360);
+        stage.addActor(playerstable);
+
         Label selectteamlabel = new Label("Team selection", skin);
         teamselecttable.add(selectteamlabel).padBottom(15);
         teamselecttable.row();
-        TextButton teamalpha = new TextButton("Alpha", skin); // Use the initialized skin
-        teamalpha.setColor(Color.BLUE);
-        teamalpha.addListener(new ClickListener() {
+        TextButton btnteamalpha = new TextButton("Alpha", skin); // Use the initialized skin
+        btnteamalpha.setColor(Color.BLUE);
+        btnteamalpha.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                try {
-                    Team teamalpha = new Team("Alpha", Color.BLUE);
-                    teamalpha.addUnit(teamalpha.getName(), 100);
-                    //Mogelijk voor als iedere player in online een eigen team heeft.
-                    //teamalpha.addPlayer(new Player("127.0.0.1", "AlphaPlayer"));
-                    teamList.add(teamalpha);
-                    gameSettings.addTeam(teamalpha);
-                    teams.setItems(teamList.toArray());
-                    session.setGameSettings(gameSettings);
-                } catch (RemoteException ex) {
-                    Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+                if (players.getSelected() != null) {
+                    try {
+                        Team teamalpha = new Team("Alpha", Color.BLUE);
+                        teamalpha.addPlayer((Player) players.getSelected());
+                        teamalpha.addUnit(teamalpha.getName(), 100);
+
+                        teamList.add(teamalpha);
+                        gameSettings.addTeam(teamalpha);
+                        teams.setItems(teamList.toArray());
+                        session.setGameSettings(gameSettings);
+                        
+                        btnteamalpha.setTouchable(Touchable.disabled);
+                        btnteamalpha.setColor(Color.LIGHT_GRAY);
+                    } catch (RemoteException ex) {
+                        Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
         });
 
-        teamselecttable.add(teamalpha).padBottom(10).width(150).height(50);
+        teamselecttable.add(btnteamalpha).padBottom(10).width(150).height(50);
         teamselecttable.row();
-        TextButton teambeta = new TextButton("Beta", skin); // Use the initialized skin
-        teambeta.setColor(Color.CORAL);
-        teambeta.addListener(new ClickListener() {
+        TextButton btnteambeta = new TextButton("Beta", skin); // Use the initialized skin
+        btnteambeta.setColor(Color.CORAL);
+        btnteambeta.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                try {
-                    Team teambeta = new Team("Beta", Color.CORAL);
-                    teambeta.addUnit(teambeta.getName(), 100);
-                    //Mogelijk voor als iedere player in online een eigen team heeft.
-                    //teambeta.addPlayer(new Player("127.0.0.1", "BetaPlayer"));
-                    teamList.add(teambeta);
-                    gameSettings.addTeam(teambeta);
-                    teams.setItems(teamList.toArray());
-                    session.setGameSettings(gameSettings);
-                } catch (RemoteException ex) {
-                    Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+                if (players.getSelected() != null) {
+                    try {
+                        Team teambeta = new Team("Beta", Color.CORAL);
+                        teambeta.addPlayer((Player) players.getSelected());
+                        teambeta.addUnit(teambeta.getName(), 100);
+
+                        teamList.add(teambeta);
+                        gameSettings.addTeam(teambeta);
+                        teams.setItems(teamList.toArray());
+                        session.setGameSettings(gameSettings);
+                        
+                        btnteambeta.setTouchable(Touchable.disabled);
+                        btnteambeta.setColor(Color.LIGHT_GRAY);
+                    } catch (RemoteException ex) {
+                        Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
         });
-        teamselecttable.add(teambeta).padBottom(10).width(150).height(50);
+        teamselecttable.add(btnteambeta).padBottom(10).width(150).height(50);
         teamselecttable.row();
-        TextButton teamgamma = new TextButton("Gamma", skin); // Use the initialized skin
-        teamgamma.setColor(Color.GREEN);
-        teamgamma.addListener(new ClickListener() {
+        TextButton btnteamgamma = new TextButton("Gamma", skin); // Use the initialized skin
+        btnteamgamma.setColor(Color.GREEN);
+        btnteamgamma.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                try {
-                    Team teamgamma = new Team("Gamma", Color.GREEN);
-                    teamgamma.addUnit(teamgamma.getName(), 100);
-                    //Mogelijk voor als iedere player in online een eigen team heeft.
-                    //teamgamma.addPlayer(new Player("127.0.0.1", "GammaPlayer"));
-                    teamList.add(teamgamma);
-                    gameSettings.addTeam(teamgamma);
-                    teams.setItems(teamList.toArray());
-                    session.setGameSettings(gameSettings);
-                } catch (RemoteException ex) {
-                    Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+                if (players.getSelected() != null) {
+                    try {
+                        Team teamgamma = new Team("Gamma", Color.GREEN);
+                        teamgamma.addPlayer((Player) players.getSelected());
+                        teamgamma.addUnit(teamgamma.getName(), 100);
+                        
+                        teamList.add(teamgamma);
+                        gameSettings.addTeam(teamgamma);
+                        teams.setItems(teamList.toArray());
+                        session.setGameSettings(gameSettings);
+
+                        btnteamgamma.setTouchable(Touchable.disabled);
+                        btnteamgamma.setColor(Color.LIGHT_GRAY);
+                    } catch (RemoteException ex) {
+                        Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
         });
-        teamselecttable.add(teamgamma).width(150).height(50);
+        teamselecttable.add(btnteamgamma).width(150).height(50);
         teamselecttable.setWidth(200);
         teamselecttable.setHeight(320);
         teamselecttable.setPosition(500, 360);
@@ -200,7 +250,7 @@ public class SessionOnlineHost implements Screen {
 
         Label iplabel = new Label("IP :", skin);
         settingstable.add(iplabel).width(120);
-        Label ipvallabel = new Label("127.0.0.1", skin);
+        Label ipvallabel = new Label(session.getHost().getIp(), skin);
         settingstable.add(ipvallabel).width(180);
         settingstable.row();
 
@@ -232,8 +282,27 @@ public class SessionOnlineHost implements Screen {
 
         Label playerslabel = new Label("Players :", skin);
         settingstable.add(playerslabel).width(120);
-        Label playersvallabel = new Label("2/10", skin);
-        settingstable.add(playersvallabel).width(180);
+        String[] maxplayervals = new String[4];
+        maxplayervals[0] = "2";
+        maxplayervals[1] = "3";
+        maxplayervals[2] = "4";
+        maxplayervals[3] = "5";
+        maxplayerbox = new SelectBox(skin);
+        maxplayerbox.setItems(maxplayervals);
+        maxplayerbox.setSelected(Integer.toString(session.getGameSettings().getMaxPlayersSession()));
+        maxplayerbox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeListener.ChangeEvent event, Actor actor) {
+                try {
+                    // Send a new property because this is sending a session object instead of a gamesettings object
+                    gameSettings.setMaxPlayersSession(Integer.valueOf(maxplayerbox.getSelected().toString()));
+                    session.setGameSettings(gameSettings);
+                } catch (RemoteException ex) {
+                    Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+        settingstable.add(maxplayerbox).width(180);
         settingstable.row();
 
         Label speedslabel = new Label("Speeds :", skin);
@@ -352,7 +421,7 @@ public class SessionOnlineHost implements Screen {
         teamstable.add(teamslabel);
         teamstable.row();
         teamstable.add(teams).width(200);
-        teamstable.setWidth(300);
+        teamstable.setWidth(260);
         teamstable.setHeight(320);
         stage.addActor(teamstable);
 
@@ -384,12 +453,13 @@ public class SessionOnlineHost implements Screen {
         exit.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                SessionContext sc = new SessionContext();
                 try {
                     // If it gets to here remove the session from the DB.
                     session.removeRegistry();
-                    SessionContext.delete(session);
+                    sc.delete(session);
                     session = null;
-                    
+                    timer.cancel();
                     game.setScreen(new LobbyGUI(game, player));
                 } catch (SQLException ex) {
                     Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
@@ -399,6 +469,21 @@ public class SessionOnlineHost implements Screen {
             }
         });
 
+        SessionPlayerContext sc = new SessionPlayerContext();
+        timer = new Timer("PlayerRefresh");
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    playerList = sc.getPlayersFromSession(session);
+                    players.setItems(playerList.toArray());
+                } catch (SQLException ex) {
+                    Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
+                    timer.cancel();
+                }
+            }
+        }, 0, 7000);
+
     }
 
     /**
@@ -407,6 +492,7 @@ public class SessionOnlineHost implements Screen {
      * @param delta The time in seconds since the last render.
      */
     @Override
+
     public void render(float delta) {
         Gdx.gl.glClearColor((float) 122 / 255, (float) 122 / 255, (float) 122 / 255, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);

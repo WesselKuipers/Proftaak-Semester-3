@@ -53,4 +53,9 @@ public class Player implements Serializable{
         this.ID = ID;
     }
 
+    @Override
+    public String toString() {
+        return name + " - " + ip;
+    }
+    
 }

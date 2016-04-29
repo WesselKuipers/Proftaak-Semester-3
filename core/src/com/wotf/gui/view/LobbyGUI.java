@@ -51,7 +51,6 @@ public class LobbyGUI implements Screen {
      * @param player
      * @throws java.sql.SQLException
      */
-
     public LobbyGUI(WotFGame game, Player player) throws SQLException {
         this.game = game;
         this.player = player;
@@ -171,16 +170,19 @@ public class LobbyGUI implements Screen {
         join.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if(sessions.getSelected() == null){
+                SessionContext sc = new SessionContext();
+                if (sessions.getSelected() == null) {
                     return;
                 }
                 try {
                     // HostIP address should be filled in here.
                     Session selhost = (Session) sessions.getSelected();
-                    
+                    selhost = sc.getByHostId(selhost.getHost().getID());
                     game.setScreen(new SessionOnlinePlayer(game, selhost, player));
                 } catch (RemoteException ex) {
                     PlayerContext.delete(player);
+                    Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SQLException ex) {
                     Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
@@ -195,20 +197,23 @@ public class LobbyGUI implements Screen {
         makesession.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                SessionContext sc = new SessionContext();
                 try {
                     // Logic for making session.
-                    Session session = new Session(player, "Room", 8);
+                    Session session = new Session(player, "Room", 5);
+                    sc.insert(session);
+                    session = sc.getLastAddedSession();
                     session.createNewRegistry();
                     game.setScreen(new SessionOnlineHost(game, session, player));
-                    // If it gets to here, add the session to the DB.
-                    SessionContext.insert(session);
                 } catch (RemoteException ex) {
                     PlayerContext.delete(player);
+                    Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SQLException ex) {
                     Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
-        
+
         TextButton refresh = new TextButton("Refresh", skin); // Use the initialized skin
         refresh.setColor(Color.BLACK);
         refresh.setWidth(100);
