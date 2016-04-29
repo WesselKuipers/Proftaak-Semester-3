@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.Array;
 import com.wotf.game.classes.Items.Item;
 import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
+import java.io.Serializable;
 
 /**
  * Unit represents a playable character on the map

@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -187,16 +188,19 @@ public class SessionOnlinePlayer implements Screen {
         teamselecttable.add(selectteamlabel).padBottom(15);
         teamselecttable.row();
         TextButton teamalpha = new TextButton("Alpha", skin); // Use the initialized skin
+        teamalpha.setName("Alpha");
         teamalpha.setColor(Color.BLUE);
 
         teamselecttable.add(teamalpha).padBottom(10).width(150).height(50);
         teamselecttable.row();
         TextButton teambeta = new TextButton("Beta", skin); // Use the initialized skin
+        teambeta.setName("Beta");
         teambeta.setColor(Color.CORAL);
 
         teamselecttable.add(teambeta).padBottom(10).width(150).height(50);
         teamselecttable.row();
         TextButton teamgamma = new TextButton("Gamma", skin); // Use the initialized skin
+        teamgamma.setName("Gamma");
         teamgamma.setColor(Color.GREEN);
 
         teamselecttable.add(teamgamma).width(150).height(50);
@@ -427,8 +431,23 @@ public class SessionOnlinePlayer implements Screen {
      */
     public void updateTeamList(Session managersession) {
         if (managersession.getGameSettings().getTeams() != null) {
+            // Set all the teambuttons to touchable first again.
+            for (Team teamv : teamList) {
+                TextButton teamtb = (TextButton) stage.getRoot().findActor(teamv.getName());
+                teamtb.setTouchable(Touchable.enabled);
+                Color ll = Color.valueOf(teamv.getColorname());
+                teamtb.setColor(Color.valueOf(teamv.getColorname()));
+            }
+
             teamList.clear();
             teamList.addAll(managersession.getGameSettings().getTeams());
+
+            // For the color of the boxes and if it is touchable.
+            for (Team teamv : teamList) {
+                TextButton teamtb = (TextButton) stage.getRoot().findActor(teamv.getName());
+                teamtb.setTouchable(Touchable.disabled);
+                teamtb.setColor(Color.LIGHT_GRAY);
+            }
             teams.setItems(teamList.toArray());
         }
     }

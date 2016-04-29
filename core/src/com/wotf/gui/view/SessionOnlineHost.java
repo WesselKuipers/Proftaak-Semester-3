@@ -162,6 +162,7 @@ public class SessionOnlineHost implements Screen {
         teamselecttable.add(selectteamlabel).padBottom(15);
         teamselecttable.row();
         TextButton btnteamalpha = new TextButton("Alpha", skin); // Use the initialized skin
+        btnteamalpha.setName("Alpha");
         btnteamalpha.setColor(Color.BLUE);
         btnteamalpha.addListener(new ClickListener() {
             @Override
@@ -169,14 +170,31 @@ public class SessionOnlineHost implements Screen {
                 if (players.getSelected() != null) {
                     try {
                         Team teamalpha = new Team("Alpha", Color.BLUE);
-                        teamalpha.addPlayer((Player) players.getSelected());
+                        teamalpha.setColorname(teamalpha.getColor().toString());
+                        Player selectedplayer = (Player) players.getSelected();
+
+                        ArrayList<Team> teamlistcopy = new ArrayList<>(teamList);
+                        for (Team fteam : teamlistcopy) {
+                            if (fteam.getOnlineplayer().getName().equals(selectedplayer.getName())) {
+                                fteam.setOnlineplayer(null);
+
+                                TextButton teamtb = (TextButton) stage.getRoot().findActor(fteam.getName());
+                                teamtb.setTouchable(Touchable.enabled);
+                                teamtb.setColor(fteam.getColor());
+
+                                teamList.remove(fteam);
+                                gameSettings.removeTeam(fteam);
+                            }
+                        }
+
+                        teamalpha.setOnlineplayer(selectedplayer);
                         teamalpha.addUnit(teamalpha.getName(), 100);
 
                         teamList.add(teamalpha);
                         gameSettings.addTeam(teamalpha);
                         teams.setItems(teamList.toArray());
                         session.setGameSettings(gameSettings);
-                        
+
                         btnteamalpha.setTouchable(Touchable.disabled);
                         btnteamalpha.setColor(Color.LIGHT_GRAY);
                     } catch (RemoteException ex) {
@@ -189,6 +207,7 @@ public class SessionOnlineHost implements Screen {
         teamselecttable.add(btnteamalpha).padBottom(10).width(150).height(50);
         teamselecttable.row();
         TextButton btnteambeta = new TextButton("Beta", skin); // Use the initialized skin
+        btnteambeta.setName("Beta");
         btnteambeta.setColor(Color.CORAL);
         btnteambeta.addListener(new ClickListener() {
             @Override
@@ -196,16 +215,37 @@ public class SessionOnlineHost implements Screen {
                 if (players.getSelected() != null) {
                     try {
                         Team teambeta = new Team("Beta", Color.CORAL);
-                        teambeta.addPlayer((Player) players.getSelected());
+                        teambeta.setColorname(teambeta.getColor().toString());
+                        Player selectedplayer = (Player) players.getSelected();
+
+                        ArrayList<Team> teamlistcopy = new ArrayList<>(teamList);
+                        for (Team fteam : teamlistcopy) {
+                            if (fteam.getOnlineplayer().getName().equals(selectedplayer.getName())) {
+                                fteam.setOnlineplayer(null);
+
+                                TextButton teamtb = (TextButton) stage.getRoot().findActor(fteam.getName());
+                                teamtb.setTouchable(Touchable.enabled);
+                                teamtb.setColor(fteam.getColor());
+
+                                teamList.remove(fteam);
+                                gameSettings.removeTeam(fteam);
+                            }
+                        }
+
+                        teambeta.setOnlineplayer(selectedplayer);
                         teambeta.addUnit(teambeta.getName(), 100);
 
                         teamList.add(teambeta);
                         gameSettings.addTeam(teambeta);
                         teams.setItems(teamList.toArray());
                         session.setGameSettings(gameSettings);
-                        
+
                         btnteambeta.setTouchable(Touchable.disabled);
                         btnteambeta.setColor(Color.LIGHT_GRAY);
+
+                        /*TextButton tbAlpha = (TextButton) stage.getRoot().findActor("Alpha");
+                        tbAlpha.setTouchable(Touchable.enabled);
+                        tbAlpha.setColor(Color.BLACK);*/
                     } catch (RemoteException ex) {
                         Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -215,6 +255,7 @@ public class SessionOnlineHost implements Screen {
         teamselecttable.add(btnteambeta).padBottom(10).width(150).height(50);
         teamselecttable.row();
         TextButton btnteamgamma = new TextButton("Gamma", skin); // Use the initialized skin
+        btnteamgamma.setName("Gamma");
         btnteamgamma.setColor(Color.GREEN);
         btnteamgamma.addListener(new ClickListener() {
             @Override
@@ -222,9 +263,27 @@ public class SessionOnlineHost implements Screen {
                 if (players.getSelected() != null) {
                     try {
                         Team teamgamma = new Team("Gamma", Color.GREEN);
-                        teamgamma.addPlayer((Player) players.getSelected());
+                        teamgamma.setColorname(teamgamma.getColor().toString());
+                        // If the selectedplayer already had a team assigned, make the team clickable again.
+                        Player selectedplayer = (Player) players.getSelected();
+
+                        ArrayList<Team> teamlistcopy = new ArrayList<>(teamList);
+                        for (Team fteam : teamlistcopy) {
+                            if (fteam.getOnlineplayer().getName().equals(selectedplayer.getName())) {
+                                fteam.setOnlineplayer(null);
+
+                                TextButton teamtb = (TextButton) stage.getRoot().findActor(fteam.getName());
+                                teamtb.setTouchable(Touchable.enabled);
+                                teamtb.setColor(fteam.getColor());
+
+                                teamList.remove(fteam);
+                                gameSettings.removeTeam(fteam);
+                            }
+                        }
+
+                        teamgamma.setOnlineplayer(selectedplayer);
                         teamgamma.addUnit(teamgamma.getName(), 100);
-                        
+
                         teamList.add(teamgamma);
                         gameSettings.addTeam(teamgamma);
                         teams.setItems(teamList.toArray());
@@ -434,6 +493,8 @@ public class SessionOnlineHost implements Screen {
         start.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                timer.cancel();
+                // Check if there are at least 2 teams otherwise return
                 if (teamList.size() < 2) {
                     return;
                 }
