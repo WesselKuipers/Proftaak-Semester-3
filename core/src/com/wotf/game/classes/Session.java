@@ -25,7 +25,6 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
     private RemotePublisher publisher;
     private String roomName;
     private int ID;
-    private int maxPlayersSession;
 
     public Session() throws RemoteException {
     }
@@ -37,16 +36,16 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
      *
      * @param host Player indicating which player is the host
      */
-    public Session(Player host, String roomName, int maxPlayersSession) throws RemoteException {
+    public Session(Player host, String roomName) throws RemoteException {
         this();
         this.gameSettings = new GameSettings();
         this.host = host;
         this.players = new ArrayList<>();
         players.add(host);
-        this.maxPlayersSession = maxPlayersSession;
         this.roomName = roomName;
         publisher = new RemotePublisher();
         publisher.registerProperty("sessionsettingsprop");
+        publisher.registerProperty("cancelgameprop");
     }
 
     public void createNewRegistry() throws RemoteException {
@@ -56,6 +55,10 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
 
     public void removeRegistry() throws NoSuchObjectException {
         UnicastRemoteObject.unexportObject(registry, true);
+    }
+
+    public void cancelSessionForClients() throws RemoteException {
+        publisher.inform("cancelgameprop", 0, 1);
     }
 
     /**

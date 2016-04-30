@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -25,6 +26,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import com.wotf.game.database.PlayerContext;
 import com.wotf.game.database.SessionContext;
+import com.wotf.game.database.SessionPlayerContext;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -173,14 +175,24 @@ public class LobbyGUI implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 SessionContext sc = new SessionContext();
                 PlayerContext pc = new PlayerContext();
+                SessionPlayerContext part = new SessionPlayerContext();
                 if (sessions.getSelected() == null) {
                     return;
                 }
                 try {
-                    // HostIP address should be filled in here.
+                    // The currently selected session.
                     Session selhost = (Session) sessions.getSelected();
                     selhost = sc.getByHostId(selhost.getHost().getID());
-                    game.setScreen(new SessionOnlinePlayer(game, selhost, player));
+                    // Check if there aren't more players than allowed, if not, continue the if statement.
+                    if (part.getPlayersFromSession(selhost).size() < sc.getById(selhost.getID()).getGameSettings().getMaxPlayersSession()) {
+                        game.setScreen(new SessionOnlinePlayer(game, selhost, player));
+                    } else {
+                        // Alert for if the server is full.
+                        Dialog msgserverfull = new Dialog("Server is full.", skin);
+                        msgserverfull.text("The server is currently full, try again later.");
+                        msgserverfull.button("Ok");
+                        msgserverfull.show(stage);
+                    }
                 } catch (RemoteException ex) {
                     pc.delete(player);
                     Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
@@ -203,7 +215,7 @@ public class LobbyGUI implements Screen {
                 PlayerContext pc = new PlayerContext();
                 try {
                     // Logic for making session.
-                    Session session = new Session(player, "Room", 5);
+                    Session session = new Session(player, "Room");
                     sc.insert(session);
                     session = sc.getLastAddedSession();
                     session.createNewRegistry();

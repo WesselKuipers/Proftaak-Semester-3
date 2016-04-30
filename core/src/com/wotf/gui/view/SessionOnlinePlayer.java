@@ -289,7 +289,7 @@ public class SessionOnlinePlayer implements Screen {
         timerbox.setSelected(timerstr);
         settingstable.add(timerbox).width(180);
         settingstable.row();
-        
+
         String[] unitvals = new String[4];
         unitvals[0] = "1";
         unitvals[1] = "2";
@@ -301,7 +301,7 @@ public class SessionOnlinePlayer implements Screen {
         unitbox.setItems(unitvals);
         String unitstr = Integer.toString(session.getGameSettings().getMaxUnitCount());
         unitbox.setSelected(unitstr);
-        settingstable.add(unitbox).width(180);        
+        settingstable.add(unitbox).width(180);
 
         settingstable.setWidth(300);
         settingstable.setHeight(200);
@@ -353,11 +353,11 @@ public class SessionOnlinePlayer implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 try {
-                    PlayerContext pc = new PlayerContext();
                     manager.removeRegistry();
                     timer.cancel();
                     game.setScreen(new LobbyGUI(game, player));
-                    pc.delete(player);
+                    SessionPlayerContext part = new SessionPlayerContext();
+                    part.deletePlayerFromSession(player, session);
                 } catch (SQLException ex) {
                     Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -439,12 +439,12 @@ public class SessionOnlinePlayer implements Screen {
     @Override
     public void dispose() {
         timer.cancel();
-        
+
         PlayerContext pc = new PlayerContext();
         pc.delete(player);
-        
+
         manager.removeRegistry();
-        
+
         SessionPlayerContext part = new SessionPlayerContext();
         part.deletePlayerFromSession(player, session);
     }
@@ -460,7 +460,6 @@ public class SessionOnlinePlayer implements Screen {
             for (Team teamv : teamList) {
                 TextButton teamtb = (TextButton) stage.getRoot().findActor(teamv.getName());
                 teamtb.setTouchable(Touchable.enabled);
-                Color ll = Color.valueOf(teamv.getColorname());
                 teamtb.setColor(Color.valueOf(teamv.getColorname()));
             }
 
@@ -522,4 +521,25 @@ public class SessionOnlinePlayer implements Screen {
             mapstable.addActor(map1);
         }
     }
+
+    public void backToLobby() {
+        Gdx.app.exit();
+        /*
+        // Won't work yet because it fails to render when calling it from another method. It's like it's cloning it's game object.
+        // So for now I just exit the whole game for a client.
+        try {
+            game.setScreen(new LobbyGUI(game, player));
+        } catch (SQLException ex) {
+            Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
+    }
+    
+    public WotFGame getGame(){
+        return game;
+    }
+    
+    public Player getPlayer(){
+        return player;
+    }
+
 }

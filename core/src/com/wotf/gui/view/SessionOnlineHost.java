@@ -355,9 +355,13 @@ public class SessionOnlineHost implements Screen {
             @Override
             public void changed(ChangeListener.ChangeEvent event, Actor actor) {
                 try {
+                    SessionContext sc = new SessionContext();
                     // Send a new property because this is sending a session object instead of a gamesettings object
                     gameSettings.setMaxPlayersSession(Integer.valueOf(maxplayerbox.getSelected().toString()));
                     session.setGameSettings(gameSettings);
+                    // Update this session's max players value. 
+                    // Otherwise people will be able to connect to the session while over the max players value.
+                    sc.update(session);
                 } catch (RemoteException ex) {
                     Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -552,16 +556,24 @@ public class SessionOnlineHost implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 SessionContext sc = new SessionContext();
+                SessionPlayerContext part = new SessionPlayerContext();
                 try {
+                    timer.cancel();
+                    // Make the clients know the session is stopping. Push an update.
+                    session.cancelSessionForClients();
                     // If it gets to here remove the session from the DB.
                     session.removeRegistry();
+                    // Remove the session_participant from the db.
+                    part.deleteSessionAndPlayers(session);
+                    // Remove the session from the db.
                     sc.delete(session);
                     session = null;
-                    timer.cancel();
                     game.setScreen(new LobbyGUI(game, player));
                 } catch (SQLException ex) {
                     Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (NoSuchObjectException ex) {
+                    Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (RemoteException ex) {
                     Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
