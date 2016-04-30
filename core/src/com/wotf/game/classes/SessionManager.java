@@ -65,7 +65,12 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
     }
     
     public void removeRegistry(){
-        registry = null;
+        try {
+            registry = null;
+            regsettings.unsubscribeRemoteListener(this, "sessionsettingsprop");
+        } catch (RemoteException ex) {
+            Logger.getLogger(SessionManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
@@ -83,11 +88,6 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
             // Update the map in the image.
             GUI.updateSelectedMap(session);
         }
-        // Possible logic for making the GUI start the game from here with the right settings..
-        // or just a copy of the Game object if this IS SERIALIZABLE?
-        /*if (evt.getPropertyName().equals("startgameprop")) {
-            //GUI.dispose();
-        }*/
     }
 
 }

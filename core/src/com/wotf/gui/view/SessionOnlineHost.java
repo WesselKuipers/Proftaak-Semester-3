@@ -34,6 +34,7 @@ import com.wotf.game.classes.Player;
 import com.wotf.game.classes.Session;
 import com.wotf.game.classes.SessionManager;
 import com.wotf.game.classes.Team;
+import com.wotf.game.database.PlayerContext;
 import com.wotf.game.database.SessionContext;
 import com.wotf.game.database.SessionPlayerContext;
 import java.rmi.NoSuchObjectException;
@@ -41,6 +42,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -422,6 +424,41 @@ public class SessionOnlineHost implements Screen {
             }
         });
         settingstable.add(timerbox).width(180);
+        settingstable.row();
+
+        String[] unitvals = new String[4];
+        unitvals[0] = "1";
+        unitvals[1] = "2";
+        unitvals[2] = "3";
+        unitvals[3] = "4";
+        Label unitlabel = new Label("Units :", skin);
+        settingstable.add(unitlabel).width(120);
+        SelectBox unitbox = new SelectBox(skin);
+        unitbox.setItems(unitvals);
+        unitbox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                try {
+                    int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
+                    gameSettings.setMaxUnitCount(selectedunitcount);
+                    // For each team in the list remove all the units first and remove it from the gamesettings.
+                    for (Team teamv : teamList) {
+                        gameSettings.removeTeam(teamv);
+                        teamv.removeAllUnits();
+                        // The new units to the team. The name of the unit is the teamname + the number of the variable 'i'.
+                        for (int i = 0; i < selectedunitcount; i++) {
+                            teamv.addUnit(teamv.getName() + Integer.toString(i), 100);
+                        }
+                        gameSettings.addTeam(teamv);
+                    }
+
+                    session.setGameSettings(gameSettings);
+                } catch (RemoteException ex) {
+                    Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+        settingstable.add(unitbox).width(180);
 
         settingstable.setWidth(300);
         settingstable.setHeight(200);
@@ -606,5 +643,23 @@ public class SessionOnlineHost implements Screen {
      */
     @Override
     public void dispose() {
+        try {
+            timer.cancel();
+
+            PlayerContext pc = new PlayerContext();
+            pc.delete(player);
+
+            SessionPlayerContext part = new SessionPlayerContext();
+            part.deleteSessionAndPlayers(session);
+
+            SessionContext sc = new SessionContext();
+            sc.delete(session);
+
+            session.removeRegistry();
+            session = null;
+        } catch (NoSuchObjectException ex) {
+            Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 }

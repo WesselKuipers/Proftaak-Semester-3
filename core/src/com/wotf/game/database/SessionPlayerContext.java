@@ -59,7 +59,7 @@ public class SessionPlayerContext {
      * @param session to remove player of
      * @return true if delete / false if not
      */
-    public static boolean deletePlayerFromSession(Player player, Session session) {
+    public boolean deletePlayerFromSession(Player player, Session session) {
         String query = "DELETE FROM session_participant WHERE SessionID = ? AND PlayerID = ?";
         List<Object> parameters = new ArrayList<>();
         parameters.add(session.getID());
@@ -73,7 +73,7 @@ public class SessionPlayerContext {
      * @param session to remove with players
      * @return true if delete / false if not
      */
-    public static boolean deleteSessionAndPlayers(Session session) {
+    public boolean deleteSessionAndPlayers(Session session) {
         String query = "DELETE FROM session_participant WHERE SessionID = ?";
         List<Object> parameters = new ArrayList<>();
         parameters.add(session.getID());

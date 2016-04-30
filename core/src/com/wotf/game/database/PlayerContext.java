@@ -115,7 +115,7 @@ public class PlayerContext extends EntityContext<Player> {
      * @param player to delete in database
      * @return true/false if update was succesfull
      */
-    public static boolean delete(Player player) {
+    public boolean delete(Player player) {
        String query = "DELETE FROM player WHERE ID = ?";
         List<Object> parameters = new ArrayList<>();
         parameters.add(player.getID());

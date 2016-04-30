@@ -76,6 +76,7 @@ public class SessionOnlinePlayer implements Screen {
     private SelectBox physicsbox;
     private SelectBox timerbox;
     private SelectBox chooseMap;
+    private SelectBox unitbox;
     private Table mapstable;
     private ArrayList<Texture> maptextures;
     private Player player;
@@ -287,6 +288,20 @@ public class SessionOnlinePlayer implements Screen {
         String timerstr = Integer.toString(session.getGameSettings().getMaxTime() / 60);
         timerbox.setSelected(timerstr);
         settingstable.add(timerbox).width(180);
+        settingstable.row();
+        
+        String[] unitvals = new String[4];
+        unitvals[0] = "1";
+        unitvals[1] = "2";
+        unitvals[2] = "3";
+        unitvals[3] = "4";
+        Label unitlabel = new Label("Units :", skin);
+        settingstable.add(unitlabel).width(120);
+        unitbox = new SelectBox(skin);
+        unitbox.setItems(unitvals);
+        String unitstr = Integer.toString(session.getGameSettings().getMaxUnitCount());
+        unitbox.setSelected(unitstr);
+        settingstable.add(unitbox).width(180);        
 
         settingstable.setWidth(300);
         settingstable.setHeight(200);
@@ -338,10 +353,11 @@ public class SessionOnlinePlayer implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 try {
+                    PlayerContext pc = new PlayerContext();
                     manager.removeRegistry();
                     timer.cancel();
                     game.setScreen(new LobbyGUI(game, player));
-                    PlayerContext.delete(player);
+                    pc.delete(player);
                 } catch (SQLException ex) {
                     Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -422,6 +438,15 @@ public class SessionOnlinePlayer implements Screen {
      */
     @Override
     public void dispose() {
+        timer.cancel();
+        
+        PlayerContext pc = new PlayerContext();
+        pc.delete(player);
+        
+        manager.removeRegistry();
+        
+        SessionPlayerContext part = new SessionPlayerContext();
+        part.deletePlayerFromSession(player, session);
     }
 
     /**
@@ -472,6 +497,9 @@ public class SessionOnlinePlayer implements Screen {
             // Maxplayers selected
             String maxplayers = Integer.toString(managersession.getGameSettings().getMaxPlayersSession());
             maxplayerbox.setSelected(maxplayers);
+            // MaxUnitCount selected
+            String maxunitcount = Integer.toString(managersession.getGameSettings().getMaxUnitCount());
+            unitbox.setSelected(maxunitcount);
         }
     }
 

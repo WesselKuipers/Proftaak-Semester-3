@@ -38,6 +38,7 @@ public class GameSettings implements Serializable {
     private int turnTime;
     private int withdrawTime;
     private int maxPlayersSession;
+    private int maxunitCount;
     private boolean fallingDamage;
     private boolean suddenDeath;
     private boolean physics;
@@ -95,7 +96,7 @@ public class GameSettings implements Serializable {
         WEAPONS_ARMORY.add(new Grenade("Grenade", 10, 10, 20, grenade_sprite, grenade_sprite));
         WEAPONS_ARMORY.add(new Clusterbomb("Clusterbomb", 10, 20, 45, clusterbomb_sprite, clusterbomb_sprite));
     }
-
+ 
     /**
      * Sets the index of the map with the settings
      *
@@ -156,6 +157,14 @@ public class GameSettings implements Serializable {
 
     public int getMaxPlayersSession() {
         return maxPlayersSession;
+    }
+    
+    public void setMaxUnitCount(int maxunitcount){
+        this.maxunitCount = maxunitcount;
+    }
+    
+    public int getMaxUnitCount(){
+        return this.maxunitCount;
     }
 
     /**

@@ -200,6 +200,14 @@ public class Team implements Serializable{
             }
         }
     }
+    
+    /**
+     * Removes all the units from the team.
+     * 
+     */
+    public void removeAllUnits(){
+        units.clear();
+    }
 
     /**
      * FOR TESTING. Use WITHOUT the boolean.

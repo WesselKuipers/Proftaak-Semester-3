@@ -154,9 +154,10 @@ public class LobbyGUI implements Screen {
         exit.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                PlayerContext pc = new PlayerContext();
                 game.setScreen(new MainMenu(game));
                 // The player has exited the LobbyGUI. It should remove the current player from the Database.
-                PlayerContext.delete(player);
+                pc.delete(player);
             }
         });
 
@@ -171,6 +172,7 @@ public class LobbyGUI implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 SessionContext sc = new SessionContext();
+                PlayerContext pc = new PlayerContext();
                 if (sessions.getSelected() == null) {
                     return;
                 }
@@ -180,7 +182,7 @@ public class LobbyGUI implements Screen {
                     selhost = sc.getByHostId(selhost.getHost().getID());
                     game.setScreen(new SessionOnlinePlayer(game, selhost, player));
                 } catch (RemoteException ex) {
-                    PlayerContext.delete(player);
+                    pc.delete(player);
                     Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SQLException ex) {
                     Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
@@ -198,6 +200,7 @@ public class LobbyGUI implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 SessionContext sc = new SessionContext();
+                PlayerContext pc = new PlayerContext();
                 try {
                     // Logic for making session.
                     Session session = new Session(player, "Room", 5);
@@ -206,7 +209,7 @@ public class LobbyGUI implements Screen {
                     session.createNewRegistry();
                     game.setScreen(new SessionOnlineHost(game, session, player));
                 } catch (RemoteException ex) {
-                    PlayerContext.delete(player);
+                    pc.delete(player);
                     Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SQLException ex) {
                     Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
@@ -281,6 +284,8 @@ public class LobbyGUI implements Screen {
      */
     @Override
     public void dispose() {
+        PlayerContext pc = new PlayerContext();
+        pc.delete(player);
     }
 
 }

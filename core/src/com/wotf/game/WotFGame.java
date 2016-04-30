@@ -4,10 +4,11 @@ import com.badlogic.gdx.Game;
 import com.wotf.gui.view.MainMenu;
 
 /**
- * ApplicationListener that delegates to a Screen
- * allowing the application to easily have multiple screens
+ * ApplicationListener that delegates to a Screen allowing the application to
+ * easily have multiple screens
  */
 public class WotFGame extends Game {
+
     WotFGame game;
 
     /**
@@ -23,5 +24,10 @@ public class WotFGame extends Game {
     @Override
     public void create() {
         game.setScreen(new MainMenu(game));
+    }
+
+    @Override
+    public void dispose() {
+        game.getScreen().dispose();
     }
 }
