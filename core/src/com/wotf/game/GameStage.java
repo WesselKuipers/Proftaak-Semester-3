@@ -20,7 +20,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.wotf.game.Networking.Command;
+import com.wotf.game.Networking.NetworkMessage;
 import com.wotf.game.classes.Game;
+import com.wotf.game.Networking.NetworkUtil;
 import com.wotf.game.classes.Team;
 import com.wotf.game.classes.TurnLogic.TurnState;
 import com.wotf.game.classes.Unit;
@@ -42,6 +45,8 @@ public class GameStage extends Stage {
 
     private Actor focusedActor; // if this is set to an actor
                                 // have the camera follow it automatically, otherwise set it to null
+    
+    private NetworkUtil networkingUtil;
 
     /**
      * Constructor for GameStage that initializes everything required for the
@@ -73,6 +78,12 @@ public class GameStage extends Stage {
 
         getCamera().update();
         game.beginTurn();
+        
+        //Create network util object to handle networking.
+        //TODO: get host ip from game settings ?
+        // jip boesenkool, 25-04-'16
+        String hostIpAddress = "127.0.0.1";
+        networkingUtil = new NetworkUtil( hostIpAddress, this );
     }
 
     /**
@@ -225,15 +236,19 @@ public class GameStage extends Stage {
      */
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        //TODO: check if client ip is allowed to fire.
         Vector3 rel = getCamera().unproject(new Vector3(screenX, screenY, 0));
 
         if (game.getTurnLogic().getState() == TurnState.PLAYING) {
-            System.out.println(String.format("Touchdown event (%d, %d) button %d", screenX, screenY, button));
-            System.out.println(String.format("Relative Touchdown event (%f, %f) button %d", rel.x, rel.y, button));
-
             if (button == Input.Buttons.LEFT) {
-                System.out.println("Firing bullet");
-                bulletLogic((int) rel.x, (int) rel.y);
+                //create fire message to send to host
+                NetworkMessage fireMsg = new NetworkMessage( Command.FIRE );
+                fireMsg.addParameter( "mousePosX", Integer.toString( (int) rel.x ));
+                fireMsg.addParameter( "mousePosY", Integer.toString( (int) rel.y ));
+                
+                //send message to host
+                networkingUtil.sendToHost( fireMsg );
+                
             } else if (button == Input.Buttons.RIGHT) {
                 explode((int) rel.x, (int) rel.y, 30, 0);
             }
@@ -393,7 +408,7 @@ public class GameStage extends Stage {
      * @param screenX Unprojected mouse position.x
      * @param screenY Unprojected mouse position.y
      */
-    private void bulletLogic(int screenX, int screenY) {
+    public void fire( int screenX, int screenY ) {
         // get wind force from map
         Vector2 wind = game.getMap().getWind();
         
@@ -401,7 +416,7 @@ public class GameStage extends Stage {
         double gravity = game.getMap().getGravityModifier();
         
         // get mouseposition to determine what direction the bullet must fly
-        Vector2 mousePos = new Vector2(screenX, screenY);
+        Vector2 mousePos = new Vector2( screenX, screenY );
         
         // trigger the fire method in unit which holds the gun
         (game.getActiveTeam().getActiveUnit()).fire(
@@ -432,4 +447,5 @@ public class GameStage extends Stage {
         cam.position.x = MathUtils.clamp(cam.position.x, effectiveViewportWidth / 2f, game.getMap().getWidth() - effectiveViewportWidth / 2f);
         cam.position.y = MathUtils.clamp(cam.position.y, effectiveViewportHeight / 2f, game.getMap().getHeight() - effectiveViewportHeight / 2f);
     }
+
 }

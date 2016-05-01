@@ -16,6 +16,7 @@ import java.util.Random;
 public class Map {
 
     private final double gravityModifier = 9.8;
+    private final int windRange = 20;
     private int waterLevel;
     private int width;
     private int height;
@@ -288,13 +289,10 @@ public class Map {
     public void calculateWind() {
         Random random = new Random();
 
-        int range = 20;
-
-        float x = (random.nextInt(range) - range / 2);
-        float y = (random.nextInt(range) - range / 2);
+        float x = (random.nextInt(windRange) - windRange / 2);
+        float y = (random.nextInt(windRange) - windRange / 2);
 
         this.windForce = new Vector2(x, y);
-        System.out.println(windForce.toString());
     }
 
     /**
