@@ -40,7 +40,7 @@ public class Unit extends Group {
     private Team team;
 
     // Font is used for displaying name and health
-    private static BitmapFont font;
+    private BitmapFont font;
 
     /**
      * Initializes a unit object
@@ -58,7 +58,7 @@ public class Unit extends Group {
 
         Texture spriteSheet = new Texture(Gdx.files.internal("unit.png"));
 
-        font.setColor(Color.BLACK);
+        font.setColor(team.getColor());
 
         sprite = new Sprite(spriteSheet);
         unitStand = sprite;
@@ -276,9 +276,6 @@ public class Unit extends Group {
     public void draw(Batch batch, float parentAlpha) {
         sprite.draw(batch);
 
-        // Sets color of the font to the same colour of the team
-        font.setColor(team.getColor());
-
         // Draws the name and current health of the unit above its sprite
         font.draw(batch, String.format("%s (%d)", name, health), getX(), getY() + getHeight() + 20);
 
@@ -295,6 +292,17 @@ public class Unit extends Group {
         super.act(delta);
         sprite.setRegion(getFrame(delta));
         updateJump();
+        
+        // flashes active unit to white and back to its original colour
+        if (((GameStage)this.getStage()).getGame().getActiveTeam().equals(team)) {
+            if (((GameStage)this.getStage()).getGame().getTurnLogic().getElapsedTime() % 2 == 1) {           
+                font.setColor(Color.WHITE);
+            } else {
+                font.setColor(team.getColor());
+            }
+        } else {
+            font.setColor(team.getColor());
+        }
 
         //make weapons move with the unit
         Array<Actor> children = this.getChildren();

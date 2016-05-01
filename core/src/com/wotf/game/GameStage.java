@@ -10,7 +10,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -33,13 +32,16 @@ import java.util.List;
  */
 public class GameStage extends Stage {
 
-    //private WotFGame game;
     private final Game game;
+    private final GuiStage guiStage;
 
     private final SpriteBatch batch;
     private final SpriteBatch guiBatch;
+    
     private final BitmapFont font;
-
+    
+    private boolean showDebug = false;
+    
     private Actor focusedActor; // if this is set to an actor
                                 // have the camera follow it automatically, otherwise set it to null
 
@@ -50,11 +52,13 @@ public class GameStage extends Stage {
      *
      * @param game Game data structure to base initial variables on (settings,
      * map, etc)
+     * @param guiStage The stage upon which the gui can be drawn
      */
-    public GameStage(Game game) {
+    public GameStage(Game game, GuiStage guiStage) {
         super(new ScreenViewport());
         this.game = game;
         this.focusedActor = null;
+        this.guiStage = guiStage;
 
         batch = new SpriteBatch();
         guiBatch = new SpriteBatch();
@@ -73,6 +77,7 @@ public class GameStage extends Stage {
 
         getCamera().update();
         game.beginTurn();
+        guiStage.updateWind();
     }
 
     /**
@@ -144,7 +149,8 @@ public class GameStage extends Stage {
         float delta = Gdx.graphics.getDeltaTime();
 
         game.update(delta);
-
+        guiStage.update();
+        
         // if focusedActor is set to an actor, we want the camera to follow it
         // otherwise, call the update() method on camera normally
         if (focusedActor != null) {
@@ -205,6 +211,10 @@ public class GameStage extends Stage {
                 game.getActiveTeam().getActiveUnit().decreaseHealth(100);
                 game.endTurn();
                 break;
+                
+            case Keys.F4:
+                showDebug = !showDebug;
+                break;
         }
 
         clampCamera();
@@ -235,7 +245,7 @@ public class GameStage extends Stage {
                 System.out.println("Firing bullet");
                 bulletLogic((int) rel.x, (int) rel.y);
             } else if (button == Input.Buttons.RIGHT) {
-                explode((int) rel.x, (int) rel.y, 30, 0);
+                explode((int) rel.x, (int) rel.y, 30, 60);
             }
 
             game.endTurn();
@@ -255,6 +265,7 @@ public class GameStage extends Stage {
         Texture backgroundTexture = game.getMap().getBackgroundTexture();
         Texture terrainTexture = game.getMap().getLandscapeTexture();
         
+        // draws background and foreground
         batch.draw(backgroundTexture, 0, 0, 0, 0,
                 backgroundTexture.getWidth(), backgroundTexture.getHeight(),
                 1f, 1f, 0, 0, 0,
@@ -265,39 +276,41 @@ public class GameStage extends Stage {
                 1f, 1f, 0, 0, 0,
                 terrainTexture.getWidth(), terrainTexture.getHeight(),
                 false, true);
-
+        
         batch.end();
 
         super.draw();
         
-        // guiBatch is primarily used to display text and miscellaneous graphics
-        guiBatch.begin();
+        if (showDebug) {
+            // guiBatch is primarily used to display text and miscellaneous graphics
+            guiBatch.begin();
 
-        font.draw(guiBatch, "Debug variables:", 0, this.getHeight());
-        font.draw(guiBatch, "Actors amount: " + this.getActors().size, 0, this.getHeight() - 20);
-        
-        if (this.game.getActiveTeam().getActiveUnit() != null) {
-            font.draw(guiBatch,
-                    String.format("Active actor: %s XY[%f, %f]",
-                            this.game.getActiveTeam().getActiveUnit().getName(),
-                            this.game.getActiveTeam().getActiveUnit().getX(),
-                            this.game.getActiveTeam().getActiveUnit().getY()),
-                    0,
-                    this.getHeight() - 40);
+            int offsetY = 200;
+            
+            font.draw(guiBatch, "Debug variables:", 0, this.getHeight() - offsetY);
+            font.draw(guiBatch, "Actors amount: " + this.getActors().size, 0, this.getHeight() - 20 - offsetY);
+
+            if (this.game.getActiveTeam() != null) {
+                if (this.game.getActiveTeam().getActiveUnit() != null) {
+                    font.draw(guiBatch,
+                            String.format("Active actor: %s XY[%f, %f]",
+                                    this.game.getActiveTeam().getActiveUnit().getName(),
+                                    this.game.getActiveTeam().getActiveUnit().getX(),
+                                    this.game.getActiveTeam().getActiveUnit().getY()),
+                            0,
+                            this.getHeight() - 40 - offsetY);
+                } 
+            }
+
+            font.draw(guiBatch, String.format("Mouse position: screen [%d, %d], viewport %s", Gdx.input.getX(), game.getMap().getHeight() - Gdx.input.getY(), getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0))), 0, this.getHeight() - 60 - offsetY);
+            font.draw(guiBatch, String.format("Camera coords [%s], zoom %f", getCamera().position.toString(), ((OrthographicCamera) getCamera()).zoom), 0, this.getHeight() - 80 - offsetY);
+            font.draw(guiBatch, "Time remaining: " + (game.getGameSettings().getTurnTime() - (int) game.getTurnLogic().getElapsedTime()), 0, this.getHeight() - 100 - offsetY);
+            font.draw(guiBatch, String.format("FPS: %d", Gdx.graphics.getFramesPerSecond()), 0, this.getHeight() - 120 - offsetY);
+
+            font.draw(guiBatch, "Wind: " + game.getMap().getWind().toString(), 0, this.getHeight() - 140 - offsetY);
+
+            guiBatch.end();
         }
-        
-        font.draw(guiBatch, String.format("Mouse position: screen [%d, %d], viewport %s", Gdx.input.getX(), game.getMap().getHeight() - Gdx.input.getY(), getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0))), 0, this.getHeight() - 60);
-        font.draw(guiBatch, String.format("Camera coords [%s], zoom %f", getCamera().position.toString(), ((OrthographicCamera) getCamera()).zoom), 0, this.getHeight() - 80);
-        font.draw(guiBatch, "Time remaining: " + (game.getGameSettings().getTurnTime() - (int) game.getTurnLogic().getElapsedTime()), 0, this.getHeight() - 100);
-        font.draw(guiBatch, String.format("FPS: %d", Gdx.graphics.getFramesPerSecond()), 0, this.getHeight() - 120);
-        
-        if (game.getTurnLogic().getState() == TurnState.GAMEOVER) {
-            font.draw(guiBatch, "GAME OVER", this.getWidth() / 2, this.getHeight() / 2);
-        }
-        
-        font.draw(guiBatch, "Wind: " + game.getMap().getWind().toString(), 0, this.getHeight() - 140);
-        
-        guiBatch.end();
     }
 
     /**
@@ -337,11 +350,17 @@ public class GameStage extends Stage {
                 }
             }
         }
-
-        // Iterates through all of the collided units and decreases their health
-        // based on the damage caused by the explosion
-        for (Unit u : collidedUnits) {
-            u.decreaseHealth(damage);
+        
+        // if any units have taken damage, we want to update their health and team healthbars
+        if (!collidedUnits.isEmpty()) {
+            
+            // Iterates through all of the collided units and decreases their health
+            // based on the damage caused by the explosion
+            for (Unit u : collidedUnits) {
+                u.decreaseHealth(damage);
+            }
+            
+            guiStage.updateHealthBars();
         }
     }
 
