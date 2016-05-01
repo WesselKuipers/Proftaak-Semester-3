@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -32,7 +33,10 @@ import com.wotf.game.WotFGame;
 import com.wotf.game.classes.GameSettings;
 import com.wotf.game.classes.Map;
 import com.wotf.game.classes.Team;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Screen that shows the local sessions menu
@@ -48,6 +52,7 @@ public class SessionLocal implements Screen {
     private final ArrayList<Team> teamList;
     private final GameSettings gameSettings;
     private Image map1;
+    private SelectBox unitbox;
 
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting
@@ -106,56 +111,57 @@ public class SessionLocal implements Screen {
         Label selectteamlabel = new Label("Team selection", skin);
         teamselecttable.add(selectteamlabel).padBottom(15);
         teamselecttable.row();
-        TextButton teamalpha = new TextButton("Alpha", skin); // Use the initialized skin
-        teamalpha.setColor(Color.BLUE);
-        teamalpha.addListener(new ClickListener() {
+        TextButton btnteamalpha = new TextButton("Alpha", skin); // Use the initialized skin
+        btnteamalpha.setColor(Color.BLUE);
+        btnteamalpha.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Team teamalpha = new Team("Alpha", Color.BLUE);
-                teamalpha.addUnit(teamalpha.getName(), 100);
-                //Mogelijk voor als iedere player in online een eigen team heeft.
-                //teamalpha.addPlayer(new Player("127.0.0.1", "AlphaPlayer"));
-                teamList.add(teamalpha);
-                gameSettings.addTeam(teamalpha);
-                teams.clear();
-                teams.setItems(teamList.toArray());
-                teams.invalidateHierarchy();
+                teamalpha.setColorname(teamalpha.getColor().toString());
+
+                int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
+                addUnitsSingleTeam(selectedunitcount, teamalpha);
+
+                btnteamalpha.setTouchable(Touchable.disabled);
+                btnteamalpha.setColor(Color.LIGHT_GRAY);
             }
         });
 
-        teamselecttable.add(teamalpha).padBottom(10).width(150).height(50);
+        teamselecttable.add(btnteamalpha).padBottom(10).width(150).height(50);
         teamselecttable.row();
-        TextButton teambeta = new TextButton("Beta", skin); // Use the initialized skin
-        teambeta.setColor(Color.CORAL);
-        teambeta.addListener(new ClickListener() {
+        TextButton btnteambeta = new TextButton("Beta", skin); // Use the initialized skin
+        btnteambeta.setColor(Color.CORAL);
+        btnteambeta.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Team teambeta = new Team("Beta", Color.CORAL);
-                teambeta.addUnit(teambeta.getName(), 100);
-                //Mogelijk voor als iedere player in online een eigen team heeft.
-                //teambeta.addPlayer(new Player("127.0.0.1", "BetaPlayer"));
-                teamList.add(teambeta);
-                gameSettings.addTeam(teambeta);
-                teams.setItems(teamList.toArray());
+                teambeta.setColorname(teambeta.getColor().toString());
+
+                int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
+                addUnitsSingleTeam(selectedunitcount, teambeta);
+
+                btnteambeta.setTouchable(Touchable.disabled);
+                btnteambeta.setColor(Color.LIGHT_GRAY);
             }
         });
-        teamselecttable.add(teambeta).padBottom(10).width(150).height(50);
+        teamselecttable.add(btnteambeta).padBottom(10).width(150).height(50);
         teamselecttable.row();
-        TextButton teamgamma = new TextButton("Gamma", skin); // Use the initialized skin
-        teamgamma.setColor(Color.GREEN);
-        teamgamma.addListener(new ClickListener() {
+        TextButton btnteamgamma = new TextButton("Gamma", skin); // Use the initialized skin
+        btnteamgamma.setColor(Color.GREEN);
+        btnteamgamma.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Team teamgamma = new Team("Gamma", Color.GREEN);
-                teamgamma.addUnit(teamgamma.getName(), 100);
-                //Mogelijk voor als iedere player in online een eigen team heeft.
-                //teamgamma.addPlayer(new Player("127.0.0.1", "GammaPlayer"));
-                teamList.add(teamgamma);
-                gameSettings.addTeam(teamgamma);
-                teams.setItems(teamList.toArray());
+                teamgamma.setColorname(teamgamma.getColor().toString());
+
+                int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
+                addUnitsSingleTeam(selectedunitcount, teamgamma);
+
+                btnteamgamma.setTouchable(Touchable.disabled);
+                btnteamgamma.setColor(Color.LIGHT_GRAY);
             }
         });
-        teamselecttable.add(teamgamma).width(150).height(50);
+        teamselecttable.add(btnteamgamma).width(150).height(50);
         teamselecttable.setWidth(200);
         teamselecttable.setHeight(320);
         teamselecttable.setPosition(500, 360);
@@ -183,19 +189,13 @@ public class SessionLocal implements Screen {
         SelectBox turntimebox = new SelectBox(skin);
         turntimebox.setItems(turntimevals);
         turntimebox.setSelectedIndex(3);
+        turntimebox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeListener.ChangeEvent event, Actor actor) {
+                gameSettings.setTurnTime(Integer.parseInt(turntimebox.getSelected().toString()));
+            }
+        });
         settingstable.add(turntimebox).width(180);
-        settingstable.row();
-
-        Label playerslabel = new Label("Players :", skin);
-        settingstable.add(playerslabel).width(120);
-        Label playersvallabel = new Label("2/10", skin);
-        settingstable.add(playersvallabel).width(180);
-        settingstable.row();
-
-        Label speedslabel = new Label("Speeds :", skin);
-        settingstable.add(speedslabel).width(120);
-        Label speedsvallabel = new Label("Marathon", skin);
-        settingstable.add(speedsvallabel).width(180);
         settingstable.row();
 
         Object[] physicsvals = new Object[2];
@@ -205,6 +205,12 @@ public class SessionLocal implements Screen {
         settingstable.add(physicslabel).width(120);
         SelectBox physicsbox = new SelectBox(skin);
         physicsbox.setItems(physicsvals);
+        physicsbox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                gameSettings.setPhysics(Boolean.parseBoolean(physicsbox.getSelected().toString()));
+            }
+        });
         settingstable.add(physicsbox).width(180);
         settingstable.row();
 
@@ -227,7 +233,34 @@ public class SessionLocal implements Screen {
         settingstable.add(timerlabel).width(120);
         SelectBox timerbox = new SelectBox(skin);
         timerbox.setItems(timervals);
+        timerbox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                gameSettings.setMaxTime(Integer.parseInt(timerbox.getSelected().toString()));
+            }
+        });
         settingstable.add(timerbox).width(180);
+        settingstable.row();
+
+        Object[] unitvals = new Object[4];
+        unitvals[0] = "1";
+        unitvals[1] = "2";
+        unitvals[2] = "3";
+        unitvals[3] = "4";
+        Label unitlabel = new Label("Units :", skin);
+        settingstable.add(unitlabel).width(120);
+        unitbox = new SelectBox(skin);
+        unitbox.setItems(unitvals);
+        unitbox.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
+                gameSettings.setMaxUnitCount(selectedunitcount);
+                refreshUnitsForTeam(selectedunitcount);
+
+            }
+        });
+        settingstable.add(unitbox).width(180);
 
         settingstable.setWidth(300);
         settingstable.setHeight(200);
@@ -289,6 +322,7 @@ public class SessionLocal implements Screen {
                 if (teamList.size() < 2) {
                     return;
                 }
+
                 // Selected MaxTime to an integer.
                 gameSettings.setMaxTime(Integer.parseInt(timerbox.getSelected().toString()));
 
@@ -314,6 +348,29 @@ public class SessionLocal implements Screen {
             }
         });
 
+    }
+
+    public void refreshUnitsForTeam(int selectedunitcount) {
+        // For each team in the list remove all the units first and remove it from the gamesettings.
+        for (Team teamv : teamList) {
+            gameSettings.removeTeam(teamv);
+            teamv.removeAllUnits();
+            // The new units to the team. The name of the unit is the teamname + the number of the variable 'i'.
+            for (int i = 0; i < selectedunitcount; i++) {
+                teamv.addUnit(teamv.getName() + Integer.toString(i), 100);
+            }
+            gameSettings.addTeam(teamv);
+        }
+    }
+
+    public void addUnitsSingleTeam(int selectedunitcount, Team team) {
+        // The new units to the team. The name of the unit is the teamname + the number of the variable 'i'.
+        for (int i = 0; i < selectedunitcount; i++) {
+            team.addUnit(team.getName() + Integer.toString(i), 100);
+        }
+        teamList.add(team);
+        gameSettings.addTeam(team);
+        teams.setItems(teamList.toArray());
     }
 
     /**

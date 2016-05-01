@@ -41,7 +41,6 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
         this.gameSettings = new GameSettings();
         this.host = host;
         this.players = new ArrayList<>();
-        players.add(host);
         this.roomName = roomName;
         publisher = new RemotePublisher();
         publisher.registerProperty("sessionsettingsprop");
@@ -146,7 +145,7 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
 
     @Override
     public String toString() {
-        return host.getName() + " " + host.getIp();
+        return host.getName() + " " + this.roomName + "     " + this.getPlayers().size() + "/" + this.gameSettings.getMaxPlayersSession();
     }
 
 }

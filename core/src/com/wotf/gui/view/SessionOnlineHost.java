@@ -71,7 +71,7 @@ public class SessionOnlineHost implements Screen {
     private Player player;
     private Timer timer;
     private SelectBox maxplayerbox;
-
+    private SelectBox unitbox;
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting
      *
@@ -174,6 +174,7 @@ public class SessionOnlineHost implements Screen {
                         Team teamalpha = new Team("Alpha", Color.BLUE);
                         teamalpha.setColorname(teamalpha.getColor().toString());
                         Player selectedplayer = (Player) players.getSelected();
+                        int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
 
                         ArrayList<Team> teamlistcopy = new ArrayList<>(teamList);
                         for (Team fteam : teamlistcopy) {
@@ -190,11 +191,9 @@ public class SessionOnlineHost implements Screen {
                         }
 
                         teamalpha.setOnlineplayer(selectedplayer);
-                        teamalpha.addUnit(teamalpha.getName(), 100);
+                        
+                        addUnitsSingleTeam(selectedunitcount, teamalpha);
 
-                        teamList.add(teamalpha);
-                        gameSettings.addTeam(teamalpha);
-                        teams.setItems(teamList.toArray());
                         session.setGameSettings(gameSettings);
 
                         btnteamalpha.setTouchable(Touchable.disabled);
@@ -219,6 +218,7 @@ public class SessionOnlineHost implements Screen {
                         Team teambeta = new Team("Beta", Color.CORAL);
                         teambeta.setColorname(teambeta.getColor().toString());
                         Player selectedplayer = (Player) players.getSelected();
+                        int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
 
                         ArrayList<Team> teamlistcopy = new ArrayList<>(teamList);
                         for (Team fteam : teamlistcopy) {
@@ -235,11 +235,9 @@ public class SessionOnlineHost implements Screen {
                         }
 
                         teambeta.setOnlineplayer(selectedplayer);
-                        teambeta.addUnit(teambeta.getName(), 100);
 
-                        teamList.add(teambeta);
-                        gameSettings.addTeam(teambeta);
-                        teams.setItems(teamList.toArray());
+                        addUnitsSingleTeam(selectedunitcount, teambeta);
+                        
                         session.setGameSettings(gameSettings);
 
                         btnteambeta.setTouchable(Touchable.disabled);
@@ -266,8 +264,8 @@ public class SessionOnlineHost implements Screen {
                     try {
                         Team teamgamma = new Team("Gamma", Color.GREEN);
                         teamgamma.setColorname(teamgamma.getColor().toString());
-                        // If the selectedplayer already had a team assigned, make the team clickable again.
                         Player selectedplayer = (Player) players.getSelected();
+                        int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
 
                         ArrayList<Team> teamlistcopy = new ArrayList<>(teamList);
                         for (Team fteam : teamlistcopy) {
@@ -284,11 +282,9 @@ public class SessionOnlineHost implements Screen {
                         }
 
                         teamgamma.setOnlineplayer(selectedplayer);
-                        teamgamma.addUnit(teamgamma.getName(), 100);
 
-                        teamList.add(teamgamma);
-                        gameSettings.addTeam(teamgamma);
-                        teams.setItems(teamList.toArray());
+                        addUnitsSingleTeam(selectedunitcount, teamgamma);
+
                         session.setGameSettings(gameSettings);
 
                         btnteamgamma.setTouchable(Touchable.disabled);
@@ -437,7 +433,7 @@ public class SessionOnlineHost implements Screen {
         unitvals[3] = "4";
         Label unitlabel = new Label("Units :", skin);
         settingstable.add(unitlabel).width(120);
-        SelectBox unitbox = new SelectBox(skin);
+        unitbox = new SelectBox(skin);
         unitbox.setItems(unitvals);
         unitbox.addListener(new ChangeListener() {
             @Override
@@ -446,15 +442,7 @@ public class SessionOnlineHost implements Screen {
                     int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
                     gameSettings.setMaxUnitCount(selectedunitcount);
                     // For each team in the list remove all the units first and remove it from the gamesettings.
-                    for (Team teamv : teamList) {
-                        gameSettings.removeTeam(teamv);
-                        teamv.removeAllUnits();
-                        // The new units to the team. The name of the unit is the teamname + the number of the variable 'i'.
-                        for (int i = 0; i < selectedunitcount; i++) {
-                            teamv.addUnit(teamv.getName() + Integer.toString(i), 100);
-                        }
-                        gameSettings.addTeam(teamv);
-                    }
+                    refreshUnitsForTeam(selectedunitcount);
 
                     session.setGameSettings(gameSettings);
                 } catch (RemoteException ex) {
@@ -594,6 +582,29 @@ public class SessionOnlineHost implements Screen {
             }
         }, 0, 7000);
 
+    }
+
+    public void refreshUnitsForTeam(int selectedunitcount) {
+        // For each team in the list remove all the units first and remove it from the gamesettings.
+        for (Team teamv : teamList) {
+            gameSettings.removeTeam(teamv);
+            teamv.removeAllUnits();
+            // The new units to the team. The name of the unit is the teamname + the number of the variable 'i'.
+            for (int i = 0; i < selectedunitcount; i++) {
+                teamv.addUnit(teamv.getName() + Integer.toString(i), 100);
+            }
+            gameSettings.addTeam(teamv);
+        }
+    }
+
+    public void addUnitsSingleTeam(int selectedunitcount, Team team) {
+        // The new units to the team. The name of the unit is the teamname + the number of the variable 'i'.
+        for (int i = 0; i < selectedunitcount; i++) {
+            team.addUnit(team.getName() + Integer.toString(i), 100);
+        }
+        teamList.add(team);
+        gameSettings.addTeam(team);
+        teams.setItems(teamList.toArray());
     }
 
     /**

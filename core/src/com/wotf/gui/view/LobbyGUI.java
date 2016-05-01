@@ -45,6 +45,7 @@ public class LobbyGUI implements Screen {
     private Player player;
     private final SessionContext sessionContext;
     private final PlayerContext playerContext;
+    private final SessionPlayerContext sesplayContext;
 
     /**
      * Creates a new instance of the LobbyGUI based on the game.
@@ -60,9 +61,14 @@ public class LobbyGUI implements Screen {
         lobby = new Lobby();
         sessionContext = new SessionContext();
         playerContext = new PlayerContext();
+        sesplayContext = new SessionPlayerContext();
 
         // Getting session out of database and sets it in lobby
         for (Session session : sessionContext.getAll()) {
+            for (Player sesplayer : sesplayContext.getPlayersFromSession(session)) {
+                // Get all the players of this session and put them in the list of players
+                session.addPlayer(sesplayer);
+            }
             lobby.addSession(session);
         }
     }
