@@ -82,6 +82,7 @@ public class SessionOnlinePlayer implements Screen {
     private Player player;
     private Timer timer;
     private SelectBox maxplayerbox;
+    private int switchscreencheck;
 
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting
@@ -90,6 +91,7 @@ public class SessionOnlinePlayer implements Screen {
      * @param session
      */
     public SessionOnlinePlayer(WotFGame game, Session session, Player player) throws RemoteException {
+        switchscreencheck = 0;
         this.player = player;
         this.game = game;
         gameSettings = new GameSettings();
@@ -220,7 +222,7 @@ public class SessionOnlinePlayer implements Screen {
         settingstable.add(ipvallabel).width(180);
         settingstable.row();
 
-        String[] turntimevals = new String[6];
+        Object[] turntimevals = new Object[6];
         turntimevals[0] = "10";
         turntimevals[1] = "20";
         turntimevals[2] = "30";
@@ -232,13 +234,14 @@ public class SessionOnlinePlayer implements Screen {
         turntimebox.setItems(turntimevals);
         String turntimestr = Integer.toString(session.getGameSettings().getTurnTime());
         turntimebox.setSelected(turntimestr);
+        turntimebox.setTouchable(Touchable.disabled);
 
         settingstable.add(turntimebox).width(180);
         settingstable.row();
 
         Label playerslabel = new Label("Players :", skin);
         settingstable.add(playerslabel).width(120);
-        String[] maxplayervals = new String[4];
+        Object[] maxplayervals = new Object[4];
         maxplayervals[0] = "2";
         maxplayervals[1] = "3";
         maxplayervals[2] = "4";
@@ -246,6 +249,7 @@ public class SessionOnlinePlayer implements Screen {
         maxplayerbox = new SelectBox(skin);
         maxplayerbox.setItems(maxplayervals);
         maxplayerbox.setSelected(Integer.toString(session.getGameSettings().getMaxPlayersSession()));
+        maxplayerbox.setTouchable(Touchable.disabled);
         settingstable.add(maxplayerbox).width(180);
         settingstable.row();
 
@@ -255,7 +259,7 @@ public class SessionOnlinePlayer implements Screen {
         settingstable.add(speedsvallabel).width(180);
         settingstable.row();
 
-        String[] physicsvals = new String[2];
+        Object[] physicsvals = new Object[2];
         physicsvals[0] = "true";
         physicsvals[1] = "false";
         Label physicslabel = new Label("Physics :", skin);
@@ -263,11 +267,12 @@ public class SessionOnlinePlayer implements Screen {
         physicsbox.setItems(physicsvals);
         String physicsstr = Boolean.toString(session.getGameSettings().getPhysics());
         physicsbox.setSelected(physicsstr);
+        physicsbox.setTouchable(Touchable.disabled);
 
         settingstable.add(physicsbox).width(180);
         settingstable.row();
 
-        String[] weaponsvals = new String[3];
+        Object[] weaponsvals = new Object[3];
         weaponsvals[0] = "All Weapons";
         weaponsvals[1] = "Non-Explosive";
         weaponsvals[2] = "Grenades Only";
@@ -275,10 +280,11 @@ public class SessionOnlinePlayer implements Screen {
         settingstable.add(weaponslabel).width(120);
         SelectBox weaponsbox = new SelectBox(skin);
         weaponsbox.setItems(weaponsvals);
+        weaponsbox.setTouchable(Touchable.disabled);
         settingstable.add(weaponsbox).width(180);
         settingstable.row();
 
-        String[] timervals = new String[3];
+        Object[] timervals = new Object[3];
         timervals[0] = "60";
         timervals[1] = "30";
         timervals[2] = "10";
@@ -287,10 +293,11 @@ public class SessionOnlinePlayer implements Screen {
         timerbox.setItems(timervals);
         String timerstr = Integer.toString(session.getGameSettings().getMaxTime() / 60);
         timerbox.setSelected(timerstr);
+        timerbox.setTouchable(Touchable.disabled);
         settingstable.add(timerbox).width(180);
         settingstable.row();
 
-        String[] unitvals = new String[4];
+        Object[] unitvals = new Object[4];
         unitvals[0] = "1";
         unitvals[1] = "2";
         unitvals[2] = "3";
@@ -301,6 +308,7 @@ public class SessionOnlinePlayer implements Screen {
         unitbox.setItems(unitvals);
         String unitstr = Integer.toString(session.getGameSettings().getMaxUnitCount());
         unitbox.setSelected(unitstr);
+        unitbox.setTouchable(Touchable.disabled);
         settingstable.add(unitbox).width(180);
 
         settingstable.setWidth(300);
@@ -316,6 +324,7 @@ public class SessionOnlinePlayer implements Screen {
         chooseMap = new SelectBox(skin);
         chooseMap.setItems(mapslist.toArray());
         chooseMap.setSelected(session.getGameSettings().getMapName());
+        chooseMap.setTouchable(Touchable.disabled);
         chooseMap.setWidth(400);
         chooseMap.setPosition(20, 20);
         mapstable.addActor(chooseMap);
@@ -330,6 +339,12 @@ public class SessionOnlinePlayer implements Screen {
         teamstable.row();
         teamList.clear();
         teamList.addAll(session.getGameSettings().getTeams());
+        // For the color of the boxes and if it is touchable.
+        for (Team teamv : teamList) {
+            TextButton teamtb = (TextButton) stage.getRoot().findActor(teamv.getName());
+            teamtb.setTouchable(Touchable.disabled);
+            teamtb.setColor(Color.LIGHT_GRAY);
+        }
         teams.setItems(teamList.toArray());
         teamstable.add(teams).width(200);
         teamstable.setWidth(260);
@@ -363,7 +378,6 @@ public class SessionOnlinePlayer implements Screen {
                 }
             }
         });
-
         SessionPlayerContext sc = new SessionPlayerContext();
         timer = new Timer("PlayerRefresh");
         timer.schedule(new TimerTask() {
@@ -387,6 +401,14 @@ public class SessionOnlinePlayer implements Screen {
      */
     @Override
     public void render(float delta) {
+        if (switchscreencheck != 0) {
+            try {
+                game.setScreen(new LobbyGUI(game, player));
+            } catch (SQLException ex) {
+                Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
         Gdx.gl.glClearColor((float) 122 / 255, (float) 122 / 255, (float) 122 / 255, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -449,6 +471,15 @@ public class SessionOnlinePlayer implements Screen {
         part.deletePlayerFromSession(player, session);
     }
 
+    public void disposeWithoutPlayer() {
+        timer.cancel();
+
+        manager.removeRegistry();
+
+        SessionPlayerContext part = new SessionPlayerContext();
+        part.deletePlayerFromSession(player, session);
+    }
+
     /**
      * Updates the teamlist for the client to the actual state on the host.
      *
@@ -459,7 +490,6 @@ public class SessionOnlinePlayer implements Screen {
             // Set all the teambuttons to touchable first again.
             for (Team teamv : teamList) {
                 TextButton teamtb = (TextButton) stage.getRoot().findActor(teamv.getName());
-                teamtb.setTouchable(Touchable.enabled);
                 teamtb.setColor(Color.valueOf(teamv.getColorname()));
             }
 
@@ -522,24 +552,14 @@ public class SessionOnlinePlayer implements Screen {
         }
     }
 
+    /**
+     * Set the variable switchscreencheck to 1. This variable is used in the
+     * render, so that the game can change screen as soon as this value is 1.
+     * This is checked inside the render.
+     *
+     */
     public void backToLobby() {
-        Gdx.app.exit();
-        /*
-        // Won't work yet because it fails to render when calling it from another method. It's like it's cloning it's game object.
-        // So for now I just exit the whole game for a client.
-        try {
-            game.setScreen(new LobbyGUI(game, player));
-        } catch (SQLException ex) {
-            Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
+        // Solution could be to change a variable which will be checked and then change screen.
+        switchscreencheck = 1;
     }
-    
-    public WotFGame getGame(){
-        return game;
-    }
-    
-    public Player getPlayer(){
-        return player;
-    }
-
 }

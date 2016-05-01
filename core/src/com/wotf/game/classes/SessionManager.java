@@ -92,9 +92,11 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
         }
         if (evt.getPropertyName().equals("cancelgameprop")){
             // Clean the defaults for a player who leaves the session. Like delete him from a session
-            GUI.dispose();
+            // The default should not delete the player from the list of players because he is going back to the lobby.
+            GUI.disposeWithoutPlayer();
 
             // Go back to the LobbyGUI for a player.
+            // This will set a value for a variable which will be checked constantly inside the render method.
             GUI.backToLobby();
         }
     }

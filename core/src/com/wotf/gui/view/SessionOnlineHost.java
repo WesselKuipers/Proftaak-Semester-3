@@ -315,7 +315,7 @@ public class SessionOnlineHost implements Screen {
         settingstable.add(ipvallabel).width(180);
         settingstable.row();
 
-        String[] turntimevals = new String[6];
+        Object[] turntimevals = new Object[6];
         turntimevals[0] = "10";
         turntimevals[1] = "20";
         turntimevals[2] = "30";
@@ -343,7 +343,7 @@ public class SessionOnlineHost implements Screen {
 
         Label playerslabel = new Label("Players :", skin);
         settingstable.add(playerslabel).width(120);
-        String[] maxplayervals = new String[4];
+        Object[] maxplayervals = new Object[4];
         maxplayervals[0] = "2";
         maxplayervals[1] = "3";
         maxplayervals[2] = "4";
@@ -376,7 +376,7 @@ public class SessionOnlineHost implements Screen {
         settingstable.add(speedsvallabel).width(180);
         settingstable.row();
 
-        String[] physicsvals = new String[2];
+        Object[] physicsvals = new Object[2];
         physicsvals[0] = "true";
         physicsvals[1] = "false";
         Label physicslabel = new Label("Physics :", skin);
@@ -397,7 +397,7 @@ public class SessionOnlineHost implements Screen {
         settingstable.add(physicsbox).width(180);
         settingstable.row();
 
-        String[] weaponsvals = new String[3];
+        Object[] weaponsvals = new Object[3];
         weaponsvals[0] = "All Weapons";
         weaponsvals[1] = "Non-Explosive";
         weaponsvals[2] = "Grenades Only";
@@ -408,7 +408,7 @@ public class SessionOnlineHost implements Screen {
         settingstable.add(weaponsbox).width(180);
         settingstable.row();
 
-        String[] timervals = new String[3];
+        Object[] timervals = new Object[3];
         timervals[0] = "60";
         timervals[1] = "30";
         timervals[2] = "10";
@@ -430,7 +430,7 @@ public class SessionOnlineHost implements Screen {
         settingstable.add(timerbox).width(180);
         settingstable.row();
 
-        String[] unitvals = new String[4];
+        Object[] unitvals = new Object[4];
         unitvals[0] = "1";
         unitvals[1] = "2";
         unitvals[2] = "3";
@@ -667,9 +667,12 @@ public class SessionOnlineHost implements Screen {
             SessionContext sc = new SessionContext();
             sc.delete(session);
 
+            session.cancelSessionForClients();
             session.removeRegistry();
             session = null;
         } catch (NoSuchObjectException ex) {
+            Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (RemoteException ex) {
             Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
         }
 

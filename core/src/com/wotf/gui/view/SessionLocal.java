@@ -171,7 +171,7 @@ public class SessionLocal implements Screen {
         settingstable.add(ipvallabel).width(180);
         settingstable.row();
 
-        String[] turntimevals = new String[6];
+        Object[] turntimevals = new Object[6];
         turntimevals[0] = "10";
         turntimevals[1] = "20";
         turntimevals[2] = "30";
@@ -198,7 +198,7 @@ public class SessionLocal implements Screen {
         settingstable.add(speedsvallabel).width(180);
         settingstable.row();
 
-        String[] physicsvals = new String[2];
+        Object[] physicsvals = new Object[2];
         physicsvals[0] = "True";
         physicsvals[1] = "False";
         Label physicslabel = new Label("Physics :", skin);
@@ -208,7 +208,7 @@ public class SessionLocal implements Screen {
         settingstable.add(physicsbox).width(180);
         settingstable.row();
 
-        String[] weaponsvals = new String[3];
+        Object[] weaponsvals = new Object[3];
         weaponsvals[0] = "All Weapons";
         weaponsvals[1] = "Non-Explosive";
         weaponsvals[2] = "Grenades Only";
@@ -219,7 +219,7 @@ public class SessionLocal implements Screen {
         settingstable.add(weaponsbox).width(180);
         settingstable.row();
 
-        String[] timervals = new String[3];
+        Object[] timervals = new Object[3];
         timervals[0] = "60";
         timervals[1] = "30";
         timervals[2] = "10";
