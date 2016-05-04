@@ -16,6 +16,7 @@ public class Game {
 
     private final Player host;
     private final List<Player> players;
+    private final Player playingPlayer;
     private final List<Team> teams;
     private final Map map;
 
@@ -31,10 +32,11 @@ public class Game {
      * @param map
      * @param players
      */
-    public Game(GameSettings gameSettings, Map map, List<Player> players) {
+    public Game(GameSettings gameSettings, Map map, List<Player> players, Player playingPlayer) {
         this.gameSettings = gameSettings;
         this.host = players.get(0);
         this.players = players;
+        this.playingPlayer = playingPlayer;
         this.teams = this.gameSettings.getTeams();
         this.gamePhysics = new GamePhysics();
         this.turnLogic = new TurnLogic(this.teams.size());
@@ -69,6 +71,14 @@ public class Game {
      */
     public Player getPlayer(int index) {
         return players.get(index);
+    }
+    
+    /**
+     *
+     * @return the player that is currently playing the game
+     */
+    public Player getPlayingPlayer() {
+        return playingPlayer;
     }
 
     /**

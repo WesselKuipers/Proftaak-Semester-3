@@ -6,12 +6,16 @@
 package com.wotf.game.Networking;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Net.Protocol;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.net.ServerSocket;
 import com.badlogic.gdx.net.ServerSocketHints;
 import com.badlogic.gdx.net.Socket;
+import com.badlogic.gdx.net.SocketHints;
 import com.wotf.game.GameStage;
+import com.wotf.game.classes.NetworkDistribution;
+import com.wotf.game.classes.Player;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -24,6 +28,13 @@ import java.util.ArrayList;
 import static java.util.Collections.list;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Jip Boesenkool, 25-04-'16
@@ -31,77 +42,86 @@ import java.util.List;
  */
 public class NetworkUtil {
     
-    private String hostIP;
+    private Player host;
     private final int _PORT = 9021;
     private GameStage scene;
+    private Socket socket;
     
     /**
      * Object holds data to connect to the host.
      * @param hostIP IP address of the host of the game.
      */
-    public NetworkUtil( String hostIP, GameStage gameStage ){
-        this.hostIP = hostIP;
+    public NetworkUtil( Player host, GameStage gameStage ){
+        this.host = host;
         this.scene = gameStage;
         
-        initNetworkListener( this.hostIP );
+        initNetworkListener( this.host );
     }
     
     /**
      * Add network listener to this client.
      * @param hostIP Ip Address of the host.
      */
-    private void initNetworkListener( String hostIP ){
-        // Listen for incoming socket connections
-        new Thread(new Runnable(){
-            @Override
-            public void run() {
-                ServerSocketHints serverSocketHint = new ServerSocketHints();
-                // 0 means no timeout.  Probably not the greatest idea in production!
-                serverSocketHint.acceptTimeout = 0;
-                
-                // Create the socket server using TCP protocol and listening on 9021
-                // Only one app can listen to a port at a time, keep in mind many ports are reserved
-                // especially in the lower numbers ( like 21, 80, etc )
-                ServerSocket serverSocket = Gdx.net.newServerSocket(Protocol.TCP, _PORT, serverSocketHint);
-                
-                // Loop forever
-                while(true){
-                    // Create a socket
-                    Socket socket = serverSocket.accept(null);
-                    
-                    // Read data from the socket into a BufferedReader
-                    BufferedReader buffer = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
-                    
-                    try {
-                        // Read to the next newline (\n) and display that text on labelMessage
-                        System.out.println( buffer.readLine() );
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start(); // And, start the thread running
+    private void initNetworkListener( Player host ){
+        if (scene.getGame().getPlayingPlayer().equals(host)) {
+            ServerSocketHints serverSocketHint = new ServerSocketHints();
+
+            // This prevents the host from dropping out, when in production set it to an appropiate value
+            serverSocketHint.acceptTimeout = 0;
+
+            // Create the socket server using TCP protocol and listening on 9021
+            ServerSocket serverSocket = Gdx.net.newServerSocket(Net.Protocol.TCP, _PORT, serverSocketHint);
+
+            this.socket = serverSocket.accept(null);
+        } else {
+            SocketHints socketHints = new SocketHints();
+            this.socket = Gdx.net.newClientSocket(Net.Protocol.TCP, host.getIp(), _PORT, socketHints);
+        }
     }
     
     /**
      * Send message to host.
-     * @param message Message to send.
+     * @param nMsg
      */
     public void sendToHost( NetworkMessage nMsg ){
         //TODO: send nMsg.toString() to host and make host send it to all clients.
+        new Thread(new Runnable() {
+            @Override
+            public void run () {
+                try {
+                    BufferedReader buffer = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
+                    String receivedMessage = buffer.readLine();
 
-        // debug 
-        System.out.println("Command: " + nMsg.getCommand().toString() + " was send to host.");
-        receiveMessage( nMsg.toString() );
+                    socket.getOutputStream().write(nMsg.toString().getBytes());
+                    // debug
+                    System.out.println(receivedMessage);
+                } catch (IOException e) {
+                    System.out.println("An error occured");
+                }
+
+                // debug 
+                System.out.println("Command: " + nMsg.getCommand().toString() + " was send to host.");
+            } 
+        }).start();
+        //receiveMessage( nMsg.toString() );
     } 
     
     /**
-     * Send message to host.
-     * @param message Message to send.
+     * Send message to client.
+     * @param message
+     * @param clientIP
      */
-    public void sendToClient( NetworkMessage nMsg, String clientIP ){
-        //TODO: send nMsg.toString() to specified client.        
-        
+    public void sendToClient( String message, String clientIP ){       
+        try {
+            BufferedReader buffer = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
+            String receivedMessage = buffer.readLine();
+
+            // debug
+            System.out.println(receivedMessage);
+            socket.getOutputStream().write(message.getBytes());
+        } catch (IOException e) {
+            System.out.println("An error occured");
+        }
     } 
     
     /**

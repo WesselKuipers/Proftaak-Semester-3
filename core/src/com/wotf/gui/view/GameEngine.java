@@ -52,7 +52,10 @@ public class GameEngine implements Screen {
     public void show() {
         // Creates default players list and object
         List<Player> players = new ArrayList<>();
-        players.add(new Player("127.0.0.1", "DefaultPlayer"));
+        players.add(new Player("127.0.0.1", "PlayerHost"));
+        players.add(new Player("192.168.2.22", "PlayerClient"));
+        
+        Player playingPlayer = players.get(0);
 
         map.setWaterLevel(30);
         
@@ -82,7 +85,7 @@ public class GameEngine implements Screen {
         viewport.apply();
 
         // Initializes game object using game settings
-        Game gameclass = new Game(gameSettings, map, players);
+        Game gameclass = new Game(gameSettings, map, players, playingPlayer);
 
         // Initializes the stage object and sets the viewport
         stage = new GameStage(gameclass);

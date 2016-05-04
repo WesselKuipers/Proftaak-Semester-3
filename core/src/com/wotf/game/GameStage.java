@@ -82,8 +82,7 @@ public class GameStage extends Stage {
         //Create network util object to handle networking.
         //TODO: get host ip from game settings ?
         // jip boesenkool, 25-04-'16
-        String hostIpAddress = "127.0.0.1";
-        networkingUtil = new NetworkUtil( hostIpAddress, this );
+        networkingUtil = new NetworkUtil( game.getHost(), this );
     }
 
     /**
@@ -143,6 +142,15 @@ public class GameStage extends Stage {
      */
     public Game getGame() {
         return this.game;
+    }
+    
+    /**
+     * Returns network distribution object associated with this stage
+     *
+     * @return Object of type Network Distribution
+     */
+    public NetworkUtil getNetworkingUtil() {
+        return this.networkingUtil;
     }
 
     /**
