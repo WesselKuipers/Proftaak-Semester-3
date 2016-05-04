@@ -19,6 +19,7 @@ public class TurnLogic {
     };
     
     public TurnState currentState;
+    private float totalTime;
     private float elapsedTime;
     private int turn;
     private int totalTeams;
@@ -31,6 +32,7 @@ public class TurnLogic {
      * @param totalTeams
      */
     public TurnLogic(int totalTeams) {
+        this.totalTime = 0;
         this.elapsedTime = 0;
         this.turn = 0;
         this.totalTeams = totalTeams;
@@ -43,6 +45,13 @@ public class TurnLogic {
      */
     public float getElapsedTime() {
         return Math.round(elapsedTime);
+    }
+    
+    /**
+     * @return The total amount of time the game has been active in seconds
+     */
+    public int getTotalTime() {
+        return Math.round(totalTime);
     }
     
     /**
@@ -99,6 +108,7 @@ public class TurnLogic {
      */
     public void update(float deltaTime) {
         elapsedTime = elapsedTime + deltaTime;
+        totalTime += deltaTime;
     }
     
     /**
