@@ -14,7 +14,6 @@ import com.badlogic.gdx.net.ServerSocketHints;
 import com.badlogic.gdx.net.Socket;
 import com.badlogic.gdx.net.SocketHints;
 import com.wotf.game.GameStage;
-import com.wotf.game.classes.NetworkDistribution;
 import com.wotf.game.classes.Player;
 import java.io.BufferedReader;
 import java.io.IOException;
