@@ -188,7 +188,7 @@ public class Game {
         }
         
         // If max time has exceeded end the game
-        if (turnLogic.getMaxElapsedTime() >= gameSettings.getMaxTime()) {
+        if (turnLogic.getTotalTime() >= gameSettings.getMaxTime()) {
             endTurn();
             turnLogic.setState(TurnState.GAMEOVER);
         }

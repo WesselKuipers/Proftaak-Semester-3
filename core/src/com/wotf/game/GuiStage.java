@@ -202,11 +202,13 @@ public final class GuiStage extends Stage {
      * Sets the remaining time of this turn and the total time on the GUI
      */
     public void updateTime() {
+        int totalTime = (int) game.getTurnLogic().getTotalTime();
         int elapsedTime = (int) game.getTurnLogic().getElapsedTime();
+        
         Integer turnTime = game.getGameSettings().getTurnTime() - elapsedTime;
         turnTimeLabel.setText(String.format("%02d", turnTime));
         
-        totalTimeLabel.setText(String.format("%02d:%02d", elapsedTime / 60, elapsedTime % 60));
+        totalTimeLabel.setText(String.format("%02d:%02d", totalTime / 60, totalTime % 60));
     }
     
     /**
