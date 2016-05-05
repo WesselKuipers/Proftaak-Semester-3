@@ -7,8 +7,6 @@ package com.wotf.game.Networking;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
-import com.badlogic.gdx.Net.Protocol;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.net.ServerSocket;
 import com.badlogic.gdx.net.ServerSocketHints;
 import com.badlogic.gdx.net.Socket;
@@ -27,11 +25,6 @@ import java.util.ArrayList;
 import static java.util.Collections.list;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -61,7 +54,7 @@ public class NetworkUtil {
      * Add network listener to this client.
      * @param hostIP Ip Address of the host.
      */
-    private void initNetworkListener( Player host ){
+    private void initNetworkListener( Player host ) {
         if (scene.getGame().getPlayingPlayer().equals(host)) {
             ServerSocketHints serverSocketHint = new ServerSocketHints();
 
@@ -71,11 +64,49 @@ public class NetworkUtil {
             // Create the socket server using TCP protocol and listening on 9021
             ServerSocket serverSocket = Gdx.net.newServerSocket(Net.Protocol.TCP, _PORT, serverSocketHint);
 
+            // Accept any incoming connections
             this.socket = serverSocket.accept(null);
+            
+            messageListener(true);
         } else {
             SocketHints socketHints = new SocketHints();
             this.socket = Gdx.net.newClientSocket(Net.Protocol.TCP, host.getIp(), _PORT, socketHints);
+            messageListener(false);
         }
+    }
+    
+    /**
+     * Used to check if host is receiving messages from any client
+     */
+    private void messageListener(Boolean isHost) {
+        new Thread(new Runnable() {
+            private String message;
+            @Override
+            public void run () {
+                // Keep checking if client receives messages
+                while(true) {
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    try {
+                        // Check if message is valid, and if it's and actual message received from the host
+                        while ((message = bufferedReader.readLine()) != null) {    
+                            receiveMessage(message);
+                            
+                            // If this is the host send the incoming message to other clients
+                            if (isHost) {
+                                for (Player player : scene.getGame().getPlayers()) {
+                                    // Dont send the message to host else it will do the action twice!
+                                    if (!player.equals(host)) {
+                                        sendToClient(message, player.getIp());
+                                    }
+                                }
+                            }
+                        }
+                    } catch (IOException ex) {
+                        System.out.println(ex);
+                    }
+                }
+            } 
+        }).start();
     }
     
     /**
@@ -83,26 +114,19 @@ public class NetworkUtil {
      * @param nMsg
      */
     public void sendToHost( NetworkMessage nMsg ){
-        //TODO: send nMsg.toString() to host and make host send it to all clients.
-        new Thread(new Runnable() {
-            @Override
-            public void run () {
-                try {
-                    BufferedReader buffer = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
-                    String receivedMessage = buffer.readLine();
-
-                    socket.getOutputStream().write(nMsg.toString().getBytes());
-                    // debug
-                    System.out.println(receivedMessage);
-                } catch (IOException e) {
-                    System.out.println("An error occured");
-                }
-
-                // debug 
-                System.out.println("Command: " + nMsg.getCommand().toString() + " was send to host.");
-            } 
-        }).start();
-        //receiveMessage( nMsg.toString() );
+        try {
+            socket.getOutputStream().write((nMsg.toString() + "\n").getBytes());
+            
+            // If its the host that is sending the message, you have to run the action for the host too
+            if (scene.getGame().getPlayingPlayer().equals(host)) {
+                receiveMessage(nMsg.toString());
+            }
+            
+            // debug 
+            System.out.println("Command: " + nMsg.getCommand().toString() + " was send to host.");
+        } catch (IOException ex) {
+            Logger.getLogger(NetworkUtil.class.getName()).log(Level.SEVERE, null, ex);
+        }
     } 
     
     /**
@@ -112,12 +136,7 @@ public class NetworkUtil {
      */
     public void sendToClient( String message, String clientIP ){       
         try {
-            BufferedReader buffer = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
-            String receivedMessage = buffer.readLine();
-
-            // debug
-            System.out.println(receivedMessage);
-            socket.getOutputStream().write(message.getBytes());
+            socket.getOutputStream().write((message + "\n").getBytes());
         } catch (IOException e) {
             System.out.println("An error occured");
         }

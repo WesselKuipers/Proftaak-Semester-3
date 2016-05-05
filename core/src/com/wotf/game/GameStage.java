@@ -260,8 +260,6 @@ public class GameStage extends Stage {
             } else if (button == Input.Buttons.RIGHT) {
                 explode((int) rel.x, (int) rel.y, 30, 0);
             }
-
-            game.endTurn();
         }
         return true;
     }
@@ -435,6 +433,9 @@ public class GameStage extends Stage {
         
         // make camera follow bullet
         focusedActor = (Actor)( game.getActiveTeam().getActiveUnit().getWeapon().getBullet() );
+        
+        // End the turn after unit has fired
+        game.endTurn();
     }
 
     /**
