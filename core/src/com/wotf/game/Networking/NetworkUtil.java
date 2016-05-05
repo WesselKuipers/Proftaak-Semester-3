@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import static java.util.Collections.list;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Jip Boesenkool, 25-04-'16
@@ -128,7 +126,7 @@ public class NetworkUtil {
             // debug 
             System.out.println("Command: " + nMsg.getCommand().toString() + " was send to host.");
         } catch (IOException ex) {
-            Logger.getLogger(NetworkUtil.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("An error occured");
         }
     } 
     
@@ -251,7 +249,7 @@ public class NetworkUtil {
         }
     }
     
-    public void initGame ( NetworkMessage nMsg ) {
+    public void initGame( NetworkMessage nMsg ) {
         try {
             scene.spawnUnits(spawnLocations);
             scene.getGame().beginTurn();
@@ -269,18 +267,17 @@ public class NetworkUtil {
             float windX = Float.parseFloat( windXStr );
             float windY = Float.parseFloat( windYStr );
             
-            Vector2 windForce = new Vector2(windX , windY );
-            
-            scene.getGame().beginTurn();
-            
-            scene.getGame().getMap().setWind(windForce);
+            Vector2 windForce = new Vector2( windX, windY );
+            if (!scene.getGame().getPlayingPlayer().equals(host)) {
+                scene.getGame().getMap().setWind(windForce);
+            }
         }
         catch( InvalidParameterException ipe ) {
             //TODO: what do we do when message went wrong ? ask host aggain ?
         }
     }
 
-    public void addSpawnLocation(NetworkMessage nMsg) {
+    public void addSpawnLocation( NetworkMessage nMsg ) {
         try {
             String locXStr = nMsg.getParameter("locX");
             String locYStr = nMsg.getParameter("locY");
@@ -291,11 +288,22 @@ public class NetworkUtil {
             Vector2 spawnLocation = new Vector2( locX, locY );
             
             spawnLocations.add(spawnLocation);
-            
         }
         catch( InvalidParameterException ipe ) {
             //TODO: what do we do when message went wrong ? ask host aggain ?
         }
+    }
+    
+    public void move( NetworkMessage nMsg ) {
+        try {
+            String direction = nMsg.getParameter("direction");
+            
+            //scene.getGame().getActiveTeam().getActiveUnit()
+        }
+        catch( InvalidParameterException ipe ) {
+            //TODO: what do we do when message went wrong ? ask host aggain ?
+        }
+        
     }
     
 }

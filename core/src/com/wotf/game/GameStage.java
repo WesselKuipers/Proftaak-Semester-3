@@ -85,31 +85,17 @@ public class GameStage extends Stage {
         if (game.getPlayingPlayer().equals(game.getHost())) {
             // Send each random spawn location seperately
             List<Vector2> randomSpawnLocations = getRandomSpawnLocations();
-            
-            System.out.println(randomSpawnLocations);
-            if (randomSpawnLocations.size() > 1) {
-                
-            
-                for(Vector2 spawnLocation : randomSpawnLocations) {
-                    NetworkMessage spawnLocMsg = new NetworkMessage( Command.SPAWNLOCATION );
-                    spawnLocMsg.addParameter("locX", Float.toString(spawnLocation.x));
-                    spawnLocMsg.addParameter("locY", Float.toString(spawnLocation.y));
-                    networkingUtil.sendToHost( spawnLocMsg );
-                }
-            
-            } 
-            
+
+            for(Vector2 spawnLocation : randomSpawnLocations) {
+                NetworkMessage spawnLocMsg = new NetworkMessage( Command.SPAWNLOCATION );
+                spawnLocMsg.addParameter("locX", Float.toString(spawnLocation.x));
+                spawnLocMsg.addParameter("locY", Float.toString(spawnLocation.y));
+                networkingUtil.sendToHost( spawnLocMsg );
+            }
+
             NetworkMessage initGameMsg = new NetworkMessage( Command.INITGAME );
-            
+
             networkingUtil.sendToHost( initGameMsg );
-            
-           /* NetworkMessage beginTurnMsg = new NetworkMessage( Command.BEGINTURN );
-            
-            //beginTurnMsg.addParameter("windX", );
-            //beginTurnMsg.addParameter("windY", );
-            
-            //send message to host
-            networkingUtil.sendToHost( beginTurnMsg );*/
         }
     }
 
@@ -122,7 +108,6 @@ public class GameStage extends Stage {
      * @param spawnLocations
      */
     public void spawnUnits(List<Vector2> spawnLocations) {       
-
         int i = 0;
         // Adds every unit as an actor to this stage
         for (Team team : game.getTeams()) {
@@ -363,7 +348,7 @@ public class GameStage extends Stage {
             font.draw(guiBatch, "GAME OVER", this.getWidth() / 2, this.getHeight() / 2);
         }
         
-        font.draw(guiBatch, "Wind: " + game.getMap().getWind().toString(), 0, this.getHeight() - 140);
+        //font.draw(guiBatch, "Wind: " + game.getMap().getWind().toString(), 0, this.getHeight() - 140);
         
         guiBatch.end();
     }

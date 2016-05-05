@@ -1,6 +1,9 @@
 package com.wotf.game.classes;
 
+import com.badlogic.gdx.math.Vector2;
 import com.wotf.game.GameStage;
+import com.wotf.game.Networking.Command;
+import com.wotf.game.Networking.NetworkMessage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 import com.wotf.game.classes.Items.Item;
 import com.wotf.game.classes.TurnLogic.TurnState;
@@ -129,9 +132,22 @@ public class Game {
      * Set keyboard & camera focus to active unit
      */
     public void beginTurn() {
-        map.calculateWind();
-        
         Team activeTeam = getActiveTeam();
+        
+        if (playingPlayer.equals(host)) {
+            map.calculateWind();
+        
+            NetworkMessage beginTurnMsg = new NetworkMessage( Command.BEGINTURN );
+
+            Vector2 windForce = map.getWind();
+            beginTurnMsg.addParameter("windX", Float.toString(windForce.x));
+            beginTurnMsg.addParameter("windY", Float.toString(windForce.y));
+
+            //send message to host        
+            GameStage gameStage = (GameStage) teams.get(0).getUnit(0).getStage();
+            gameStage.getNetworkingUtil().sendToHost( beginTurnMsg );
+        }
+        
         turnLogic.beginTurn();
         activeTeam.beginTurn();
         setActiveUnit(activeTeam);
