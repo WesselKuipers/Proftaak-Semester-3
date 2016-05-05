@@ -14,7 +14,11 @@ public enum Command {
     
     //actual enum commands
     FIRE, 
-    MOVE;
+    MOVE,
+    BEGINTURN,
+    ENDTURN,
+    INITGAME,
+    SPAWNLOCATION;
     
     /**
      * Helper method which converts a string into command enum.

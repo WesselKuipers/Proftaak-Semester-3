@@ -29,6 +29,8 @@ import com.wotf.game.classes.TurnLogic.TurnState;
 import com.wotf.game.classes.Unit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Extension of Stage that contains a game session
@@ -73,16 +75,42 @@ public class GameStage extends Stage {
      * actors Spawns the units at random collision-free locations
      */
     public void init() {
-        // spawning users and adding them as actors
-        spawnUnits();
-
         getCamera().update();
-        game.beginTurn();
         
         //Create network util object to handle networking.
         //TODO: get host ip from game settings ?
         // jip boesenkool, 25-04-'16
         networkingUtil = new NetworkUtil( game.getHost(), this );
+        
+        if (game.getPlayingPlayer().equals(game.getHost())) {
+            // Send each random spawn location seperately
+            List<Vector2> randomSpawnLocations = getRandomSpawnLocations();
+            
+            System.out.println(randomSpawnLocations);
+            if (randomSpawnLocations.size() > 1) {
+                
+            
+                for(Vector2 spawnLocation : randomSpawnLocations) {
+                    NetworkMessage spawnLocMsg = new NetworkMessage( Command.SPAWNLOCATION );
+                    spawnLocMsg.addParameter("locX", Float.toString(spawnLocation.x));
+                    spawnLocMsg.addParameter("locY", Float.toString(spawnLocation.y));
+                    networkingUtil.sendToHost( spawnLocMsg );
+                }
+            
+            } 
+            
+            NetworkMessage initGameMsg = new NetworkMessage( Command.INITGAME );
+            
+            networkingUtil.sendToHost( initGameMsg );
+            
+           /* NetworkMessage beginTurnMsg = new NetworkMessage( Command.BEGINTURN );
+            
+            //beginTurnMsg.addParameter("windX", );
+            //beginTurnMsg.addParameter("windY", );
+            
+            //send message to host
+            networkingUtil.sendToHost( beginTurnMsg );*/
+        }
     }
 
     /**
@@ -91,11 +119,33 @@ public class GameStage extends Stage {
      * Spawn location is determined by the highest available pixel above
      * a solid pixel at a randomly generated X-coordinate.
      * 
+     * @param spawnLocations
      */
-    public void spawnUnits() {
-        boolean[][] terrain = game.getMap().getTerrain();        
+    public void spawnUnits(List<Vector2> spawnLocations) {       
 
+        int i = 0;
         // Adds every unit as an actor to this stage
+        for (Team team : game.getTeams()) {
+            for (Unit unit : team.getUnits()) {
+
+                // spawn a unit
+                unit.spawn(spawnLocations.get(i));
+
+                // formally adds the unit as an actor to the stage
+                this.addActor(unit);
+                i++;
+            }
+        }
+    }
+    
+    /**
+     * 
+     * @return a list with random spawn locations 
+     */
+    public List<Vector2> getRandomSpawnLocations() {
+        boolean[][] terrain = game.getMap().getTerrain(); 
+        List<Vector2> spawnLocations = new ArrayList<>();
+
         for (Team team : game.getTeams()) {
             for (Unit unit : team.getUnits()) {
                 // Generates a random X position and attempts to find the highest collision-free position
@@ -122,18 +172,15 @@ public class GameStage extends Stage {
                     // if a position has been found, we can exit the loop
                     if (posY != -1) {
                         spawned = true;
+                        spawnLocations.add(new Vector2(posX, posY + 1));
                         break;
                     }
                 }
-
-                // since [posX][posY] is solid, we want to spawn the unit one pixel higher
-                unit.spawn(new Vector2(posX, posY + 1));
-
-                // formally adds the unit as an actor to the stage
-                this.addActor(unit);
             }
         }
-    }
+        
+        return spawnLocations;
+    }  
 
     /**
      * Returns game object associated with this stage

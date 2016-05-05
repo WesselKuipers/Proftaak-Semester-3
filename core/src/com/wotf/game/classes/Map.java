@@ -305,6 +305,15 @@ public class Map {
     }
     
     /**
+     * Function that sets the current wind force.
+     *
+     * @param windForce
+     */
+    public void setWind(Vector2 windForce) {
+        this.windForce = windForce;
+    }
+    
+    /**
      * Checks if a pixel at a given coordinate is set to solid or not
      *
      * @param x X-coordinate in world map

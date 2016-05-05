@@ -7,6 +7,7 @@ package com.wotf.game.Networking;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.net.ServerSocket;
 import com.badlogic.gdx.net.ServerSocketHints;
 import com.badlogic.gdx.net.Socket;
@@ -38,6 +39,7 @@ public class NetworkUtil {
     private final int _PORT = 9021;
     private GameStage scene;
     private Socket socket;
+    private List<Vector2> spawnLocations = new ArrayList<>();
     
     /**
      * Object holds data to connect to the host.
@@ -103,6 +105,7 @@ public class NetworkUtil {
                         }
                     } catch (IOException ex) {
                         System.out.println(ex);
+                        break;
                     }
                 }
             } 
@@ -113,7 +116,7 @@ public class NetworkUtil {
      * Send message to host.
      * @param nMsg
      */
-    public void sendToHost( NetworkMessage nMsg ){
+    public void sendToHost( NetworkMessage nMsg ) {
         try {
             socket.getOutputStream().write((nMsg.toString() + "\n").getBytes());
             
@@ -134,7 +137,7 @@ public class NetworkUtil {
      * @param message
      * @param clientIP
      */
-    public void sendToClient( String message, String clientIP ){       
+    public void sendToClient( String message, String clientIP ) {       
         try {
             socket.getOutputStream().write((message + "\n").getBytes());
         } catch (IOException e) {
@@ -148,7 +151,7 @@ public class NetworkUtil {
      * For example if you send unit movement before the impact of the bullet on the client the unit might not get hit!
      * @param message Message to send.
      */
-    public void receiveMessage( String message ){
+    public void receiveMessage( String message ) {
         //debug
         System.out.println("Received message: " + message);
         
@@ -157,7 +160,7 @@ public class NetworkUtil {
         //split message up into networkMessages by splitting by end of line (;).        
         String[] splitMessages = message.split(";");
         
-        for( String msg : splitMessages ){
+        for( String msg : splitMessages ) {
             NetworkMessage nMsg = new NetworkMessage( msg );
             
             //debug
@@ -170,7 +173,7 @@ public class NetworkUtil {
     /**
      * handle the logic behind the messages.
      */
-    public void commandLogic( NetworkMessage nMsg ){
+    public void commandLogic( NetworkMessage nMsg ) {
         // TODO: handle message logic
         // the action can be checked based on the enum Command which can be retreived by nMsg.getCommand()
         // to retreive a parameter do nMsg.getParameter( parameterName).
@@ -182,6 +185,15 @@ public class NetworkUtil {
                 break;
             case MOVE:
                 break;
+            case BEGINTURN:
+                beginTurn( nMsg );
+            case ENDTURN:
+                break;
+            case INITGAME:
+                initGame( nMsg );
+            case SPAWNLOCATION:
+                addSpawnLocation ( nMsg );
+                break;
             default: 
                 System.out.println("Command was not processed");
                 break;
@@ -191,7 +203,7 @@ public class NetworkUtil {
     /**
      * function to get the networking interfaces of the client that calls this function.
      */
-    public static void clientIPInfo(){
+    public static void clientIPInfo() {
         // The following code loops through the available network interfaces
         // Keep in mind, there can be multiple interfaces per device, for example
         // one per NIC, one per active wireless and the loopback
@@ -224,8 +236,8 @@ public class NetworkUtil {
      * Fire function which retreives the mousePos parameter from the network message and call in scene fire function.
      * @param nMsg Network message which holds the data for the fire method.
      */
-    public void fire( NetworkMessage nMsg ){
-        try{
+    public void fire( NetworkMessage nMsg ) {
+        try {
             String mousePosXStr = nMsg.getParameter("mousePosX");
             String mousePosYStr = nMsg.getParameter("mousePosY");
             
@@ -234,7 +246,54 @@ public class NetworkUtil {
             
             scene.fire( mousePosX, mousePosY );
         }
-        catch( InvalidParameterException ipe ){
+        catch( InvalidParameterException ipe ) {
+            //TODO: what do we do when message went wrong ? ask host aggain ?
+        }
+    }
+    
+    public void initGame ( NetworkMessage nMsg ) {
+        try {
+            scene.spawnUnits(spawnLocations);
+            scene.getGame().beginTurn();
+        }
+        catch( InvalidParameterException ipe ) {
+            //TODO: what do we do when message went wrong ? ask host aggain ?
+        }
+    }
+    
+    public void beginTurn( NetworkMessage nMsg ) {
+        try {
+            String windXStr = nMsg.getParameter("windX");
+            String windYStr = nMsg.getParameter("windY");
+            
+            float windX = Float.parseFloat( windXStr );
+            float windY = Float.parseFloat( windYStr );
+            
+            Vector2 windForce = new Vector2(windX , windY );
+            
+            scene.getGame().beginTurn();
+            
+            scene.getGame().getMap().setWind(windForce);
+        }
+        catch( InvalidParameterException ipe ) {
+            //TODO: what do we do when message went wrong ? ask host aggain ?
+        }
+    }
+
+    public void addSpawnLocation(NetworkMessage nMsg) {
+        try {
+            String locXStr = nMsg.getParameter("locX");
+            String locYStr = nMsg.getParameter("locY");
+            
+            float locX = Float.parseFloat( locXStr );
+            float locY = Float.parseFloat( locYStr );
+            
+            Vector2 spawnLocation = new Vector2( locX, locY );
+            
+            spawnLocations.add(spawnLocation);
+            
+        }
+        catch( InvalidParameterException ipe ) {
             //TODO: what do we do when message went wrong ? ask host aggain ?
         }
     }
