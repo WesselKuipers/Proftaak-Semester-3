@@ -41,6 +41,7 @@ com.badlogic.gdx.scenes.scene2d.ui.ProgressBar$ProgressBarStyle: {
 },
 com.badlogic.gdx.scenes.scene2d.ui.Slider$SliderStyle: {
 	default-horizontal: { background: default-slider, knob: default-slider-knob },
+	default-horizontal-no-knob: { background: default-slider },
 	default-vertical: { background: default-slider, knob: default-round-large }
 },
 com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {

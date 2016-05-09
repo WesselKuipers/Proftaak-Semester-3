@@ -75,7 +75,7 @@ public class Game {
     public Player getPlayer(int index) {
         return players.get(index);
     }
-    
+
     /**
      *
      * @return the player that is currently playing the game
@@ -135,7 +135,7 @@ public class Game {
         Team activeTeam = getActiveTeam();
         
         if (playingPlayer.equals(host)) {
-            map.calculateWind();
+        map.calculateWind();
         
             NetworkMessage beginTurnMsg = new NetworkMessage( Command.BEGINTURN );
 
@@ -207,10 +207,16 @@ public class Game {
         }
         
         // When the player has passed 
-        if(turnLogic.getState() == TurnState.WITHDRAW) {
+        if (turnLogic.getState() == TurnState.WITHDRAW) {
             if(turnLogic.getElapsedTime() >= gameSettings.getWithdrawTime()) {
                 beginTurn();
             }
+        }
+        
+        // If max time has exceeded end the game
+        if (turnLogic.getTotalTime() >= gameSettings.getMaxTime()) {
+            endTurn();
+            turnLogic.setState(TurnState.GAMEOVER);
         }
     }
 

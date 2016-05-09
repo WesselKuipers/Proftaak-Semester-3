@@ -6,8 +6,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -284,7 +282,6 @@ public class Map {
 
     /**
      * Function that calculates a random wind, should be called every turn.
-     * TODO: Test!
      */
     public void calculateWind() {
         Random random = new Random();

@@ -239,8 +239,8 @@ public class NetworkUtil {
             String mousePosXStr = nMsg.getParameter("mousePosX");
             String mousePosYStr = nMsg.getParameter("mousePosY");
             
-            int mousePosX = Integer.parseInt( mousePosXStr );
-            int mousePosY = Integer.parseInt( mousePosYStr );
+            float mousePosX = Float.parseFloat(mousePosXStr );
+            float mousePosY = Float.parseFloat( mousePosYStr );
             
             scene.fire( mousePosX, mousePosY );
         }

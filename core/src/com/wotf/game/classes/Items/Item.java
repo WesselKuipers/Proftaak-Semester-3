@@ -5,11 +5,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.wotf.game.GameStage;
 import com.wotf.game.classes.Projectile;
+import java.io.Serializable;
 
 /**
  * Abstract class that describes all necessary fields for an Item
  */
-public abstract class Item extends Actor {
+public abstract class Item extends Actor implements Serializable{
 
     /*
     NOTES: create weapons and items accordingly

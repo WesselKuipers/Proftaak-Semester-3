@@ -19,6 +19,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.wotf.game.WotFGame;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Screen that shows the main menu
@@ -99,8 +102,7 @@ public class MainMenu implements Screen {
         online.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                    //game.setScreen(new LobbyGUI(game));
-                    game.setScreen(new Username(game));
+                game.setScreen(new Username(game));
             }
         });
         stage.addActor(online);
