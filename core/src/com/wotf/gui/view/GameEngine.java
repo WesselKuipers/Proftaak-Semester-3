@@ -1,11 +1,18 @@
 package com.wotf.gui.view;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.wotf.game.GameStage;
+import com.wotf.game.GuiStage;
 import com.wotf.game.classes.Game;
 import com.wotf.game.classes.GameSettings;
 import com.wotf.game.classes.Map;
@@ -22,6 +29,8 @@ public class GameEngine implements Screen {
 
     private final WotFGame game;
     private GameStage stage;
+    private GuiStage stageGUI;
+    private Skin skin;
     private List<Team> teams;
     private GameSettings gameSettings;
     private Map map;
@@ -43,6 +52,7 @@ public class GameEngine implements Screen {
         this.game = game;
         this.gameSettings = gameSettings;
         this.map = map;
+        this.skin = new Skin(Gdx.files.internal("uiskin.json"));
     }
 
     /**
@@ -84,12 +94,17 @@ public class GameEngine implements Screen {
         // Initializes game object using game settings
         Game gameclass = new Game(gameSettings, map, players);
 
+        stageGUI = new GuiStage(gameclass);
+        
         // Initializes the stage object and sets the viewport
-        stage = new GameStage(gameclass);
+        stage = new GameStage(gameclass, stageGUI);
         stage.init();
         stage.setViewport(viewport);
-
-        Gdx.input.setInputProcessor(stage);
+        
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(stageGUI);
+        multiplexer.addProcessor(stage);
+        Gdx.input.setInputProcessor(multiplexer);
     }
 
     /**
@@ -102,6 +117,9 @@ public class GameEngine implements Screen {
 
         stage.act();
         stage.draw();
+
+        stageGUI.act();
+        stageGUI.draw();
     }
 
     /**
