@@ -47,6 +47,7 @@ public class GameEngine implements Screen {
     * Constructor of GameEngine
     * @param game Game that will be launched
     * @param gameSettings Settings associated with this game
+     * @param map
     */
     public GameEngine(WotFGame game, GameSettings gameSettings, Map map) {
         this.game = game;
@@ -62,8 +63,9 @@ public class GameEngine implements Screen {
     public void show() {
         // Creates default players list and object
         List<Player> players = new ArrayList<>();
+        //players.add(new Player("145.93.92.128", "PlayerHost"));
         players.add(new Player("127.0.0.1", "PlayerHost"));
-        players.add(new Player("192.168.2.22", "PlayerClient"));
+        players.add(new Player("127.0.0.1", "PlayerClient"));
         
         Player playingPlayer = players.get(0);
 

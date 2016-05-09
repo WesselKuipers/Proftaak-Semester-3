@@ -129,13 +129,11 @@ public class Game {
     }
 
     /**
-     * Set keyboard & camera focus to active unit
+     * Function to send the current beginTurn
      */
     public void beginTurn() {
-        Team activeTeam = getActiveTeam();
-        
         if (playingPlayer.equals(host)) {
-        map.calculateWind();
+            map.calculateWind();
         
             NetworkMessage beginTurnMsg = new NetworkMessage( Command.BEGINTURN );
 
@@ -143,11 +141,22 @@ public class Game {
             beginTurnMsg.addParameter("windX", Float.toString(windForce.x));
             beginTurnMsg.addParameter("windY", Float.toString(windForce.y));
 
-            //send message to host        
+            // send message to host        
             GameStage gameStage = (GameStage) teams.get(0).getUnit(0).getStage();
             gameStage.getNetworkingUtil().sendToHost( beginTurnMsg );
+            
+            beginTurnReceive(windForce);
         }
-        
+    }
+    
+    /**
+     * Function for network to receive a begin turn by the clients
+     * This will set the wind, set the next active unit
+     * @param windForce 
+     */
+    public void beginTurnReceive(Vector2 windForce) {
+        Team activeTeam = getActiveTeam();
+        map.setWind(windForce);
         turnLogic.beginTurn();
         activeTeam.beginTurn();
         setActiveUnit(activeTeam);

@@ -79,32 +79,29 @@ public class NetworkUtil {
      * Used to check if host is receiving messages from any client
      */
     private void messageListener(Boolean isHost) {
-        new Thread(new Runnable() {
-            private String message;
-            @Override
-            public void run () {
-                // Keep checking if client receives messages
-                while(true) {
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    try {
-                        // Check if message is valid, and if it's and actual message received from the host
-                        while ((message = bufferedReader.readLine()) != null) {    
-                            receiveMessage(message);
-                            
-                            // If this is the host send the incoming message to other clients
-                            if (isHost) {
-                                for (Player player : scene.getGame().getPlayers()) {
-                                    // Dont send the message to host else it will do the action twice!
-                                    if (!player.equals(host)) {
-                                        sendToClient(message, player.getIp());
-                                    }
+        new Thread(() -> {
+            String message;
+            // Keep checking if client receives messages
+            while(true) {
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                try {
+                    // Check if message is valid, and if it's and actual message received from the host
+                    while ((message = bufferedReader.readLine()) != null) {
+                        receiveMessage(message);
+                        
+                        // If this is the host send the incoming message to other clients
+                        if (isHost) {
+                            for (Player player : scene.getGame().getPlayers()) {
+                                // Dont send the message to host else it will do the action twice!
+                                if (!player.equals(host)) {
+                                    sendToClient(message, player.getIp());
                                 }
                             }
                         }
-                    } catch (IOException ex) {
-                        System.out.println(ex);
-                        break;
                     }
+                } catch (IOException ex) {
+                    System.out.println(ex);
+                    break;
                 }
             } 
         }).start();
@@ -206,13 +203,13 @@ public class NetworkUtil {
         // Keep in mind, there can be multiple interfaces per device, for example
         // one per NIC, one per active wireless and the loopback
         // In this case we only care about IPv4 address ( x.x.x.x format )
-        List<String> addresses = new ArrayList<String>();
+        List<String> addresses = new ArrayList<>();
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-            for(NetworkInterface ni : list(interfaces)){
-                for(InetAddress address : list(ni.getInetAddresses()))
+            for (NetworkInterface ni : list(interfaces)){
+                for (InetAddress address : list(ni.getInetAddresses()))
                 {
-                    if(address instanceof Inet4Address){
+                    if (address instanceof Inet4Address){
                         addresses.add(address.getHostAddress());
                     }
                 }
@@ -222,7 +219,7 @@ public class NetworkUtil {
         }
         
         // Print the contents of our array to a string.  Yeah, should have used StringBuilder
-        String ipAddress = new String("");
+        String ipAddress = "";
         for(String str:addresses)
         {
             ipAddress = ipAddress + str + "\n";
@@ -231,7 +228,7 @@ public class NetworkUtil {
     }
     
     /**
-     * Fire function which retreives the mousePos parameter from the network message and call in scene fire function.
+     * Fire function which retrieves the mousePos parameter from the network message and call in scene fire function.
      * @param nMsg Network message which holds the data for the fire method.
      */
     public void fire( NetworkMessage nMsg ) {
@@ -269,7 +266,7 @@ public class NetworkUtil {
             
             Vector2 windForce = new Vector2( windX, windY );
             if (!scene.getGame().getPlayingPlayer().equals(host)) {
-                scene.getGame().getMap().setWind(windForce);
+                scene.getGame().beginTurnReceive(windForce);
             }
         }
         catch( InvalidParameterException ipe ) {
@@ -298,7 +295,7 @@ public class NetworkUtil {
         try {
             String direction = nMsg.getParameter("direction");
             
-            //scene.getGame().getActiveTeam().getActiveUnit()
+            //scene.getGame().getActiveTeam().getActiveUnit().jump()
         }
         catch( InvalidParameterException ipe ) {
             //TODO: what do we do when message went wrong ? ask host aggain ?

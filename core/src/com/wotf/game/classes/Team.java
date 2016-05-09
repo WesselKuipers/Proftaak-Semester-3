@@ -28,8 +28,7 @@ public class Team implements Serializable{
     // This is used for RMI because the Color of GDX can't be serialized. But we need them both
     private String colorname;
     private transient Color color;
-    private final List<Player> players;
-    private Player onlineplayer;
+    private Player player;
     private transient final List<Unit> units;
     private transient final Map<Item, Integer> items; // The integer represents the ammo remaining
     private int activeUnitIndex;
@@ -52,7 +51,6 @@ public class Team implements Serializable{
         this.color = color;
 
         //Instantiating list of items
-        players = new ArrayList<>();
         units = new ArrayList<>();
     }
 
@@ -66,42 +64,15 @@ public class Team implements Serializable{
         this.color = color;
 
         //Instantiating list of items
-        players = new ArrayList<>();
         units = new ArrayList<>();
     }
-
-    /**
-     * @return all the players of the team
-     */
-    /*public List<Player> getPlayers() {
-        return Collections.unmodifiableList(players);
-    }*/
-
-    /**
-     * Adds a player to the team
-     *
-     * @param p player
-     */
-    /*public void addPlayer(Player p) {
-        players.add(p);
-    }*/
-
-    /**
-     * TODO: Logic for kicking player out Removes a player from the team
-     *
-     * @param p player
-     */
-    public void removePlayer(Player p) {
-        players.remove(p);
-        // TODO: Logic for kicking player out
-    }
-
-    public void setOnlineplayer(Player p){
-        this.onlineplayer = p;
+    
+    public void setPlayer(Player player){
+        this.player = player;
     }
     
-    public Player getOnlineplayer(){
-        return onlineplayer;
+    public Player getPlayer(){
+        return player;
     }
     
     public void setColorname(String colorname){

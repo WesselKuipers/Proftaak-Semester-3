@@ -38,6 +38,8 @@ public class Map {
         // Generates and initializes background and foreground textures
         generateBackgroundTexture();
         initializeTerrainTexture(filename);
+        
+        windForce = new Vector2(0,0);
     }
 
     /**

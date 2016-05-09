@@ -96,10 +96,9 @@ public class GameStage extends Stage {
     public void init() {
         getCamera().update();
         
-        //Create network util object to handle networking.
-        //TODO: get host ip from game settings ?
-        // jip boesenkool, 25-04-'16
         networkingUtil = new NetworkUtil( game.getHost(), this );
+        
+        
         
         if (game.getPlayingPlayer().equals(game.getHost())) {
             // Send each random spawn location seperately
@@ -115,8 +114,9 @@ public class GameStage extends Stage {
             NetworkMessage initGameMsg = new NetworkMessage( Command.INITGAME );
 
             networkingUtil.sendToHost( initGameMsg );
-            guiStage.updateWind();
         }
+        
+        guiStage.updateWind();
     }
 
     /**
@@ -301,21 +301,27 @@ public class GameStage extends Stage {
      */
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        //TODO: check if client ip is allowed to fire.
         Vector3 rel = getCamera().unproject(new Vector3(screenX, screenY, 0));
 
-        if (game.getTurnLogic().getState() == TurnState.PLAYING) {
-            if (button == Input.Buttons.LEFT) {
-                //create fire message to send to host
-                NetworkMessage fireMsg = new NetworkMessage( Command.FIRE );
-                fireMsg.addParameter( "mousePosX", Float.toString(  rel.x ));
-                fireMsg.addParameter( "mousePosY", Float.toString(  rel.y ));
-                
-                //send message to host
-                networkingUtil.sendToHost( fireMsg );
-                
-            } else if (button == Input.Buttons.RIGHT) {
-                explode((int) rel.x, (int) rel.y, 30, 0);
+        
+        // Check if the playing player is allowed to do actions
+        if (game.getPlayingPlayer().equals(game.getActiveTeam().getPlayer())) {
+            // TODO: Input listener for Unit Movement within this if statement
+            
+            // Check if 
+            if (game.getTurnLogic().getState() == TurnState.PLAYING) {
+                if (button == Input.Buttons.LEFT) {
+                    //create fire message to send to host
+                    NetworkMessage fireMsg = new NetworkMessage( Command.FIRE );
+                    fireMsg.addParameter( "mousePosX", Float.toString(  rel.x ));
+                    fireMsg.addParameter( "mousePosY", Float.toString(  rel.y ));
+
+                    //send message to host
+                    networkingUtil.sendToHost( fireMsg );
+
+                } else if (button == Input.Buttons.RIGHT) {
+                    explode((int) rel.x, (int) rel.y, 30, 0);
+                }
             }
         }
         return true;

@@ -178,8 +178,8 @@ public class SessionOnlineHost implements Screen {
 
                         ArrayList<Team> teamlistcopy = new ArrayList<>(teamList);
                         for (Team fteam : teamlistcopy) {
-                            if (fteam.getOnlineplayer().getName().equals(selectedplayer.getName())) {
-                                fteam.setOnlineplayer(null);
+                            if (fteam.getPlayer().getName().equals(selectedplayer.getName())) {
+                                fteam.setPlayer(null);
 
                                 TextButton teamtb = (TextButton) stage.getRoot().findActor(fteam.getName());
                                 teamtb.setTouchable(Touchable.enabled);
@@ -190,7 +190,7 @@ public class SessionOnlineHost implements Screen {
                             }
                         }
 
-                        teamalpha.setOnlineplayer(selectedplayer);
+                        teamalpha.setPlayer(selectedplayer);
                         
                         addUnitsSingleTeam(selectedunitcount, teamalpha);
 
@@ -222,8 +222,8 @@ public class SessionOnlineHost implements Screen {
 
                         ArrayList<Team> teamlistcopy = new ArrayList<>(teamList);
                         for (Team fteam : teamlistcopy) {
-                            if (fteam.getOnlineplayer().getName().equals(selectedplayer.getName())) {
-                                fteam.setOnlineplayer(null);
+                            if (fteam.getPlayer().getName().equals(selectedplayer.getName())) {
+                                fteam.setPlayer(null);
 
                                 TextButton teamtb = (TextButton) stage.getRoot().findActor(fteam.getName());
                                 teamtb.setTouchable(Touchable.enabled);
@@ -234,7 +234,7 @@ public class SessionOnlineHost implements Screen {
                             }
                         }
 
-                        teambeta.setOnlineplayer(selectedplayer);
+                        teambeta.setPlayer(selectedplayer);
 
                         addUnitsSingleTeam(selectedunitcount, teambeta);
                         
@@ -269,8 +269,8 @@ public class SessionOnlineHost implements Screen {
 
                         ArrayList<Team> teamlistcopy = new ArrayList<>(teamList);
                         for (Team fteam : teamlistcopy) {
-                            if (fteam.getOnlineplayer().getName().equals(selectedplayer.getName())) {
-                                fteam.setOnlineplayer(null);
+                            if (fteam.getPlayer().getName().equals(selectedplayer.getName())) {
+                                fteam.setPlayer(null);
 
                                 TextButton teamtb = (TextButton) stage.getRoot().findActor(fteam.getName());
                                 teamtb.setTouchable(Touchable.enabled);
@@ -281,7 +281,7 @@ public class SessionOnlineHost implements Screen {
                             }
                         }
 
-                        teamgamma.setOnlineplayer(selectedplayer);
+                        teamgamma.setPlayer(selectedplayer);
 
                         addUnitsSingleTeam(selectedunitcount, teamgamma);
 
