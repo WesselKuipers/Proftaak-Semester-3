@@ -1,9 +1,11 @@
 package com.wotf.game.classes;
 
+import java.io.Serializable;
+
 /**
  * Represents a player connected in the session
  */
-public class Player {
+public class Player implements Serializable{
 
     private int ID;
     private final String ip;
@@ -51,4 +53,9 @@ public class Player {
         this.ID = ID;
     }
 
+    @Override
+    public String toString() {
+        return name + " - " + ip;
+    }
+    
 }
