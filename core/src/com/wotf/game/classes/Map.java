@@ -283,7 +283,6 @@ public class Map {
 
     /**
      * Function that calculates a random wind, should be called every turn.
-     * TODO: Test!
      */
     public void calculateWind() {
         Random random = new Random();
@@ -291,7 +290,7 @@ public class Map {
         int range = 20;
 
         float x = (random.nextInt(range) - range / 2);
-        float y = (random.nextInt(range) - range / 2);
+        float y = 0; //(random.nextInt(range) - range / 2);
 
         this.windForce = new Vector2(x, y);
         System.out.println(windForce.toString());

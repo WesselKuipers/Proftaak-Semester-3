@@ -10,7 +10,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
@@ -37,13 +36,16 @@ import java.util.List;
  */
 public class GameStage extends Stage {
 
-    //private WotFGame game;
     private final Game game;
+    private final GuiStage guiStage;
 
     private final SpriteBatch batch;
     private final SpriteBatch guiBatch;
+    
     private final BitmapFont font;
-
+    
+    private boolean showDebug = false;
+    
     private Actor focusedActor; // if this is set to an actor
     // have the camera follow it automatically, otherwise set it to null
 
@@ -59,11 +61,13 @@ public class GameStage extends Stage {
      *
      * @param game Game data structure to base initial variables on (settings,
      * map, etc)
+     * @param guiStage The stage upon which the gui can be drawn
      */
-    public GameStage(Game game) {
+    public GameStage(Game game, GuiStage guiStage) {
         super(new ScreenViewport());
         this.game = game;
         this.focusedActor = null;
+        this.guiStage = guiStage;
 
         batch = new SpriteBatch();
         guiBatch = new SpriteBatch();
@@ -90,6 +94,7 @@ public class GameStage extends Stage {
 
         getCamera().update();
         game.beginTurn();
+        guiStage.updateWind();
     }
 
     /**
@@ -162,7 +167,8 @@ public class GameStage extends Stage {
         float delta = Gdx.graphics.getDeltaTime();
 
         game.update(delta);
-
+        guiStage.update();
+        
         // if focusedActor is set to an actor, we want the camera to follow it
         // otherwise, call the update() method on camera normally
         if (focusedActor != null) {
@@ -223,6 +229,10 @@ public class GameStage extends Stage {
                 game.getActiveTeam().getActiveUnit().decreaseHealth(100);
                 game.endTurn();
                 break;
+                
+            case Keys.F4:
+                showDebug = !showDebug;
+                break;
         }
 
         clampCamera();
@@ -253,7 +263,7 @@ public class GameStage extends Stage {
                 System.out.println("Firing bullet");
                 bulletLogic((int) rel.x, (int) rel.y);
             } else if (button == Input.Buttons.RIGHT) {
-                explode((int) rel.x, (int) rel.y, 30, 0);
+                explode((int) rel.x, (int) rel.y, 30, 60);
             }
 
             game.endTurn();
@@ -272,7 +282,8 @@ public class GameStage extends Stage {
 
         Texture backgroundTexture = game.getMap().getBackgroundTexture();
         Texture terrainTexture = game.getMap().getLandscapeTexture();
-
+        
+        // draws background and foreground
         batch.draw(backgroundTexture, 0, 0, 0, 0,
                 backgroundTexture.getWidth(), backgroundTexture.getHeight(),
                 1f, 1f, 0, 0, 0,
@@ -297,11 +308,11 @@ public class GameStage extends Stage {
                 //effect.reset();
             }
         }
-
         batch.end();
 
         super.draw();
 
+        if (showDebug) {
         // guiBatch is primarily used to display text and miscellaneous graphics
         guiBatch.begin();
 
@@ -321,7 +332,7 @@ public class GameStage extends Stage {
         font.draw(guiBatch, String.format("Mouse position: screen [%d, %d], viewport %s", Gdx.input.getX(), game.getMap().getHeight() - Gdx.input.getY(), getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0))), 0, this.getHeight() - 60);
         font.draw(guiBatch, String.format("Camera coords [%s], zoom %f", getCamera().position.toString(), ((OrthographicCamera) getCamera()).zoom), 0, this.getHeight() - 80);
         font.draw(guiBatch, "Turn Time remaining: " + (game.getGameSettings().getTurnTime() - (int) game.getTurnLogic().getElapsedTime()), 0, this.getHeight() - 100);
-        font.draw(guiBatch, "Time remaining: " + (game.getGameSettings().getMaxTime() - (int) game.getTurnLogic().getMaxElapsedTime()), 0, this.getHeight() - 120);
+        font.draw(guiBatch, "Time remaining: " + (game.getGameSettings().getMaxTime() - (int) game.getTurnLogic().getTotalTime()), 0, this.getHeight() - 120);
         font.draw(guiBatch, String.format("FPS: %d", Gdx.graphics.getFramesPerSecond()), 0, this.getHeight() - 140);
 
         if (game.getTurnLogic().getState() == TurnState.GAMEOVER) {
@@ -331,6 +342,7 @@ public class GameStage extends Stage {
         font.draw(guiBatch, "Wind: " + game.getMap().getWind().toString(), 0, this.getHeight() - 160);
 
         guiBatch.end();
+    }
     }
 
     /**
@@ -381,17 +393,22 @@ public class GameStage extends Stage {
                 }
             }
         }
-
-        // Iterates through all of the collided units and decreases their health
-        // based on the damage caused by the explosion
-        for (Unit u : collidedUnits) {
-            u.decreaseHealth(damage);
+        
+        // if any units have taken damage, we want to update their health and team healthbars
+        if (!collidedUnits.isEmpty()) {
+            
+            // Iterates through all of the collided units and decreases their health
+            // based on the damage caused by the explosion
+            for (Unit u : collidedUnits) {
+                u.decreaseHealth(damage);
+            }
+            
+            guiStage.updateHealthBars();
         }
     }
 
     /**
      * Checks if a pixel at a given coordinate collides with a unit or not
-     *
      * @param x X-coordinate in world map
      * @param y Y-coordinate in world map
      * @return True if pixel if a collision was detected, false if not

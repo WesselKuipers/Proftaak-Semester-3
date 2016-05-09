@@ -5,13 +5,8 @@
  */
 package com.wotf.game.classes.Items;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
-import java.util.Random;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * @author chaos
