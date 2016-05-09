@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
@@ -25,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.wotf.game.classes.Game;
+import com.wotf.game.classes.Projectile;
 import com.wotf.game.classes.Team;
 import com.wotf.game.classes.TurnLogic.TurnState;
 import com.wotf.game.classes.Unit;
@@ -47,10 +49,11 @@ public class GameStage extends Stage {
     private Actor focusedActor; // if this is set to an actor
     // have the camera follow it automatically, otherwise set it to null
 
-    // particle effect objects
-    private TextureAtlas particleAtlas;
+//    // particle effect objects  
     private ParticleEffectPool explosionEffectPool;
     private List<PooledEffect> particles;
+
+    private ParticleEffect tempParticleEffects;
 
     /**
      * Constructor for GameStage that initializes everything required for the
@@ -72,12 +75,6 @@ public class GameStage extends Stage {
         font.setColor(Color.BLACK);
 
         particles = new ArrayList<>();
-
-        ParticleEffect explosionEffect = new ParticleEffect();
-        explosionEffect.setEmittersCleanUpBlendFunction(false);
-        explosionEffect.load(Gdx.files.internal("effects/test_explosion.p"), Gdx.files.internal("effects"));
-
-        explosionEffectPool = new ParticleEffectPool(explosionEffect, 1, 5);
     }
 
     /**
@@ -253,7 +250,7 @@ public class GameStage extends Stage {
                 System.out.println("Firing bullet");
                 bulletLogic((int) rel.x, (int) rel.y);
             } else if (button == Input.Buttons.RIGHT) {
-                explode((int) rel.x, (int) rel.y, 30, 0);
+                explode((int) rel.x, (int) rel.y, 30, 0, false);
             }
 
             game.endTurn();
@@ -293,7 +290,7 @@ public class GameStage extends Stage {
             if (effect.isComplete()) {
                 effect.free();
                 particles.remove(i);
-                
+
                 //effect.reset();
             }
         }
@@ -344,7 +341,7 @@ public class GameStage extends Stage {
      * @param damage Amount of damage the explosion does should it collide with
      * a Unit
      */
-    public void explode(int x, int y, int radius, int damage) {
+    public void explode(int x, int y, int radius, int damage, boolean cluster) {
         // calls radius destruction method in game map
         // which will update the boolean[][] and the terrain texture
         game.getMap().destroyRadius(x, y, radius);
@@ -357,11 +354,41 @@ public class GameStage extends Stage {
         //effect.scaleEffect(radius/100);
         effect.start();
         particles.add(effect);
+
+        if (cluster) {
+            fireCluster(x, y);
+        }
+    }
+
+    private void fireCluster(int x, int y) {
+        Sprite partSprite = new Sprite(new Texture(Gdx.files.internal("part.png")));
+        
+        x = x - 3;
+        for (int i = 0; i <= 4; i++) {            
+            Vector2 mousePos = new Vector2(x, y+2);
+            Vector2 position = new Vector2(x + i * 2, y);            
+            Projectile part = new Projectile(partSprite, tempParticleEffects);
+            
+            //fire: fire from, fire towards, power, wind, gravity, radius, damage
+            part.fire(position, mousePos, 5, Vector2.Zero, 9.8, 10, 16);
+            part.updateShot();
+            addActor(part);
+        }
+    }
+
+    /**
+     * @param pEff sets the temporarily particle effect
+     */
+    public void setParticle(ParticleEffect pEff) {
+        tempParticleEffects = pEff;
+
+        explosionEffectPool = new ParticleEffectPool(tempParticleEffects, 1, 5);
+        //tempParticleEffects.setEmittersCleanUpBlendFunction(false);  
     }
 
     private void unitCollisionExplosion(int x, int radius, int y, int damage) {
         List<Unit> collidedUnits = new ArrayList<>();
-        
+
         for (int xPos = x - radius; xPos <= x + radius; xPos++) {
             for (int yPos = y - radius; yPos <= y + radius; yPos++) {
                 // scan square area around radius to determine which pixels are within the radius

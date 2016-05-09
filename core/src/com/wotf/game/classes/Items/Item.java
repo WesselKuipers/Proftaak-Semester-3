@@ -1,5 +1,6 @@
 package com.wotf.game.classes.Items;
 
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -19,15 +20,15 @@ public abstract class Item extends Actor {
     Weapons logic should be remodeled in the next version when it is mapped where what function goes
      */
     private String name;
-    private float power;
-    private int blastRadius;
-    private Sprite weaponSprite;
+//    private float power;
+//    private int blastRadius;
+    // private Sprite weaponSprite;
 
-    private Projectile bullet;
-    private int damage;
-
+//    private Projectile bullet;
+//    private int damage;
     /**
      * Main constructor of Item used to initialize all necessary fields
+     *
      * @param nm Name of the item
      * @param pw Power of the item
      * @param rad Radius of the explosion of the item
@@ -35,38 +36,45 @@ public abstract class Item extends Actor {
      * @param weaponSprite Sprite of the weapon of the item
      * @param bulletSprite Sprite of the bullet/projectile of the item
      */
-    public Item(String nm, float pw, int rad, int damage, Sprite weaponSprite, Sprite bulletSprite) {
+    public Item(String nm /*, float pw, int rad, int damage, Sprite weaponSprite, Sprite bulletSprite*/) {
         //graphics
-        this.weaponSprite = weaponSprite;
-
-        this.setBounds(getX(), getY(), weaponSprite.getWidth(), weaponSprite.getHeight());
-        this.setWidth(weaponSprite.getWidth());
-        this.setHeight(weaponSprite.getHeight());
-        
+        // this.weaponSprite = weaponSprite;
         this.name = nm;
+
+        /*
         this.power = pw;
         this.blastRadius = rad;
         this.damage = damage;
-        this.bullet = new Projectile(bulletSprite);
+        this.bullet = new Projectile(bulletSprite);*/
+    }
+
+    public void InitItemChildSuper(Sprite weapon_Sprite) {
+        this.setBounds(getX(), getY(), weapon_Sprite.getWidth(), weapon_Sprite.getHeight());
+        this.setWidth(weapon_Sprite.getWidth());
+        this.setHeight(weapon_Sprite.getHeight());
     }
 
     /**
      * Constructor of Item used to initialize all necessary fields
+     *
      * @param nm Name of the item
      * @param pw Power of the item
      * @param weaponSprite Sprite of the weapon of the item
      * @param bulletSprite Sprite of the bullet/projectile of the item
      */
-    public Item(String nm, float pw, Sprite weaponSprite, Sprite bulletSprite) {
+    /* public Item(String nm, float pw, Sprite weaponSprite, Sprite bulletSprite) {
         this(nm, pw, 1, 25, weaponSprite, bulletSprite);
     }
-    
-     /**
+     */
+    /**
      * @return stprite image of the weapon
      */
-    public Sprite getWeaponSprite() {
-        return weaponSprite;
-    }
+    public abstract Sprite getWeaponSprite();
+    
+    /**
+     * @return particle affect
+     */
+      public abstract ParticleEffect getParticle();
 
     /**
      * @return the name of the item
@@ -87,43 +95,22 @@ public abstract class Item extends Actor {
     /**
      * @return gets the power of the item
      */
-    public float getPower() {
-        return power;
-    }
- /**
-  * @param power sets the given power as the item's power
-  */
-    public void setPower(int power) {
-        this.power = power;
-    }
+    public abstract float getPower();
 
     /**
      * @return gets the initial blastradius
      */
-    public int getBlastRadius() {
-        return blastRadius;
-    }
+    public abstract int getBlastRadius();
 
     /**
-     * @param blastRadius sets the new blastradius
+     * @return gets the bullet
      */
-    public void setBlastRadius(int blastRadius) {
-        this.blastRadius = blastRadius;
-    }
-    
-    /**
-     * @return gets the bullet 
-     */
-    public Projectile getBullet() {
-        return bullet;
-    }
-    
+    public abstract Projectile getBullet();
+
     /**
      * @return gets the damage that this item can do
      */
-    public int getDamage() {
-        return damage;
-    }
+    public abstract int getDamage();
 
     /**
      * initiate this object as an actor
@@ -140,7 +127,9 @@ public abstract class Item extends Actor {
     }
 
     /**
-     * The implementation of this method should specifiy what an item does when it's activated
+     * The implementation of this method should specifiy what an item does when
+     * it's activated
+     *
      * @param position Position from which the activation originates
      * @param mousePos Mouse position of the activation
      * @param wind Current wind upon activation

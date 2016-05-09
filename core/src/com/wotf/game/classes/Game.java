@@ -137,9 +137,11 @@ public class Game {
             gameStage.setKeyboardFocus(team.getActiveUnit());
             gameStage.setCameraFocusToActor(team.getActiveUnit(), true);
 
-            // select first weapon
-            Item i = WEAPONS_ARMORY.get(0);
-            team.getActiveUnit().selectWeapon(i);
+//            // select first weapon
+//            Item i = WEAPONS_ARMORY.get(0);
+//            team.getActiveUnit().selectWeapon(i);
+            
+             team.getActiveUnit().selecting_weapon(0);
         } else {
             endTurn();
         }
