@@ -84,7 +84,8 @@ public class Unit extends Group {
                 if (keycode == Keys.UP) {
                     jump();
                 }
-// <editor-fold defaultstate="collapsed" desc=" switching between weapons ">
+                
+                // <editor-fold defaultstate="collapsed" desc=" switching between weapons ">
                 if (keycode == Keys.NUM_1) {
                     selecting_weapon(0);
                 }
@@ -103,7 +104,8 @@ public class Unit extends Group {
                 if (keycode == Keys.NUM_6) {
                     selecting_weapon(5);
                 }
-// </editor-fold>
+                // </editor-fold>
+                
                 return true;
             }
         });
@@ -161,7 +163,6 @@ public class Unit extends Group {
     public void selectWeapon(Item i) {
         destroyWeapon();
         weapon = i;
-        //i.initActor();
         ((GameStage) this.getStage()).addActor(weapon);
     }
 
@@ -293,7 +294,7 @@ public class Unit extends Group {
         sprite.setRegion(getFrame(delta));
         updateJump();
         
-        // flashes active unit to white and back to its original colour
+        // Flashes active unit to white and back to its original colour
         if (((GameStage)this.getStage()).getGame().getActiveTeam().equals(team)) {
             if (((GameStage)this.getStage()).getGame().getTurnLogic().getElapsedTime() % 2 == 1) {           
                 font.setColor(Color.WHITE);
@@ -304,7 +305,7 @@ public class Unit extends Group {
             font.setColor(team.getColor());
         }
 
-        //make weapons move with the unit
+        // Make weapons move with the unit
         Array<Actor> children = this.getChildren();
         if (children.size > 0) {
             children.first().setPosition(Unit.this.getX(), Unit.this.getY());
@@ -315,7 +316,7 @@ public class Unit extends Group {
         if (isOutOfBounds()) {
             health = 0;
 
-            // if it's currently this unit's turn, manually call the endTurn() method
+            // If it's currently this unit's turn, manually call the endTurn() method
             if (((GameStage) this.getStage()).getGame().getActiveTeam().getActiveUnit().equals(this)) {
                 ((GameStage) this.getStage()).getGame().endTurn();
             }
@@ -374,7 +375,6 @@ public class Unit extends Group {
         velocity.x += acceleration.x * delta;
         velocity.y += acceleration.y * delta;
 
-        //System.out.println(velocity.toString());
         this.setPosition(position.x, position.y);
         positionChanged();
 
@@ -432,8 +432,8 @@ public class Unit extends Group {
      * @param force Force towards direction.
      */
     private void setVelocity(float force) {
-        final double DEG2RAD = Math.PI / 180;
-        double ang = angle * DEG2RAD;
+        final double deg2Rad = Math.PI / 180;
+        double ang = angle * deg2Rad;
 
         velocity = new Vector2(
                 (float) (force * Math.cos(ang)),

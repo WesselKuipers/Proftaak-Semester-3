@@ -5,11 +5,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.wotf.game.GameStage;
 import com.wotf.game.GuiStage;
@@ -17,7 +12,6 @@ import com.wotf.game.classes.Game;
 import com.wotf.game.classes.GameSettings;
 import com.wotf.game.classes.Map;
 import com.wotf.game.classes.Player;
-import com.wotf.game.classes.Team;
 import java.util.ArrayList;
 import java.util.List;
 import com.wotf.game.WotFGame;
@@ -30,8 +24,6 @@ public class GameEngine implements Screen {
     private final WotFGame game;
     private GameStage stage;
     private GuiStage stageGUI;
-    private Skin skin;
-    private List<Team> teams;
     private GameSettings gameSettings;
     private Map map;
 
@@ -47,12 +39,12 @@ public class GameEngine implements Screen {
     * Constructor of GameEngine
     * @param game Game that will be launched
     * @param gameSettings Settings associated with this game
+    * @param map The terrain of the game
     */
     public GameEngine(WotFGame game, GameSettings gameSettings, Map map) {
         this.game = game;
         this.gameSettings = gameSettings;
         this.map = map;
-        this.skin = new Skin(Gdx.files.internal("uiskin.json"));
     }
 
     /**
@@ -65,26 +57,7 @@ public class GameEngine implements Screen {
         players.add(new Player("127.0.0.1", "DefaultPlayer"));
 
         map.setWaterLevel(30);
-        
-        /* Debug map:
-        // Creates a new terrain mask and assigns a flat rectangle as terrain
-        boolean[][] terrain = new boolean[map.getWidth()][map.getHeight()];
-        for (int x = 100; x < (map.getWidth() - 100); x++) {
-            for (int y = 0; y < 80; y++) {
-                terrain[x][y] = true;
-            }
-        }
-        
-        // Creates a platform on the debug map
-        for(int x = (map.getWidth() / 2); x < (map.getWidth() / 2 + 50); x++) {
-            for(int y = 80; y < 120; y++) {
-                terrain[x][y] = true;
-            }
-        }
 
-        map.setTerrain(terrain);
-        */
-        
         // Initializes a viewport and a camera object
         ScreenViewport viewport = new ScreenViewport(new OrthographicCamera(1280, 720));
         viewport.setWorldSize(map.getWidth(), map.getHeight());

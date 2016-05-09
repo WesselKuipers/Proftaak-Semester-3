@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.wotf.gui.view;
 
 import com.badlogic.gdx.Gdx;
@@ -99,7 +94,6 @@ public class MainMenu implements Screen {
         online.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                    //game.setScreen(new LobbyGUI(game));
                     game.setScreen(new Username(game));
             }
         });

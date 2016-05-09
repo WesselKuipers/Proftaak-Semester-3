@@ -23,7 +23,8 @@ public class GameSettings {
     /**
      * List of weapons in the game
      */
-    public static List<Item> WEAPONS_ARMORY;
+    protected static final List<Item> WEAPONS_ARMORY = new ArrayList<>();
+    
     /**
      * List of teams in the game
      */
@@ -40,8 +41,7 @@ public class GameSettings {
      * Main constructor for GameSettings Sets all variables to the default rules
      */
     public GameSettings() {
-        if (WEAPONS_ARMORY == null) {
-            WEAPONS_ARMORY = new ArrayList<>();
+        if (WEAPONS_ARMORY.isEmpty()) {
             fillWeapons();
         }
 

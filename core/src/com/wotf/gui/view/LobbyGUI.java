@@ -96,8 +96,8 @@ public class LobbyGUI implements Screen {
         Table sessionstable = new Table();
         Table playerstable = new Table();
 
-        sessionstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"))));
-        playerstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"))));
+        sessionstable.setBackground(new NinePatchDrawable(getNinePatch("GUI/tblbg.png")));
+        playerstable.setBackground(new NinePatchDrawable(getNinePatch("GUI/tblbg.png")));
         String[] playerlist = null;
         try {
             playerlist = new String[playerContext.getAll().size()];

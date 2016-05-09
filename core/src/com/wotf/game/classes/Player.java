@@ -5,7 +5,7 @@ package com.wotf.game.classes;
  */
 public class Player {
 
-    private int ID;
+    private int id;
     private final String ip;
     private String name;
 
@@ -43,12 +43,12 @@ public class Player {
         this.name = name;
     }
 
-    public int getID() {
-        return ID;
+    public int getId() {
+        return id;
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    public void setId(int id) {
+        this.id = id;
     }
 
 }

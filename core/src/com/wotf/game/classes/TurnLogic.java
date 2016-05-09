@@ -18,7 +18,7 @@ public class TurnLogic {
         PLAYING, WITHDRAW, GAMEOVER
     };
     
-    public TurnState currentState;
+    private TurnState currentState;
     private float elapsedTime;
     private float totalTime;
     private int turn;

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.wotf.gui.view;
 
 import com.badlogic.gdx.Gdx;
@@ -16,7 +11,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
@@ -27,7 +21,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.badlogic.gdx.utils.Array;
 import com.wotf.game.WotFGame;
 import com.wotf.game.classes.GameSettings;
 import com.wotf.game.classes.Map;
@@ -89,12 +82,11 @@ public class SessionLocal implements Screen {
     @Override
     public void show() {
         stage = new Stage();
-        Gdx.input.setInputProcessor(stage);// Make the stage consume events
-        //System.out.println(Gdx.files.internal("maps"));
+        Gdx.input.setInputProcessor(stage); // Make the stage consume events
         skin = new Skin(Gdx.files.internal("uiskin.json"));
         teams = new List(skin);
 
-        // Alle teams en labels hiervoor.
+        // All teams and labels
         Table teamstable = new Table();
         Table mapstable = new Table();
         Table settingstable = new Table();
@@ -113,8 +105,7 @@ public class SessionLocal implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 Team teamalpha = new Team("Alpha", Color.BLUE);
                 teamalpha.addUnit(teamalpha.getName(), 100);
-                //Mogelijk voor als iedere player in online een eigen team heeft.
-                //teamalpha.addPlayer(new Player("127.0.0.1", "AlphaPlayer"));
+
                 teamList.add(teamalpha);
                 gameSettings.addTeam(teamalpha);
                 teams.clear();
@@ -132,8 +123,7 @@ public class SessionLocal implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 Team teambeta = new Team("Beta", Color.CORAL);
                 teambeta.addUnit(teambeta.getName(), 100);
-                //Mogelijk voor als iedere player in online een eigen team heeft.
-                //teambeta.addPlayer(new Player("127.0.0.1", "BetaPlayer"));
+
                 teamList.add(teambeta);
                 gameSettings.addTeam(teambeta);
                 teams.setItems(teamList.toArray());
@@ -148,8 +138,7 @@ public class SessionLocal implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 Team teamgamma = new Team("Gamma", Color.GREEN);
                 teamgamma.addUnit(teamgamma.getName(), 100);
-                //Mogelijk voor als iedere player in online een eigen team heeft.
-                //teamgamma.addPlayer(new Player("127.0.0.1", "GammaPlayer"));
+
                 teamList.add(teamgamma);
                 gameSettings.addTeam(teamgamma);
                 teams.setItems(teamList.toArray());

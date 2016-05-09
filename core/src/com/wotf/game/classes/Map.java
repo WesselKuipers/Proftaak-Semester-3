@@ -6,8 +6,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -15,7 +13,7 @@ import java.util.Random;
  */
 public class Map {
 
-    private final double gravityModifier = 9.8;
+    private static final double GravityModifier = 9.8;
     private int waterLevel;
     private int width;
     private int height;
@@ -163,7 +161,7 @@ public class Map {
      * @return Gravity value used for falling objects
      */
     public double getGravityModifier() {
-        return gravityModifier;
+        return GravityModifier;
     }
 
     /**
@@ -289,8 +287,8 @@ public class Map {
 
         int range = 20;
 
-        float x = (random.nextInt(range) - range / 2);
-        float y = 0; //(random.nextInt(range) - range / 2);
+        float x = random.nextInt(range) - range / 2;
+        float y = 0;
 
         this.windForce = new Vector2(x, y);
         System.out.println(windForce.toString());

@@ -1,9 +1,6 @@
 package com.wotf.game.classes;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import java.util.ArrayList;
@@ -15,7 +12,6 @@ import java.util.Map.Entry;
 import com.wotf.game.classes.Items.Item;
 import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
-import java.util.Iterator;
 
 /**
  * Team contains data that represent a team Contains a list of players, list of
@@ -41,7 +37,6 @@ public class Team {
         for(Item i : WEAPONS_ARMORY){
             items.put(i, 99);
         }
-        //items.put(WEAPONS_ARMORY.get(0), 99);
 
         this.name = name;
         this.color = color;
@@ -259,7 +254,7 @@ public class Team {
     public Item containsKey(Item item) {
         Item result = null;
         for (Entry<Item, Integer> entry : items.entrySet()) {
-            if ((entry.getKey().getName().equals(item.getName()))) {
+            if (entry.getKey().getName().equals(item.getName())) {
                 result = entry.getKey();
                 break;
             }
@@ -288,7 +283,7 @@ public class Team {
         if (items.containsKey(item)) {
 
             if (items.get(item) > 0) {
-                increaseItemAmount(item, (items.get(item) - 1));
+                increaseItemAmount(item, items.get(item) - 1);
             }
             if (items.get(item) == 0 || items.get(item) < 0) {
                 //TODO: handle what happens when unlimited ammo (-1) or out of ammo

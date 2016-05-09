@@ -1,20 +1,22 @@
 package com.wotf.game.database;
 
+import com.badlogic.gdx.Gdx;
+import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
- * Created by Wessel on 1-2-2016.
+ * Helper class for making database calls
  */
 public class DBCon {
 
     private static Connection connection;
 
-    // TODO: 6-3-2016 Refactor this so that the username and password are loaded from a file instead of being hard-coded
-    private static final String ConnectionPath = "jdbc:mysql://athena01.fhict.local/dbi335437"; // example oracle string: "jdbc:oracle:thin:@localhost:1521:XE";
-    private static final String Username = "dbi335437";
-    private static final String Password = "slZprf8XkD";
+    private static String ConnectionPath;
+    private static String Username;
+    private static String Password;
 
     private static final String NumericDefault = "0";
 
@@ -22,6 +24,10 @@ public class DBCon {
      * @return a JDBC Connection object based
      */
     public static Connection getConnection() {
+        if (ConnectionPath == null) {
+            loadProperties();
+        }
+        
         try {
             connection = DriverManager.getConnection(ConnectionPath, Username, Password);
         } catch (SQLException e) {
@@ -30,6 +36,22 @@ public class DBCon {
         }
 
         return connection;
+    }
+
+    /**
+     * Loads the login info required to make a connection to the database
+     */
+    private static void loadProperties() {
+        Properties prop = new Properties();
+        try {
+            prop.load(Gdx.files.internal("dbc.properties").read());
+            
+            ConnectionPath = prop.getProperty("ConnectionPath");
+            Username = prop.getProperty("Username");
+            Password = prop.getProperty("Password");
+        } catch (IOException ex) {
+            Gdx.app.error("Database", "Couldn't load dbc.properties");
+        }
     }
 
     /**
@@ -49,10 +71,7 @@ public class DBCon {
      */
     public static int executeUpdate(String query, List<Object> parameters) {
         Connection con = getConnection();
-        PreparedStatement ps;
-
-        try {
-            ps = con.prepareCall(query);
+        try (PreparedStatement ps = con.prepareCall(query)) {
 
             // If the list of parameters isn't empty, adds them to the prepared statement
             if (parameters != null) {
@@ -90,11 +109,8 @@ public class DBCon {
      */
     public static ResultSet executeResultSet(String query, List<Object> parameters) {
         Connection con = getConnection();
-        PreparedStatement ps;
-
-        try {
-            ps = con.prepareCall(query);
-
+        
+        try (PreparedStatement ps = con.prepareCall(query)) {
             // If the list of parameters isn't empty, adds them to the prepared statement
             if (parameters != null) {
                 for (int i = 1; i <= parameters.size(); i++) {
@@ -131,10 +147,8 @@ public class DBCon {
      */
     public static List<String[]> executeResultSetAsList(String query, List<Object> parameters) {
         Connection con = getConnection();
-        PreparedStatement ps;
 
-        try {
-            ps = con.prepareCall(query);
+        try (PreparedStatement ps = con.prepareCall(query)) {
 
             // If the list of parameters isn't empty, adds them to the prepared statement
             if (parameters != null) {

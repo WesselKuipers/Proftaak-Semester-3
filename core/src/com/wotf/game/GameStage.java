@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.wotf.game;
 
 import com.badlogic.gdx.Gdx;
@@ -16,7 +11,6 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -32,7 +26,6 @@ import java.util.List;
 
 /**
  * Extension of Stage that contains a game session
- *
  */
 public class GameStage extends Stage {
 
@@ -47,12 +40,11 @@ public class GameStage extends Stage {
     private boolean showDebug = false;
     
     private Actor focusedActor; // if this is set to an actor
-    // have the camera follow it automatically, otherwise set it to null
+                                // have the camera follow it automatically, otherwise set it to null
 
     // particle effect objects
-    private TextureAtlas particleAtlas;
-    private ParticleEffectPool explosionEffectPool;
-    private List<PooledEffect> particles;
+    private final ParticleEffectPool explosionEffectPool;
+    private final List<PooledEffect> particles;
 
     /**
      * Constructor for GameStage that initializes everything required for the
@@ -113,28 +105,24 @@ public class GameStage extends Stage {
             for (Unit unit : team.getUnits()) {
                 // Generates a random X position and attempts to find the highest collision-free position
                 // and spawns the unit at that position, will continue looping until a position has been found
-                boolean spawned = false;
                 int posX = 0;
                 int posY = 0;
 
-                while (!spawned) {
+                while (true) {
                     posX = MathUtils.random(0 + (int) unit.getWidth(), (int) game.getMap().getWidth() - (int) unit.getWidth());
                     posY = -1;
 
                     // loops through terrain[x ± half its width][y] to check for collision free locations
                     for (int x = posX; x < posX + unit.getWidth(); x++) {
                         for (int y = terrain[0].length - 1; y > 0; y--) {
-                            if (terrain[x][y]) {
-                                if (y > posY) {
+                            if (terrain[x][y] && y > posY) {
                                     posY = y;
-                                }
                             }
                         }
                     }
 
                     // if a position has been found, we can exit the loop
                     if (posY != -1) {
-                        spawned = true;
                         break;
                     }
                 }
@@ -233,6 +221,9 @@ public class GameStage extends Stage {
             case Keys.F4:
                 showDebug = !showDebug;
                 break;
+                
+            default:
+                break;
         }
 
         clampCamera();
@@ -256,11 +247,8 @@ public class GameStage extends Stage {
         Vector3 rel = getCamera().unproject(new Vector3(screenX, screenY, 0));
 
         if (game.getTurnLogic().getState() == TurnState.PLAYING) {
-            System.out.println(String.format("Touchdown event (%d, %d) button %d", screenX, screenY, button));
-            System.out.println(String.format("Relative Touchdown event (%f, %f) button %d", rel.x, rel.y, button));
 
             if (button == Input.Buttons.LEFT) {
-                System.out.println("Firing bullet");
                 bulletLogic((int) rel.x, (int) rel.y);
             } else if (button == Input.Buttons.RIGHT) {
                 explode((int) rel.x, (int) rel.y, 30, 60);
@@ -304,8 +292,6 @@ public class GameStage extends Stage {
             if (effect.isComplete()) {
                 effect.free();
                 particles.remove(i);
-                
-                //effect.reset();
             }
         }
         batch.end();
@@ -366,7 +352,6 @@ public class GameStage extends Stage {
         // adds effect to the list of effects to draw
         PooledEffect effect = explosionEffectPool.obtain();
         effect.setPosition(x, y);
-        //effect.scaleEffect(radius/100);
         effect.start();
         particles.add(effect);
     }
@@ -382,11 +367,11 @@ public class GameStage extends Stage {
                     // and add it to the list of collided Units if its bounding box contains explosion Xs and Ys
                     for (Team t : game.getTeams()) {
                         for (Unit u : t.getUnits()) {
-                            if (!collidedUnits.contains(u)) {
-                                if (u.getBounds().contains(xPos, yPos)) {
-                                    collidedUnits.add(u);
-                                    System.out.println("Collided with unit: " + u.getName());
-                                }
+                            if (!collidedUnits.contains(u)
+                                && u.getBounds().contains(xPos, yPos)) {
+                                
+                                collidedUnits.add(u);
+                                System.out.println("Collided with unit: " + u.getName());
                             }
                         }
                     }
@@ -438,7 +423,7 @@ public class GameStage extends Stage {
 
         // Sets the camera's X position based on the center of the specified actor
         cam.position.x = actor.getX() + actor.getWidth() / 2;
-        //if(followVertically) { cam.position.y = actor.getY() + actor.getHeight() / 2; }
+        
         clampCamera();
         cam.update();
 
