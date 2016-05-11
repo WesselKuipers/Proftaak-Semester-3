@@ -46,6 +46,7 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
         publisher = new RemotePublisher();
         publisher.registerProperty("sessionsettingsprop");
         publisher.registerProperty("cancelgameprop");
+        publisher.registerProperty("startgameprop");
     }
 
     public void createNewRegistry() throws RemoteException {
