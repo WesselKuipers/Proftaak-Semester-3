@@ -48,6 +48,7 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
             gamesettings = (GameSettings) regsettings.getGameSettings();
             regsettings.subscribeRemoteListener(this, "sessionsettingsprop");
             regsettings.subscribeRemoteListener(this, "cancelgameprop");
+            regsettings.subscribeRemoteListener(this, "startgameprop"); 
             // Hou er rekening mee dat de inform van hieruit niet doorgevoerd wordt.
             // Dit is puur om de gamesettings te zetten. De Session klasse kan alleen de inform afgeven.
             session.setGameSettings(gamesettings);
@@ -70,6 +71,7 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
             registry = null;
             regsettings.unsubscribeRemoteListener(this, "sessionsettingsprop");
             regsettings.unsubscribeRemoteListener(this, "cancelgameprop");
+            regsettings.unsubscribeRemoteListener(this, "startgameprop");     
         } catch (RemoteException ex) {
             Logger.getLogger(SessionManager.class.getName()).log(Level.SEVERE, null, ex);
         }
