@@ -60,7 +60,7 @@ public class DBCon {
                     ps.setObject(i, parameters.get(i - 1));
                 }
             }
-            
+
             int result = ps.executeUpdate();
             if (result != 0) {
                 return result;
@@ -68,7 +68,7 @@ public class DBCon {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-
+        connectionClose(con);
         // If we've reached this point, it means the query didn't succeed, return -1
         return -1;
     }
@@ -82,7 +82,7 @@ public class DBCon {
         return executeResultSet(query, null);
     }
 
-     /**
+    /**
      * Executes a query and returns the resulting ResultSet object
      * @param query Query to run
      * @param parameters Parameters to add to the prepared statement
@@ -108,13 +108,13 @@ public class DBCon {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-        }
-
+        } 
+        connectionClose(con);
         // If we've reached this point, it means the query didn't succeed, return null
         return null;
     }
 
-     /**
+    /**
      * Executes a query and converts its result set as a List of Strings
      * @param query Query to run
      * @return List of String[] representing every row returned from the query
@@ -182,9 +182,20 @@ public class DBCon {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-        }
-
+        } 
+        
+        connectionClose(con);
         // If we've reached this point, it means the query didn't succeed, return null
         return null;
+    }
+
+    public static void connectionClose(Connection con) {
+        if (con != null) {
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
     }
 }
