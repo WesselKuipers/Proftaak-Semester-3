@@ -98,8 +98,7 @@ public class GameStage extends Stage {
         
         networkingUtil = new NetworkUtil( game.getHost(), this );
         
-        
-        
+        // Initialize the game by host, after that send it to all connected clients
         if (game.getPlayingPlayer().equals(game.getHost())) {
             // Send each random spawn location seperately
             List<Vector2> randomSpawnLocations = getRandomSpawnLocations();
@@ -302,10 +301,9 @@ public class GameStage extends Stage {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         Vector3 rel = getCamera().unproject(new Vector3(screenX, screenY, 0));
-
         
         // Check if the playing player is allowed to do actions
-        if (game.getPlayingPlayer().equals(game.getActiveTeam().getPlayer())) {
+        //if (game.getPlayingPlayer().equals(game.getActiveTeam().getPlayer())) {
             // TODO: Input listener for Unit Movement within this if statement
             
             // Check if 
@@ -323,7 +321,7 @@ public class GameStage extends Stage {
                     explode((int) rel.x, (int) rel.y, 30, 0);
                 }
             }
-        }
+        //}
         return true;
     }
 

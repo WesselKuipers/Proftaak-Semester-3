@@ -83,6 +83,7 @@ public class SessionOnlinePlayer implements Screen {
     private Timer timer;
     private SelectBox maxplayerbox;
     private int switchscreencheck;
+    private int startGame;
 
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting
@@ -92,6 +93,7 @@ public class SessionOnlinePlayer implements Screen {
      */
     public SessionOnlinePlayer(WotFGame game, Session session, Player player) throws RemoteException {
         switchscreencheck = 0;
+        startGame = 0;
         this.player = player;
         this.game = game;
         gameSettings = new GameSettings();
@@ -408,6 +410,10 @@ public class SessionOnlinePlayer implements Screen {
                 Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        
+        if (startGame != 0) {
+            game.setScreen(new GameEngine(game, session, player));
+        }
 
         Gdx.gl.glClearColor((float) 122 / 255, (float) 122 / 255, (float) 122 / 255, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -561,5 +567,9 @@ public class SessionOnlinePlayer implements Screen {
     public void backToLobby() {
         // Solution could be to change a variable which will be checked and then change screen.
         switchscreencheck = 1;
+    }
+    
+    public void startGame() {
+        startGame = 1;
     }
 }

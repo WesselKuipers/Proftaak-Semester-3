@@ -133,29 +133,46 @@ public class Game {
      */
     public void beginTurn() {
         if (playingPlayer.equals(host)) {
+            GameStage gameStage = (GameStage) teams.get(0).getUnit(0).getStage();
+            
             map.calculateWind();
+          
+            // add terrain solid booleans to parameters
+            boolean[][] terrain = map.getTerrain();
+  /*            for (int x = 0; x < terrain.length; x++) {
+                NetworkMessage terrainMsg = new NetworkMessage( Command.TERRAIN );
+                terrainMsg.addParameter("x", Integer.toString(x));
+                for (int y = 0; y < terrain[0].length; y++) {
+                    terrainMsg.addParameter("y"+y, Integer.toString(y));
+                    terrainMsg.addParameter("val"+y, Boolean.toString(terrain[x][y]));
+                }
+                gameStage.getNetworkingUtil().sendToHost( terrainMsg );
+            }*/
         
             NetworkMessage beginTurnMsg = new NetworkMessage( Command.BEGINTURN );
 
+            // add wind to parameters
             Vector2 windForce = map.getWind();
             beginTurnMsg.addParameter("windX", Float.toString(windForce.x));
             beginTurnMsg.addParameter("windY", Float.toString(windForce.y));
 
-            // send message to host        
-            GameStage gameStage = (GameStage) teams.get(0).getUnit(0).getStage();
+            // send message to host and after that, all clients        
             gameStage.getNetworkingUtil().sendToHost( beginTurnMsg );
             
-            beginTurnReceive(windForce);
+            // run action for host too
+            beginTurnReceive(terrain, windForce);
         }
     }
     
     /**
      * Function for network to receive a begin turn by the clients
      * This will set the wind, set the next active unit
+     * @param terrain 
      * @param windForce 
      */
-    public void beginTurnReceive(Vector2 windForce) {
+    public void beginTurnReceive(boolean[][] terrain, Vector2 windForce) {
         Team activeTeam = getActiveTeam();
+        map.setTerrain(terrain);
         map.setWind(windForce);
         turnLogic.beginTurn();
         activeTeam.beginTurn();

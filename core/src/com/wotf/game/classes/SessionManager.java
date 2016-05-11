@@ -99,6 +99,10 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
             // This will set a value for a variable which will be checked constantly inside the render method.
             GUI.backToLobby();
         }
+        
+        if (evt.getPropertyName().equals("startgameprop")){
+            GUI.startGame();
+        }
     }
 
 }

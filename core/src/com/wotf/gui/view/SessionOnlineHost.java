@@ -528,9 +528,12 @@ public class SessionOnlineHost implements Screen {
                     return;
                 }
 
-                // Create the map
-                Map map = new Map(chooseMap.getSelected().toString());
-                game.setScreen(new GameEngine(game, gameSettings, map));
+                try {
+                    session.startGame();
+                } catch (RemoteException ex) {
+                    Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                game.setScreen(new GameEngine(game, session, player));
             }
         });
 

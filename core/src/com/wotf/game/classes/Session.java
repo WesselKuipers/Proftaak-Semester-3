@@ -1,5 +1,6 @@
 package com.wotf.game.classes;
 
+import com.wotf.gui.view.GameEngine;
 import com.wotf.gui.view.ISessionSettings;
 import fontyspublisher.IRemotePropertyListener;
 import fontyspublisher.RemotePublisher;
@@ -130,7 +131,7 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
      * Initializes the game screen
      */
     public void startGame() throws RemoteException {
-        // TODO: handle code for creating game object
+        publisher.inform("startgameprop", 0, 1);
     }
 
     @Override

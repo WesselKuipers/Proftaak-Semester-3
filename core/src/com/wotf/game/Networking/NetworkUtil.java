@@ -38,6 +38,7 @@ public class NetworkUtil {
     private GameStage scene;
     private Socket socket;
     private List<Vector2> spawnLocations = new ArrayList<>();
+    private boolean[][] terrain;
     
     /**
      * Object holds data to connect to the host.
@@ -113,7 +114,7 @@ public class NetworkUtil {
      */
     public void sendToHost( NetworkMessage nMsg ) {
         try {
-            socket.getOutputStream().write((nMsg.toString() + "\n").getBytes());
+            socket.getOutputStream().write((nMsg.toString() + System.lineSeparator()).getBytes());
             
             // If its the host that is sending the message, you have to run the action for the host too
             if (scene.getGame().getPlayingPlayer().equals(host)) {
@@ -134,7 +135,7 @@ public class NetworkUtil {
      */
     public void sendToClient( String message, String clientIP ) {       
         try {
-            socket.getOutputStream().write((message + "\n").getBytes());
+            socket.getOutputStream().write((message + System.lineSeparator()).getBytes());
         } catch (IOException e) {
             System.out.println("An error occured");
         }
@@ -148,7 +149,7 @@ public class NetworkUtil {
      */
     public void receiveMessage( String message ) {
         //debug
-        System.out.println("Received message: " + message);
+        //System.out.println("Received message: " + message);
         
         //check if host get this message if so make host send it to all clients.
         
@@ -188,6 +189,8 @@ public class NetworkUtil {
                 initGame( nMsg );
             case SPAWNLOCATION:
                 addSpawnLocation ( nMsg );
+            case TERRAIN:
+                addTerrainX ( nMsg );
                 break;
             default: 
                 System.out.println("Command was not processed");
@@ -258,16 +261,21 @@ public class NetworkUtil {
     
     public void beginTurn( NetworkMessage nMsg ) {
         try {
-            String windXStr = nMsg.getParameter("windX");
-            String windYStr = nMsg.getParameter("windY");
-            
-            float windX = Float.parseFloat( windXStr );
-            float windY = Float.parseFloat( windYStr );
-            
-            Vector2 windForce = new Vector2( windX, windY );
+            // host has already ran this action when sending this message, so we want to apply it only on the connected clients 
             if (!scene.getGame().getPlayingPlayer().equals(host)) {
-                scene.getGame().beginTurnReceive(windForce);
+                
+                // set the wind force
+                String windXStr = nMsg.getParameter("windX");
+                String windYStr = nMsg.getParameter("windY");
+
+                float windX = Float.parseFloat( windXStr );
+                float windY = Float.parseFloat( windYStr );
+
+                Vector2 windForce = new Vector2( windX, windY );
+                
+                scene.getGame().beginTurnReceive(terrain, windForce);
             }
+            
         }
         catch( InvalidParameterException ipe ) {
             //TODO: what do we do when message went wrong ? ask host aggain ?
@@ -285,6 +293,30 @@ public class NetworkUtil {
             Vector2 spawnLocation = new Vector2( locX, locY );
             
             spawnLocations.add(spawnLocation);
+        }
+        catch( InvalidParameterException ipe ) {
+            //TODO: what do we do when message went wrong ? ask host aggain ?
+        }
+    }
+    
+    public void addTerrainX( NetworkMessage nMsg ) {
+        try {
+            boolean[][] terrain = scene.getGame().getMap().getTerrain();
+            int yVal = 0;
+            boolean val = false;
+            
+            String xStr = nMsg.getParameter("x");
+            for (int y = 0; y < terrain[0].length; y++) {
+                String yStr = nMsg.getParameter("y"+y);
+                String valStr = nMsg.getParameter("val"+y);
+                
+                yVal = Integer.parseInt( yStr );
+                val = Boolean.parseBoolean(valStr);
+            }
+            
+            int x = Integer.parseInt( xStr );
+            
+            terrain[x][yVal] = val;
         }
         catch( InvalidParameterException ipe ) {
             //TODO: what do we do when message went wrong ? ask host aggain ?

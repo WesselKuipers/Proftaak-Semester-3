@@ -18,7 +18,8 @@ public enum Command {
     BEGINTURN,
     ENDTURN,
     INITGAME,
-    SPAWNLOCATION;
+    SPAWNLOCATION, 
+    TERRAIN;
     
     /**
      * Helper method which converts a string into command enum.

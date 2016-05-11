@@ -21,6 +21,7 @@ import com.wotf.game.classes.Team;
 import java.util.ArrayList;
 import java.util.List;
 import com.wotf.game.WotFGame;
+import com.wotf.game.classes.Session;
 
 /**
  * Wrapper class that contains the Game object
@@ -33,7 +34,9 @@ public class GameEngine implements Screen {
     private Skin skin;
     private List<Team> teams;
     private GameSettings gameSettings;
+    private Session session;
     private Map map;
+    private Player playingPlayer;
 
     /**
      * Constructor of GameEngine
@@ -55,6 +58,20 @@ public class GameEngine implements Screen {
         this.map = map;
         this.skin = new Skin(Gdx.files.internal("uiskin.json"));
     }
+    
+    /**
+    * Constructor of GameEngine
+    * @param game Game that will be launched
+     * @param session
+    */
+    public GameEngine(WotFGame game, Session session, Player playingPlayer) {
+        this.game = game;
+        this.session = session;
+        this.gameSettings = session.getGameSettings();
+        this.playingPlayer = playingPlayer;
+        this.map = new Map(session.getGameSettings().getMapName());
+        this.skin = new Skin(Gdx.files.internal("uiskin.json"));
+    }
 
     /**
      * {@inheritDoc}
@@ -62,12 +79,12 @@ public class GameEngine implements Screen {
     @Override
     public void show() {
         // Creates default players list and object
-        List<Player> players = new ArrayList<>();
+        /*List<Player> players = new ArrayList<>();
         //players.add(new Player("145.93.92.128", "PlayerHost"));
         players.add(new Player("127.0.0.1", "PlayerHost"));
         players.add(new Player("127.0.0.1", "PlayerClient"));
         
-        Player playingPlayer = players.get(0);
+        Player playingPlayer = players.get(0);*/
 
         map.setWaterLevel(30);
         
@@ -97,7 +114,7 @@ public class GameEngine implements Screen {
         viewport.apply();
 
         // Initializes game object using game settings
-        Game gameclass = new Game(gameSettings, map, players, playingPlayer);
+        Game gameclass = new Game(gameSettings, map, session.getPlayers(), playingPlayer);
 
         stageGUI = new GuiStage(gameclass);
         
