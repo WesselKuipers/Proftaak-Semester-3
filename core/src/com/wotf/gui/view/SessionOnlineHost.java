@@ -464,7 +464,6 @@ public class SessionOnlineHost implements Screen {
         }
 
         map1 = new Image(new Texture(mapslist.get(0)));
-        gameSettings.setMapIndex(0);
         try {
             session.setGameSettings(gameSettings);
         } catch (RemoteException ex) {
@@ -476,6 +475,10 @@ public class SessionOnlineHost implements Screen {
         mapstable.addActor(map1);
         SelectBox chooseMap = new SelectBox(skin);
         chooseMap.setItems(mapslist.toArray());
+        
+        gameSettings.setMapIndex(chooseMap.getSelectedIndex());
+        gameSettings.setMapName(chooseMap.getSelected().toString());
+        
         chooseMap.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
