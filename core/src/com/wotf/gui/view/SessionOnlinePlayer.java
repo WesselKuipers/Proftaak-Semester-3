@@ -13,11 +13,9 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
@@ -25,27 +23,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.badlogic.gdx.utils.Array;
 import com.wotf.game.WotFGame;
 import com.wotf.game.classes.GameSettings;
-import com.wotf.game.classes.Map;
 import com.wotf.game.classes.Player;
 import com.wotf.game.classes.Session;
 import com.wotf.game.classes.SessionManager;
 import com.wotf.game.classes.Team;
 import com.wotf.game.database.PlayerContext;
 import com.wotf.game.database.SessionPlayerContext;
-import fontyspublisher.IRemotePropertyListener;
-import java.beans.PropertyChangeEvent;
-import java.rmi.AccessException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Timer;
@@ -410,7 +398,7 @@ public class SessionOnlinePlayer implements Screen {
                 Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+
         if (startGame != 0) {
             game.setScreen(new GameEngine(game, session, player));
         }
@@ -568,8 +556,11 @@ public class SessionOnlinePlayer implements Screen {
         // Solution could be to change a variable which will be checked and then change screen.
         switchscreencheck = 1;
     }
-    
+
     public void startGame() {
         startGame = 1;
+        // Updating the playerList before lauch
+        getPlayersOfSession();
+        session.setPlayerList(playerList);
     }
 }

@@ -524,9 +524,14 @@ public class SessionOnlineHost implements Screen {
                 try {
                     timer.cancel();
 
+                    // Updating map before lauch
                     gameSettings.setMapName(chooseMap.getSelected().toString());
                     gameSettings.setMapIndex(chooseMap.getSelectedIndex());
                     session.setGameSettings(gameSettings);
+                    
+                    // Updating the playerList before lauch
+                    getPlayersOfSession();
+                    session.setPlayerList(playerList);
 
                     // Check if there are at least 2 teams otherwise return
                     if (teamList.size() < 2) {

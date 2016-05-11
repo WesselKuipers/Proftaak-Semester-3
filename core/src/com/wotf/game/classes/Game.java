@@ -37,8 +37,8 @@ public class Game {
      */
     public Game(GameSettings gameSettings, Map map, List<Player> players, Player playingPlayer) {
         this.gameSettings = gameSettings;
-        this.host = players.get(0);
         this.players = players;
+        this.host = this.players.get(0);
         this.playingPlayer = playingPlayer;
         this.teams = this.gameSettings.getTeams();
         this.gamePhysics = new GamePhysics();

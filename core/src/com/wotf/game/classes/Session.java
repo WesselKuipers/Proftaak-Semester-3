@@ -1,6 +1,5 @@
 package com.wotf.game.classes;
 
-import com.wotf.gui.view.GameEngine;
 import com.wotf.gui.view.ISessionSettings;
 import fontyspublisher.IRemotePropertyListener;
 import fontyspublisher.RemotePublisher;
@@ -114,6 +113,10 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
     public void removePlayer(Player p) {
         players.remove(p);
         // TODO: logic for kicking players
+    }
+    
+    public void setPlayerList(ArrayList<Player> playerList){
+        this.players = playerList;
     }
 
     public String getRoomName() {
