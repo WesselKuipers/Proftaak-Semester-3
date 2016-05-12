@@ -94,9 +94,9 @@ public class Unit extends Group {
                 if (keycode == Keys.NUM_5) {
                     selecting_weapon(4);
                 }
-                if (keycode == Keys.NUM_6) {
-                    selecting_weapon(5);
-                }
+//                if (keycode == Keys.NUM_6) {
+//                    selecting_weapon(5);
+//                }
 // </editor-fold>
                 return true;
             }
@@ -153,6 +153,7 @@ public class Unit extends Group {
      * @param i Item object that you want to select
      */
     public void selectWeapon(Item i) {
+        Unit.this.clearChildren();
         destroyWeapon();
         weapon = i;
         //i.initActor();
