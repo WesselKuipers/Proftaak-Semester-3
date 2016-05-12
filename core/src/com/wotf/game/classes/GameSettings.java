@@ -83,19 +83,20 @@ public class GameSettings implements Serializable {
      * TODO!
      */
     private void fillWeapons() {
-        Sprite bullet_sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
+        /*Sprite bullet_sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
         Sprite bazooka_sprite = new Sprite(new Texture(Gdx.files.internal("Bazooka.png")));
 
         Sprite grenade_sprite = new Sprite(new Texture(Gdx.files.internal("grenade.png")));
         Sprite clusterbomb_sprite = new Sprite(new Texture(Gdx.files.internal("clusterbomb.png")));
 
         Sprite nuke_sprite = new Sprite(new Texture(Gdx.files.internal("nuclearbomb.png")));
-        Sprite remote_sprite = new Sprite(new Texture(Gdx.files.internal("remote.png")));
+        Sprite remote_sprite = new Sprite(new Texture(Gdx.files.internal("remote.png")));*/
 
-        WEAPONS_ARMORY.add(new Bazooka("Bazooka", 15, 30, 40, bazooka_sprite, bullet_sprite));
-        WEAPONS_ARMORY.add(new Nuke("Nuke", 5, 60, 80, remote_sprite, nuke_sprite));
-        WEAPONS_ARMORY.add(new Grenade("Grenade", 10, 10, 20, grenade_sprite, grenade_sprite));
-        WEAPONS_ARMORY.add(new Clusterbomb("Clusterbomb", 10, 20, 45, clusterbomb_sprite, clusterbomb_sprite));
+        WEAPONS_ARMORY.add(new Bazooka("Bazooka"));
+        WEAPONS_ARMORY.add(new Nuke("Nuke"));
+        WEAPONS_ARMORY.add(new Grenade("Grenade"));
+        WEAPONS_ARMORY.add(new Clusterbomb("Clusterbomb"));
+        WEAPONS_ARMORY.add(new AirStrike("Airstrike"));
     }
  
     /**

@@ -15,11 +15,11 @@ import org.junit.Test;
  */
 public class BazookaTest {
 
-    private Bazooka bazooka;
+    private Bazooka1 bazooka;
 
     /*@Before
     public void initItem() {
-        bazooka = new Bazooka("Bazooka", 20, 30, 100, null, null);
+        bazooka = new Bazooka1("Bazooka", 20, 30, 100, null, null);
     }
 
     @Test
