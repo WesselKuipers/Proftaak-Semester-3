@@ -495,6 +495,8 @@ public class SessionOnlinePlayer implements Screen {
                 TextButton teamtb = (TextButton) stage.getRoot().findActor(teamv.getName());
                 teamtb.setTouchable(Touchable.disabled);
                 teamtb.setColor(Color.LIGHT_GRAY);
+                int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
+                addUnitsSingleTeam(selectedunitcount,teamv);
             }
             teams.setItems(teamList.toArray());
         }
@@ -523,6 +525,7 @@ public class SessionOnlinePlayer implements Screen {
             // MaxUnitCount selected
             String maxunitcount = Integer.toString(managersession.getGameSettings().getMaxUnitCount());
             unitbox.setSelected(maxunitcount);
+            refreshUnitsForTeam(Integer.parseInt(maxunitcount));
         }
     }
 
@@ -556,11 +559,34 @@ public class SessionOnlinePlayer implements Screen {
         // Solution could be to change a variable which will be checked and then change screen.
         switchscreencheck = 1;
     }
-
+    
     public void startGame() {
         startGame = 1;
         // Updating the playerList before lauch
         getPlayersOfSession();
         session.setPlayerList(playerList);
+    }
+    
+        public void addUnitsSingleTeam(int selectedunitcount, Team team) {
+        // The new units to the team. The name of the unit is the teamname + the number of the variable 'i'.
+        for (int i = 0; i < selectedunitcount; i++) {
+            team.addUnit(team.getName() + Integer.toString(i), 100);
+        }
+        teamList.add(team);
+        gameSettings.addTeam(team);
+        teams.setItems(teamList.toArray());
+    }
+        
+    public void refreshUnitsForTeam(int selectedunitcount) {
+        // For each team in the list remove all the units first and remove it from the gamesettings.
+        for (Team teamv : teamList) {
+            gameSettings.removeTeam(teamv);
+            teamv.removeAllUnits();
+            // The new units to the team. The name of the unit is the teamname + the number of the variable 'i'.
+            for (int i = 0; i < selectedunitcount; i++) {
+                teamv.addUnit(teamv.getName() + Integer.toString(i), 100);
+            }
+            gameSettings.addTeam(teamv);
+        }
     }
 }

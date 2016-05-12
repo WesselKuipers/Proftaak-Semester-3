@@ -150,6 +150,7 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
 
     @Override
     public String toString() {
+        if(this.host == null || this.gameSettings == null) return "Remove session from DB";
         return host.getName() + " " + this.roomName + "     " + this.getPlayers().size() + "/" + this.gameSettings.getMaxPlayersSession();
     }
 

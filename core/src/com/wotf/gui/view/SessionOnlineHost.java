@@ -192,7 +192,7 @@ public class SessionOnlineHost implements Screen {
                         teamalpha.setPlayer(selectedplayer);
 
                         addUnitsSingleTeam(selectedunitcount, teamalpha);
-
+                        
                         session.setGameSettings(gameSettings);
 
                         btnteamalpha.setTouchable(Touchable.disabled);
