@@ -16,25 +16,26 @@ import com.badlogic.gdx.utils.Array;
 import com.wotf.game.classes.Items.Item;
 import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
+import java.io.Serializable;
 
 /**
  * Unit represents a playable character on the map
  */
-public class Unit extends Group {
+public class Unit extends Group implements Serializable {
 
     private float angle;
-    private Vector2 acceleration;
-    private TextureRegion unitStand;
-    private Vector2 velocity = new Vector2();
-    public boolean moveRight;
+    private transient Vector2 acceleration;
+    private transient TextureRegion unitStand;
+    private transient Vector2 velocity = new Vector2();
+    public  boolean moveRight;
     private int health;
     private String name;
-    private Sprite sprite;
-    private Vector2 position;
-    private Item weapon;
+    private transient Sprite sprite;
+    private transient Vector2 position;
+    private transient Item weapon;
     private Team team;
     // Font is used for displaying name and health
-    private BitmapFont font;
+    private transient BitmapFont font;
 
     /**
      * Initializes a unit object
