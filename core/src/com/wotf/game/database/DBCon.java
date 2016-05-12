@@ -48,11 +48,10 @@ public class DBCon {
      * @return Number of rows afflicted
      */
     public static int executeUpdate(String query, List<Object> parameters) {
-        Connection con = getConnection();
-        PreparedStatement ps;
-
+        Connection con = null;
         try {
-            ps = con.prepareCall(query);
+            con = getConnection();
+            PreparedStatement ps = con.prepareCall(query);
 
             // If the list of parameters isn't empty, adds them to the prepared statement
             if (parameters != null) {
@@ -67,8 +66,15 @@ public class DBCon {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
         }
-        connectionClose(con);
         // If we've reached this point, it means the query didn't succeed, return -1
         return -1;
     }
@@ -89,11 +95,10 @@ public class DBCon {
      * @return ResultSet of the query
      */
     public static ResultSet executeResultSet(String query, List<Object> parameters) {
-        Connection con = getConnection();
-        PreparedStatement ps;
-
+        Connection con = null;
         try {
-            ps = con.prepareCall(query);
+            con = getConnection();
+            PreparedStatement ps = con.prepareCall(query);
 
             // If the list of parameters isn't empty, adds them to the prepared statement
             if (parameters != null) {
@@ -108,8 +113,15 @@ public class DBCon {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-        } 
-        connectionClose(con);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        }
         // If we've reached this point, it means the query didn't succeed, return null
         return null;
     }
@@ -130,11 +142,10 @@ public class DBCon {
      * @return List of String[] representing every row returned from the query
      */
     public static List<String[]> executeResultSetAsList(String query, List<Object> parameters) {
-        Connection con = getConnection();
-        PreparedStatement ps;
-
+        Connection con = null;
         try {
-            ps = con.prepareCall(query);
+            con = getConnection();
+            PreparedStatement ps = con.prepareCall(query);
 
             // If the list of parameters isn't empty, adds them to the prepared statement
             if (parameters != null) {
@@ -182,20 +193,16 @@ public class DBCon {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-        } 
-        
-        connectionClose(con);
-        // If we've reached this point, it means the query didn't succeed, return null
-        return null;
-    }
-
-    public static void connectionClose(Connection con) {
-        if (con != null) {
-            try {
-                con.close();
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (SQLException ex) {
+                    System.out.println(ex.getMessage());
+                }
             }
         }
+        // If we've reached this point, it means the query didn't succeed, return null
+        return null;
     }
 }
