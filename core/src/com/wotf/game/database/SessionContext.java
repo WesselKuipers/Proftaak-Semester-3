@@ -47,6 +47,7 @@ public class SessionContext extends EntityContext<Session> {
         while (result.next()) {
             id = result.getInt("ID");
         }
+        DBCon.close(result);
         return getById(id);
     }
 
@@ -78,7 +79,7 @@ public class SessionContext extends EntityContext<Session> {
         while (res.next()) {
             sessions.add(getById(res.getInt("ID")));
         }
-
+        DBCon.close(res);
         return sessions;
     }
 
