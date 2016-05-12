@@ -59,3 +59,5 @@ nb-configuration.xml
 .gradle
 build/
 /.nb-gradle/
+/core/src/com/.sonar/
+/core/assets/dbc.properties
