@@ -14,6 +14,8 @@ import com.badlogic.gdx.net.Socket;
 import com.badlogic.gdx.net.SocketHints;
 import com.wotf.game.GameStage;
 import com.wotf.game.classes.Player;
+import com.wotf.game.classes.Team;
+import com.wotf.game.classes.Unit;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -33,16 +35,17 @@ import java.util.List;
  */
 public class NetworkUtil {
     
-    private Player host;
+    private final Player host;
     private final int _PORT = 9021;
-    private GameStage scene;
+    private final GameStage scene;
     private Socket socket;
-    private List<Vector2> spawnLocations = new ArrayList<>();
+    private final List<Vector2> unitPositions = new ArrayList<>();
     private boolean[][] terrain;
     
     /**
      * Object holds data to connect to the host.
-     * @param hostIP IP address of the host of the game.
+     * @param host the host of the game.
+     * @param gameStage stage to interact with the actors and all classes being used by the game
      */
     public NetworkUtil( Player host, GameStage gameStage ){
         this.host = host;
@@ -101,7 +104,7 @@ public class NetworkUtil {
                         }
                     }
                 } catch (IOException ex) {
-                    System.out.println(ex);
+                    Gdx.app.log("networkingUtil", "Error occured while reading message", ex);
                     break;
                 }
             } 
@@ -124,7 +127,7 @@ public class NetworkUtil {
             // debug 
             System.out.println("Command: " + nMsg.getCommand().toString() + " was send to host.");
         } catch (IOException ex) {
-            System.out.println("An error occured");
+            Gdx.app.log("networkingUtil", "Error occured while sending message to host", ex);
         }
     } 
     
@@ -136,8 +139,8 @@ public class NetworkUtil {
     public void sendToClient( String message, String clientIP ) {       
         try {
             socket.getOutputStream().write((message + System.lineSeparator()).getBytes());
-        } catch (IOException e) {
-            System.out.println("An error occured");
+        } catch (IOException ex) {
+            Gdx.app.log("networkingUtil", "Error occured while sending message to client", ex);
         }
     } 
     
@@ -168,9 +171,9 @@ public class NetworkUtil {
     
     /**
      * handle the logic behind the messages.
+     * @param nMsg the network message being sent to the appropriate method
      */
     public void commandLogic( NetworkMessage nMsg ) {
-        // TODO: handle message logic
         // the action can be checked based on the enum Command which can be retreived by nMsg.getCommand()
         // to retreive a parameter do nMsg.getParameter( parameterName).
         // will return null if specified parameter could not be found (message was created incorrect)
@@ -180,15 +183,19 @@ public class NetworkUtil {
                 fire( nMsg );
                 break;
             case MOVE:
+                move ( nMsg );
                 break;
             case BEGINTURN:
                 beginTurn( nMsg );
             case ENDTURN:
+                endTurn ( nMsg );
                 break;
             case INITGAME:
                 initGame( nMsg );
-            case SPAWNLOCATION:
-                addSpawnLocation ( nMsg );
+                break;
+            case SYNCUNITS:
+                syncUnits( nMsg );
+                break;
             case TERRAIN:
                 addTerrainX ( nMsg );
                 break;
@@ -246,12 +253,13 @@ public class NetworkUtil {
         }
         catch( InvalidParameterException ipe ) {
             //TODO: what do we do when message went wrong ? ask host aggain ?
+            Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
     }
     
     public void initGame( NetworkMessage nMsg ) {
         try {
-            scene.spawnUnits(spawnLocations);
+            scene.spawnUnits(unitPositions);
             scene.getGame().beginTurn();
         }
         catch( InvalidParameterException ipe ) {
@@ -263,7 +271,6 @@ public class NetworkUtil {
         try {
             // host has already ran this action when sending this message, so we want to apply it only on the connected clients 
             if (!scene.getGame().getPlayingPlayer().equals(host)) {
-                
                 // set the wind force
                 String windXStr = nMsg.getParameter("windX");
                 String windYStr = nMsg.getParameter("windY");
@@ -275,27 +282,10 @@ public class NetworkUtil {
                 
                 scene.getGame().beginTurnReceive(terrain, windForce);
             }
-            
         }
         catch( InvalidParameterException ipe ) {
             //TODO: what do we do when message went wrong ? ask host aggain ?
-        }
-    }
-
-    public void addSpawnLocation( NetworkMessage nMsg ) {
-        try {
-            String locXStr = nMsg.getParameter("locX");
-            String locYStr = nMsg.getParameter("locY");
-            
-            float locX = Float.parseFloat( locXStr );
-            float locY = Float.parseFloat( locYStr );
-            
-            Vector2 spawnLocation = new Vector2( locX, locY );
-            
-            spawnLocations.add(spawnLocation);
-        }
-        catch( InvalidParameterException ipe ) {
-            //TODO: what do we do when message went wrong ? ask host aggain ?
+            Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
     }
     
@@ -320,6 +310,44 @@ public class NetworkUtil {
         }
         catch( InvalidParameterException ipe ) {
             //TODO: what do we do when message went wrong ? ask host aggain ?
+            Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
+        }
+    }
+    
+    public void syncUnits( NetworkMessage nMsg ) {
+        try {   
+            List<Team> teams = scene.getGame().getTeams();
+            int unitCount = 0;
+            
+            for (Team team : teams) {
+                for (Unit unit : team.getUnits()) {
+                    String unitXStr = nMsg.getParameter("u" + unitCount + "x");
+                    String unitYStr = nMsg.getParameter("u" + unitCount + "y");
+
+                    float unitX = Float.parseFloat( unitXStr );
+                    float unitY = Float.parseFloat( unitYStr );
+
+                    Vector2 unitPosition = new Vector2( unitX, unitY );
+
+                    // When no positions are yet added, add them to the array, else we are going to sync the current positions and the unit health
+                    if (unitPositions == null || unitPositions.size() < 1) {
+                        unitPositions.add(unitPosition);
+                    } else {
+                        unit.setPosition(unitPosition);
+
+                        // Sync the unit health
+                        String unitHealthStr = nMsg.getParameter("u" + unitCount + "hp");
+                        int unitHealth = Integer.parseInt(unitHealthStr);
+                        int damageUnit = unit.getHealth() - unitHealth;
+                        unit.decreaseHealth(damageUnit);
+                    }
+                    unitCount++;
+                }
+            }
+        }
+        catch( InvalidParameterException ipe ) {
+            //TODO: what do we do when message went wrong ? ask host aggain ?
+            Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
     }
     
@@ -331,8 +359,12 @@ public class NetworkUtil {
         }
         catch( InvalidParameterException ipe ) {
             //TODO: what do we do when message went wrong ? ask host aggain ?
+            Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
         
     }
-    
+
+    private void endTurn(NetworkMessage nMsg) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

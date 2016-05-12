@@ -100,18 +100,20 @@ public class GameStage extends Stage {
         
         // Initialize the game by host, after that send it to all connected clients
         if (game.getPlayingPlayer().equals(game.getHost())) {
-            // Send each random spawn location seperately
-            List<Vector2> randomSpawnLocations = getRandomSpawnLocations();
-
-            for(Vector2 spawnLocation : randomSpawnLocations) {
-                NetworkMessage spawnLocMsg = new NetworkMessage( Command.SPAWNLOCATION );
-                spawnLocMsg.addParameter("locX", Float.toString(spawnLocation.x));
-                spawnLocMsg.addParameter("locY", Float.toString(spawnLocation.y));
-                networkingUtil.sendToHost( spawnLocMsg );
+            
+            // Send all the random spawn locations in one message
+            int unitCount = 0;
+            NetworkMessage syncUnitsMsg = new NetworkMessage ( Command.SYNCUNITS );
+            
+            for (Vector2 spawnLocation : getRandomSpawnLocations()) {
+                syncUnitsMsg.addParameter("u" + unitCount + "x", Float.toString(spawnLocation.x));
+                syncUnitsMsg.addParameter("u" + unitCount + "x", Float.toString(spawnLocation.y));
+                unitCount++;
             }
+            
+            networkingUtil.sendToHost( syncUnitsMsg );
 
             NetworkMessage initGameMsg = new NetworkMessage( Command.INITGAME );
-
             networkingUtil.sendToHost( initGameMsg );
         }
         
@@ -144,41 +146,42 @@ public class GameStage extends Stage {
     
     /**
      * 
+     * @param unitAmount
      * @return a list with random spawn locations 
      */
     public List<Vector2> getRandomSpawnLocations() {
         boolean[][] terrain = game.getMap().getTerrain(); 
         List<Vector2> spawnLocations = new ArrayList<>();
+        int unitAmount = game.getGameSettings().getMaxUnitCount() * game.getTeams().size();
+        float unitWidth = game.getTeam(0).getUnit(0).getWidth();
 
-        for (Team team : game.getTeams()) {
-            for (Unit unit : team.getUnits()) {
-                // Generates a random X position and attempts to find the highest collision-free position
-                // and spawns the unit at that position, will continue looping until a position has been found
-                boolean spawned = false;
-                int posX = 0;
-                int posY = 0;
+        for (int i = unitAmount; i >= 0; i--) {
+            // Generates a random X position and attempts to find the highest collision-free position
+            // and spawns the unit at that position, will continue looping until a position has been found
+            boolean spawned = false;
+            int posX = 0;
+            int posY = 0;
 
-                while (!spawned) {
-                    posX = MathUtils.random(0 + (int) unit.getWidth(), (int) game.getMap().getWidth() - (int) unit.getWidth());
-                    posY = -1;
+            while (!spawned) {
+                posX = MathUtils.random(0 + (int) unitWidth, (int) game.getMap().getWidth() - (int) unitWidth);
+                posY = -1;
 
-                    // loops through terrain[x ± half its width][y] to check for collision free locations
-                    for (int x = posX; x < posX + unit.getWidth(); x++) {
-                        for (int y = terrain[0].length - 1; y > 0; y--) {
-                            if (terrain[x][y]) {
-                                if (y > posY) {
-                                    posY = y;
-                                }
+                // loops through terrain[x ± half its width][y] to check for collision free locations
+                for (int x = posX; x < posX + unitWidth; x++) {
+                    for (int y = terrain[0].length - 1; y > 0; y--) {
+                        if (terrain[x][y]) {
+                            if (y > posY) {
+                                posY = y;
                             }
                         }
                     }
+                }
 
-                    // if a position has been found, we can exit the loop
-                    if (posY != -1) {
-                        spawned = true;
-                        spawnLocations.add(new Vector2(posX, posY + 1));
-                        break;
-                    }
+                // if a position has been found, we can exit the loop
+                if (posY != -1) {
+                    spawned = true;
+                    spawnLocations.add(new Vector2(posX, posY + 1));
+                    break;
                 }
             }
         }

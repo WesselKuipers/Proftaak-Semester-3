@@ -18,7 +18,7 @@ public enum Command {
     BEGINTURN,
     ENDTURN,
     INITGAME,
-    SPAWNLOCATION, 
+    SYNCUNITS,
     TERRAIN;
     
     /**

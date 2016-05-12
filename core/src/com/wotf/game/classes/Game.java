@@ -148,6 +148,21 @@ public class Game {
                 }
                 gameStage.getNetworkingUtil().sendToHost( terrainMsg );
             }*/
+  
+            // Sync units position and health
+            int unitCount = 0;
+            NetworkMessage syncUnitsMsg = new NetworkMessage ( Command.SYNCUNITS );
+
+            for (Team team : teams) {
+                for (Unit unit : team.getUnits()) {
+                    syncUnitsMsg.addParameter("u" + unitCount + "x", Float.toString(unit.getPosition().x));
+                    syncUnitsMsg.addParameter("u" + unitCount + "x", Float.toString(unit.getPosition().y));
+                    syncUnitsMsg.addParameter("u" + unitCount + "hp", Integer.toString(unit.getHealth()));
+                    unitCount++;
+                }
+            }
+            
+            gameStage.getNetworkingUtil().sendToHost( syncUnitsMsg );
         
             NetworkMessage beginTurnMsg = new NetworkMessage( Command.BEGINTURN );
 
