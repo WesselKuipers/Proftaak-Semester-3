@@ -1,8 +1,10 @@
 package com.wotf.game.database;
 
+import com.sun.rowset.CachedRowSetImpl;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.sql.rowset.CachedRowSet;
 
 /**
  * Created by Wessel on 1-2-2016.
@@ -12,7 +14,7 @@ public class DBCon {
     private static Connection connection;
 
     // TODO: 6-3-2016 Refactor this so that the username and password are loaded from a file instead of being hard-coded
-    private static final String ConnectionPath = "jdbc:mysql://89.98.157.235:3306/school"; // example oracle string: "jdbc:oracle:thin:@localhost:1521:XE";
+    private static final String ConnectionPath = "jdbc:mysql://192.168.0.187:3306/school"; // example oracle string: "jdbc:oracle:thin:@localhost:1521:XE";
     private static final String Username = "connect";
     private static final String Password = "admin";
 
@@ -34,6 +36,7 @@ public class DBCon {
 
     /**
      * Executes an update query
+     *
      * @param query Query to run
      * @return Number of rows afflicted
      */
@@ -49,9 +52,10 @@ public class DBCon {
      */
     public static int executeUpdate(String query, List<Object> parameters) {
         Connection con = null;
+        PreparedStatement ps = null;
         try {
             con = getConnection();
-            PreparedStatement ps = con.prepareCall(query);
+            ps = con.prepareCall(query);
 
             // If the list of parameters isn't empty, adds them to the prepared statement
             if (parameters != null) {
@@ -66,6 +70,8 @@ public class DBCon {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally{
+            closeQuietly(con, ps);
         }
         // If we've reached this point, it means the query didn't succeed, return -1
         return -1;
@@ -88,9 +94,11 @@ public class DBCon {
      */
     public static ResultSet executeResultSet(String query, List<Object> parameters) {
         Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet result = null;
         try {
             con = getConnection();
-            PreparedStatement ps = con.prepareCall(query);
+            ps = con.prepareCall(query);
 
             // If the list of parameters isn't empty, adds them to the prepared statement
             if (parameters != null) {
@@ -101,10 +109,18 @@ public class DBCon {
 
             // If the query returned a ResultSet, we can safely return it (or at least the first one)
             if (ps.execute()) {
-                return ps.getResultSet();
+                result = ps.getResultSet();
+                
+                CachedRowSet rowset;
+                rowset = new CachedRowSetImpl();
+                rowset.populate(result);
+
+                return rowset;
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally{
+            closeQuietly(con, ps, result);
         }
         // If we've reached this point, it means the query didn't succeed, return null
         return null;
@@ -127,9 +143,10 @@ public class DBCon {
      */
     public static List<String[]> executeResultSetAsList(String query, List<Object> parameters) {
         Connection con = null;
+        PreparedStatement ps = null;
         try {
             con = getConnection();
-            PreparedStatement ps = con.prepareCall(query);
+            ps = con.prepareCall(query);
 
             // If the list of parameters isn't empty, adds them to the prepared statement
             if (parameters != null) {
@@ -172,22 +189,27 @@ public class DBCon {
 
                     result.add(record);
                 }
-
+                rs.close();
                 return result;
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally{
+            closeQuietly(con, ps);
         }
         // If we've reached this point, it means the query didn't succeed, return null
         return null;
     }
     
-    public static void close(ResultSet resultTemp){
+    public static void closeQuietly(AutoCloseable ... closeables) {
+    for (AutoCloseable c : closeables) {
+        if (c != null) {
             try {
-                if (resultTemp != null) 
-                    resultTemp.close();
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+                c.close();
+            } catch (Exception e) {
+                // log or ignore, we can't do anything about it really
             }
+        }
     }
+}
 }

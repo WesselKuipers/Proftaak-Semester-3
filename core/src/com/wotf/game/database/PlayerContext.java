@@ -44,7 +44,6 @@ public class PlayerContext extends EntityContext<Player> {
         while (result.next()) {
             id = result.getInt("ID");
         }
-        DBCon.close(result);
         return getById(id);
     }
 
@@ -76,7 +75,6 @@ public class PlayerContext extends EntityContext<Player> {
         while (res.next()) {
             players.add(getById(res.getInt("ID")));
         }
-        DBCon.close(res);
         return players;
     }
 

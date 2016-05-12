@@ -36,7 +36,6 @@ public class SessionPlayerContext {
         while (res.next()) {
             players.add(_context.getById(res.getInt("PlayerID")));
         }
-        DBCon.close(res);
         return players;
     }
     /**
