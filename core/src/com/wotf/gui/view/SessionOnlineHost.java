@@ -29,7 +29,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.wotf.game.WotFGame;
 import com.wotf.game.classes.GameSettings;
-import com.wotf.game.classes.Map;
 import com.wotf.game.classes.Player;
 import com.wotf.game.classes.Session;
 import com.wotf.game.classes.SessionManager;
@@ -42,7 +41,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -72,6 +70,7 @@ public class SessionOnlineHost implements Screen {
     private Timer timer;
     private SelectBox maxplayerbox;
     private SelectBox unitbox;
+
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting
      *
@@ -191,9 +190,9 @@ public class SessionOnlineHost implements Screen {
                         }
 
                         teamalpha.setPlayer(selectedplayer);
-                        
-                        addUnitsSingleTeam(selectedunitcount, teamalpha);
 
+                        addUnitsSingleTeam(selectedunitcount, teamalpha);
+                        
                         session.setGameSettings(gameSettings);
 
                         btnteamalpha.setTouchable(Touchable.disabled);
@@ -237,7 +236,7 @@ public class SessionOnlineHost implements Screen {
                         teambeta.setPlayer(selectedplayer);
 
                         addUnitsSingleTeam(selectedunitcount, teambeta);
-                        
+
                         session.setGameSettings(gameSettings);
 
                         btnteambeta.setTouchable(Touchable.disabled);
@@ -525,18 +524,27 @@ public class SessionOnlineHost implements Screen {
         start.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                timer.cancel();
-                // Check if there are at least 2 teams otherwise return
-                if (teamList.size() < 2) {
-                    return;
-                }
-
                 try {
+                    timer.cancel();
+
+                    // Updating map before lauch
+                    gameSettings.setMapName(chooseMap.getSelected().toString());
+                    gameSettings.setMapIndex(chooseMap.getSelectedIndex());
+                    session.setGameSettings(gameSettings);
+                    
+                    // Updating the playerList before lauch
+                    getPlayersOfSession();
+                    session.setPlayerList(playerList);
+
+                    // Check if there are at least 2 teams otherwise return
+                    if (teamList.size() < 2) {
+                        return;
+                    }
                     session.startGame();
+                    game.setScreen(new GameEngine(game, session, player));
                 } catch (RemoteException ex) {
                     Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                game.setScreen(new GameEngine(game, session, player));
             }
         });
 

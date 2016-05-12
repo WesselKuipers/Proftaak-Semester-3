@@ -1,9 +1,6 @@
 package com.wotf.game.classes;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import java.util.ArrayList;
@@ -16,7 +13,6 @@ import com.wotf.game.classes.Items.Item;
 import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 import java.io.Serializable;
-import java.util.Iterator;
 
 /**
  * Team contains data that represent a team Contains a list of players, list of

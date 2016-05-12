@@ -74,7 +74,7 @@ public class SessionContext extends EntityContext<Session> {
         String query = "SELECT * FROM session ORDER BY ID";
         ResultSet res = DBCon.executeResultSet(query);
         List<Session> sessions = new ArrayList<>();
-
+        
         while (res.next()) {
             sessions.add(getById(res.getInt("ID")));
         }
