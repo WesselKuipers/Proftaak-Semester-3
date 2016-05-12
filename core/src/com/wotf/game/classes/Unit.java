@@ -326,13 +326,13 @@ public class Unit extends Group {
         if (moveRight) {
             nextPos = new Vector2(position.x + 20, position.y + 20);
             if (((GameStage) getStage()).getGame().getMap()
-                    .isPixelSolid((int) nextPos.x, (int) position.y)) {
+                    .isPixelSolid((int) nextPos.x + 5, (int) position.y + 3)) {
                 return;
             }
         } else {
             nextPos = new Vector2(position.x - 20, position.y + 20);
             if (((GameStage) getStage()).getGame().getMap()
-                    .isPixelSolid((int) nextPos.x, (int) position.y))
+                    .isPixelSolid((int) nextPos.x + 5, (int) position.y + 3))
                 return;
         }
 
