@@ -69,15 +69,6 @@ public class Unit extends Group {
         addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if (keycode == Keys.RIGHT) {
-                    moveRight = true;
-                    jump();
-                }
-
-                if (keycode == Keys.LEFT) {
-                    moveRight = false;
-                    jump();
-                }
 // <editor-fold defaultstate="collapsed" desc=" switching between weapons ">
                 if (keycode == Keys.NUM_1) {
                     selecting_weapon(0);
@@ -321,8 +312,10 @@ public class Unit extends Group {
      * setAcceleration with the gravity - setVelocity with the force
      *
      * Then the act calls the updateJump().
+     * @param moveRight
      */
-    public void jump() {
+    public void jump(boolean moveRight) {
+        this.moveRight = moveRight;
         // Jumping once
         if (velocity.x != 0 && velocity.y != 0) {
             return;
