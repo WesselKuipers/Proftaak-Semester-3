@@ -66,14 +66,6 @@ public class DBCon {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
-                }
-            }
         }
         // If we've reached this point, it means the query didn't succeed, return -1
         return -1;
@@ -113,14 +105,6 @@ public class DBCon {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
-                }
-            }
         }
         // If we've reached this point, it means the query didn't succeed, return null
         return null;
@@ -193,16 +177,17 @@ public class DBCon {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
-                }
-            }
         }
         // If we've reached this point, it means the query didn't succeed, return null
         return null;
+    }
+    
+    public static void close(ResultSet resultTemp){
+            try {
+                if (resultTemp != null) 
+                    resultTemp.close();
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
     }
 }
