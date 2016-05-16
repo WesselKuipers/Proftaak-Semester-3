@@ -42,11 +42,11 @@ public class GameStage extends Stage {
 
     private final SpriteBatch batch;
     private final SpriteBatch guiBatch;
-    
+
     private final BitmapFont font;
 
     private boolean showDebug = false;
-    
+
     private Actor focusedActor; // if this is set to an actor
     // have the camera follow it automatically, otherwise set it to null
 
@@ -225,10 +225,21 @@ public class GameStage extends Stage {
                 game.getActiveTeam().getActiveUnit().decreaseHealth(100);
                 game.endTurn();
                 break;
-                
+
             case Keys.F4:
                 showDebug = !showDebug;
                 break;
+
+            case Keys.RIGHT:
+                if(game.getActiveTeam().getActiveUnit() != null)
+                    game.getActiveTeam().getActiveUnit().jump(true);
+                break;
+
+            case Keys.LEFT:
+                if(game.getActiveTeam().getActiveUnit() != null)
+                    game.getActiveTeam().getActiveUnit().jump(false);
+                break;
+
         }
 
         clampCamera();
@@ -309,36 +320,36 @@ public class GameStage extends Stage {
         super.draw();
 
         if (showDebug) {
-        // guiBatch is primarily used to display text and miscellaneous graphics
-        guiBatch.begin();
+            // guiBatch is primarily used to display text and miscellaneous graphics
+            guiBatch.begin();
 
-        font.draw(guiBatch, "Debug variables:", 0, this.getHeight());
-        font.draw(guiBatch, "Actors amount: " + this.getActors().size, 0, this.getHeight() - 20);
+            font.draw(guiBatch, "Debug variables:", 0, this.getHeight());
+            font.draw(guiBatch, "Actors amount: " + this.getActors().size, 0, this.getHeight() - 20);
 
-        if (this.game.getActiveTeam().getActiveUnit() != null) {
-            font.draw(guiBatch,
-                    String.format("Active actor: %s XY[%f, %f]",
-                            this.game.getActiveTeam().getActiveUnit().getName(),
-                            this.game.getActiveTeam().getActiveUnit().getX(),
-                            this.game.getActiveTeam().getActiveUnit().getY()),
-                    0,
-                    this.getHeight() - 40);
+            if (this.game.getActiveTeam().getActiveUnit() != null) {
+                font.draw(guiBatch,
+                        String.format("Active actor: %s XY[%f, %f]",
+                                this.game.getActiveTeam().getActiveUnit().getName(),
+                                this.game.getActiveTeam().getActiveUnit().getX(),
+                                this.game.getActiveTeam().getActiveUnit().getY()),
+                        0,
+                        this.getHeight() - 40);
+            }
+
+            font.draw(guiBatch, String.format("Mouse position: screen [%d, %d], viewport %s", Gdx.input.getX(), game.getMap().getHeight() - Gdx.input.getY(), getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0))), 0, this.getHeight() - 60);
+            font.draw(guiBatch, String.format("Camera coords [%s], zoom %f", getCamera().position.toString(), ((OrthographicCamera) getCamera()).zoom), 0, this.getHeight() - 80);
+            font.draw(guiBatch, "Turn Time remaining: " + (game.getGameSettings().getTurnTime() - (int) game.getTurnLogic().getElapsedTime()), 0, this.getHeight() - 100);
+            font.draw(guiBatch, "Time remaining: " + (game.getGameSettings().getMaxTime() - (int) game.getTurnLogic().getTotalTime()), 0, this.getHeight() - 120);
+            font.draw(guiBatch, String.format("FPS: %d", Gdx.graphics.getFramesPerSecond()), 0, this.getHeight() - 140);
+
+            if (game.getTurnLogic().getState() == TurnState.GAMEOVER) {
+                font.draw(guiBatch, "GAME OVER", this.getWidth() / 2, this.getHeight() / 2);
+            }
+
+            font.draw(guiBatch, "Wind: " + game.getMap().getWind().toString(), 0, this.getHeight() - 160);
+
+            guiBatch.end();
         }
-
-        font.draw(guiBatch, String.format("Mouse position: screen [%d, %d], viewport %s", Gdx.input.getX(), game.getMap().getHeight() - Gdx.input.getY(), getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0))), 0, this.getHeight() - 60);
-        font.draw(guiBatch, String.format("Camera coords [%s], zoom %f", getCamera().position.toString(), ((OrthographicCamera) getCamera()).zoom), 0, this.getHeight() - 80);
-        font.draw(guiBatch, "Turn Time remaining: " + (game.getGameSettings().getTurnTime() - (int) game.getTurnLogic().getElapsedTime()), 0, this.getHeight() - 100);
-        font.draw(guiBatch, "Time remaining: " + (game.getGameSettings().getMaxTime() - (int) game.getTurnLogic().getTotalTime()), 0, this.getHeight() - 120);
-        font.draw(guiBatch, String.format("FPS: %d", Gdx.graphics.getFramesPerSecond()), 0, this.getHeight() - 140);
-
-        if (game.getTurnLogic().getState() == TurnState.GAMEOVER) {
-            font.draw(guiBatch, "GAME OVER", this.getWidth() / 2, this.getHeight() / 2);
-        }
-
-        font.draw(guiBatch, "Wind: " + game.getMap().getWind().toString(), 0, this.getHeight() - 160);
-
-        guiBatch.end();
-    }
     }
 
     /**
@@ -373,13 +384,13 @@ public class GameStage extends Stage {
 
     private void fireCluster(int x, int y) {
         Sprite partSprite = new Sprite(new Texture(Gdx.files.internal("part.png")));
-        
+
         x = x - 3;
-        for (int i = 0; i <= 4; i++) {            
-            Vector2 mousePos = new Vector2(x, y+2);
-            Vector2 position = new Vector2(x + i * 2, y);            
+        for (int i = 0; i <= 4; i++) {
+            Vector2 mousePos = new Vector2(x, y + 2);
+            Vector2 position = new Vector2(x + i * 2, y);
             Projectile part = new Projectile(partSprite, tempParticleEffects);
-            
+
             //fire: fire from, fire towards, power, wind, gravity, radius, damage
             part.fire(position, mousePos, 5, Vector2.Zero, 9.8, 10, 16);
             part.updateShot();
@@ -422,19 +433,20 @@ public class GameStage extends Stage {
 
         // if any units have taken damage, we want to update their health and team healthbars
         if (!collidedUnits.isEmpty()) {
-            
-        // Iterates through all of the collided units and decreases their health
-        // based on the damage caused by the explosion
-        for (Unit u : collidedUnits) {
-            u.decreaseHealth(damage);
-        }
-            
+
+            // Iterates through all of the collided units and decreases their health
+            // based on the damage caused by the explosion
+            for (Unit u : collidedUnits) {
+                u.decreaseHealth(damage);
+            }
+
             guiStage.updateHealthBars();
-    }
+        }
     }
 
     /**
      * Checks if a pixel at a given coordinate collides with a unit or not
+     *
      * @param x X-coordinate in world map
      * @param y Y-coordinate in world map
      * @return True if pixel if a collision was detected, false if not

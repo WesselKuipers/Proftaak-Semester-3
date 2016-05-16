@@ -69,15 +69,6 @@ public class Unit extends Group {
         addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if (keycode == Keys.RIGHT) {
-                    moveRight = true;
-                    jump();
-                }
-
-                if (keycode == Keys.LEFT) {
-                    moveRight = false;
-                    jump();
-                }
 // <editor-fold defaultstate="collapsed" desc=" switching between weapons ">
                 if (keycode == Keys.NUM_1) {
                     selecting_weapon(0);
@@ -289,8 +280,8 @@ public class Unit extends Group {
         updateJump(delta);
 
         // flashes active unit to white and back to its original colour
-        if (((GameStage)this.getStage()).getGame().getActiveTeam().equals(team)) {
-            if (((GameStage)this.getStage()).getGame().getTurnLogic().getElapsedTime() % 2 == 1) {           
+        if (((GameStage) this.getStage()).getGame().getActiveTeam().equals(team)) {
+            if (((GameStage) this.getStage()).getGame().getTurnLogic().getElapsedTime() % 2 == 1) {
                 font.setColor(Color.WHITE);
             } else {
                 font.setColor(team.getColor());
@@ -321,8 +312,11 @@ public class Unit extends Group {
      * setAcceleration with the gravity - setVelocity with the force
      *
      * Then the act calls the updateJump().
+     *
+     * @param moveRight
      */
-    public void jump() {
+    public void jump(boolean moveRight) {
+        this.moveRight = moveRight;
         // Jumping once
         if (velocity.x != 0 && velocity.y != 0) {
             return;
@@ -331,8 +325,15 @@ public class Unit extends Group {
 
         if (moveRight) {
             nextPos = new Vector2(position.x + 20, position.y + 20);
+            if (((GameStage) getStage()).getGame().getMap()
+                    .isPixelSolid((int) nextPos.x + 5, (int) position.y + 3)) {
+                return;
+            }
         } else {
             nextPos = new Vector2(position.x - 20, position.y + 20);
+            if (((GameStage) getStage()).getGame().getMap()
+                    .isPixelSolid((int) nextPos.x + 5, (int) position.y + 3))
+                return;
         }
 
         setAngle(position, nextPos);
@@ -369,32 +370,23 @@ public class Unit extends Group {
     }
 
     public void checkSolid() {
-        boolean isSolidX = false;
 
         if (velocity.y >= -2) {
             if (((GameStage) getStage()).getGame().getMap()
-                    .isPixelSolid((int) position.x, (int) position.y)) {
+                    .isPixelSolid((int) position.x, (int) position.y)
+                    || ((GameStage) getStage()).getGame().getMap()
+                    .isPixelSolid((int) position.x - 1, (int) position.y)
+                    || ((GameStage) getStage()).getGame().getMap()
+                    .isPixelSolid((int) position.x + 16, (int) position.y)) {
                 velocity = new Vector2();
             }
-        } else {
-            if (((GameStage) getStage()).getGame().getMap()
-                    .isPixelSolid((int) position.x, (int) position.y - 10)) {
-                velocity = new Vector2();
-            }
-        }
-
-        if (!moveRight) {
-            isSolidX = ((GameStage) getStage()).getGame().getMap()
-                    .isPixelSolid((int) position.x - 1, (int) position.y);
-            if (isSolidX) {
-                velocity = new Vector2(0, 0);
-            }
-        } else {
-            isSolidX = ((GameStage) getStage()).getGame().getMap()
-                    .isPixelSolid((int) position.x + 16, (int) position.y);
-            if (isSolidX) {
-                velocity = new Vector2(0, 0);
-            }
+        } else if (((GameStage) getStage()).getGame().getMap()
+                .isPixelSolid((int) position.x, (int) position.y - 10)
+                || ((GameStage) getStage()).getGame().getMap()
+                .isPixelSolid((int) position.x - 1, (int) position.y)
+                || ((GameStage) getStage()).getGame().getMap()
+                .isPixelSolid((int) position.x + 16, (int) position.y)) {
+            velocity = new Vector2();
         }
     }
 
