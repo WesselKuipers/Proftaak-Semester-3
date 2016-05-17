@@ -83,6 +83,11 @@ public class Lobby {
         // TODO: Database calls
         sessions.remove(s);
     }
+    
+    public void removeAllSessions() {
+        // TODO: Database calls
+        sessions.clear();
+    }
 
     /**
      * Attempts to join the given session

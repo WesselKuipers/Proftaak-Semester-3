@@ -241,7 +241,24 @@ public class LobbyGUI implements Screen {
         refresh.setHeight(30);
         refresh.setPosition(30, 680);
         stage.addActor(refresh);
-
+        refresh.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                try {
+                    // RELOADING ALL NEW SESSIONS
+                    lobby.removeAllSessions();
+                    // Getting session out of database and sets it in lobby
+                    for (Session session : sessionContext.getAll()) {
+                        lobby.addSession(session);
+                    }
+                    
+                    sessions.clear();
+                    sessions.setItems(lobby.getSessions().toArray());
+                } catch (SQLException ex) {
+                    Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
     }
 
     /**
