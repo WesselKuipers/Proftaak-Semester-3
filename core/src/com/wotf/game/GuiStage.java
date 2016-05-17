@@ -161,6 +161,10 @@ public final class GuiStage extends Stage {
             y -= 20;
         }
     }
+    
+    public void initializeWeaponSelection() {
+    
+    }
 
     public void update() {
         // update the turn and total time
