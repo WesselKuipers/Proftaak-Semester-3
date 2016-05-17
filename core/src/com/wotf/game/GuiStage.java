@@ -161,6 +161,10 @@ public final class GuiStage extends Stage {
             y -= 20;
         }
     }
+    
+    public void initializeWeaponSelection() {
+    
+    }
 
     public void update() {
         // update the turn and total time
@@ -202,7 +206,7 @@ public final class GuiStage extends Stage {
      * Sets the remaining time of this turn and the total time on the GUI
      */
     public void updateTime() {
-        int totalTime = game.getTurnLogic().getTotalTime();
+        int totalTime = (int) game.getTurnLogic().getTotalTime();
         int elapsedTime = (int) game.getTurnLogic().getElapsedTime();
         
         Integer turnTime = game.getGameSettings().getTurnTime() - elapsedTime;

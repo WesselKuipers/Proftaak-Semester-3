@@ -23,22 +23,16 @@ import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 public class Unit extends Group {
 
     private float angle;
-    private float force = 3f;
     private Vector2 acceleration;
     private TextureRegion unitStand;
-
     private Vector2 velocity = new Vector2();
-    private boolean moveRight;
-
+    public boolean moveRight;
     private int health;
     private String name;
-
     private Sprite sprite;
     private Vector2 position;
-
     private Item weapon;
     private Team team;
-
     // Font is used for displaying name and health
     private BitmapFont font;
 
@@ -69,21 +63,12 @@ public class Unit extends Group {
         this.setBounds(getX(), getY(), sprite.getWidth(), sprite.getHeight());
         this.setWidth(sprite.getWidth());
         this.setHeight(sprite.getHeight());
+        setAcceleration(9.8);
 
         // Input listener for every unit
         addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if (keycode == Keys.RIGHT) {
-                    moveRight = true;
-                }
-
-                if (keycode == Keys.LEFT) {
-                    moveRight = false;
-                }
-                if (keycode == Keys.UP) {
-                    jump();
-                }
 // <editor-fold defaultstate="collapsed" desc=" switching between weapons ">
                 if (keycode == Keys.NUM_1) {
                     selecting_weapon(0);
@@ -100,9 +85,9 @@ public class Unit extends Group {
                 if (keycode == Keys.NUM_5) {
                     selecting_weapon(4);
                 }
-                if (keycode == Keys.NUM_6) {
-                    selecting_weapon(5);
-                }
+//                if (keycode == Keys.NUM_6) {
+//                    selecting_weapon(5);
+//                }
 // </editor-fold>
                 return true;
             }
@@ -132,7 +117,7 @@ public class Unit extends Group {
         this.team = team;
         this.position = position;
         this.sprite = null;
-        moveRight = true;
+        this.moveRight = true;
     }
 
     /**
@@ -159,6 +144,7 @@ public class Unit extends Group {
      * @param i Item object that you want to select
      */
     public void selectWeapon(Item i) {
+        Unit.this.clearChildren();
         destroyWeapon();
         weapon = i;
         //i.initActor();
@@ -291,11 +277,11 @@ public class Unit extends Group {
     public void act(float delta) {
         super.act(delta);
         sprite.setRegion(getFrame(delta));
-        updateJump();
-        
+        updateJump(delta);
+
         // flashes active unit to white and back to its original colour
-        if (((GameStage)this.getStage()).getGame().getActiveTeam().equals(team)) {
-            if (((GameStage)this.getStage()).getGame().getTurnLogic().getElapsedTime() % 2 == 1) {           
+        if (((GameStage) this.getStage()).getGame().getActiveTeam().equals(team)) {
+            if (((GameStage) this.getStage()).getGame().getTurnLogic().getElapsedTime() % 2 == 1) {
                 font.setColor(Color.WHITE);
             } else {
                 font.setColor(team.getColor());
@@ -303,7 +289,6 @@ public class Unit extends Group {
         } else {
             font.setColor(team.getColor());
         }
-
         //make weapons move with the unit
         Array<Actor> children = this.getChildren();
         if (children.size > 0) {
@@ -327,24 +312,32 @@ public class Unit extends Group {
      * setAcceleration with the gravity - setVelocity with the force
      *
      * Then the act calls the updateJump().
+     *
+     * @param moveRight
      */
-    public void jump() {        
+    public void jump(boolean moveRight) {
+        this.moveRight = moveRight;
         // Jumping once
-        if(velocity.x != 0 && velocity.y != 0){
+        if (velocity.x != 0 && velocity.y != 0) {
             return;
         }
-        
-        float nextX;
+        Vector2 nextPos;
 
         if (moveRight) {
-            nextX = position.x + 20;
+            nextPos = new Vector2(position.x + 20, position.y + 20);
+            if (((GameStage) getStage()).getGame().getMap()
+                    .isPixelSolid((int) nextPos.x + 5, (int) position.y + 3)) {
+                return;
+            }
         } else {
-            nextX = position.x - 20;
+            nextPos = new Vector2(position.x - 20, position.y + 20);
+            if (((GameStage) getStage()).getGame().getMap()
+                    .isPixelSolid((int) nextPos.x + 5, (int) position.y + 3))
+                return;
         }
 
-        setAngle(position, new Vector2(nextX, position.y + 20));
-        setAcceleration(9.8);
-        setVelocity(force);
+        setAngle(position, nextPos);
+        setVelocity(3f);
     }
 
     /**
@@ -355,14 +348,10 @@ public class Unit extends Group {
      *
      * After changing the position we look for a solid point on the map. Is it
      * possible the unit can move to the point?
+     *
+     * @param delta
      */
-    public void updateJump() {
-        if (acceleration == null) {
-            return;
-        }
-       
-        float delta = Gdx.graphics.getDeltaTime();
-
+    public void updateJump(float delta) {
         //keep old position to change rotation of object
         Vector2 oldPos = position.cpy();
 
@@ -374,30 +363,31 @@ public class Unit extends Group {
         velocity.x += acceleration.x * delta;
         velocity.y += acceleration.y * delta;
 
-        //System.out.println(velocity.toString());
+        checkSolid();
         this.setPosition(position.x, position.y);
         positionChanged();
+        //sprite.setRotation(angle);
+    }
 
-        if (!moveRight) {
-            boolean isSolidX = ((GameStage) getStage()).getGame().getMap()
-                                .isPixelSolid((int) position.x - 1, (int) position.y);
-            if (isSolidX) {
-                velocity = new Vector2(0,0);
-            }
-        } else {
-            boolean isSolidX = ((GameStage) getStage()).getGame().getMap()
-                                .isPixelSolid((int) position.x + 15, (int) position.y);
-            if (isSolidX) {
-                velocity = new Vector2(0,0);
-            }
-        }
+    public void checkSolid() {
 
-        boolean isSolidY = ((GameStage) getStage()).getGame().getMap()
-                            .isPixelSolid((int) position.x, (int) position.y - 1);
-        if (isSolidY) {
-            velocity = new Vector2(0,0);
+        if (velocity.y >= -2) {
+            if (((GameStage) getStage()).getGame().getMap()
+                    .isPixelSolid((int) position.x, (int) position.y)
+                    || ((GameStage) getStage()).getGame().getMap()
+                    .isPixelSolid((int) position.x - 1, (int) position.y)
+                    || ((GameStage) getStage()).getGame().getMap()
+                    .isPixelSolid((int) position.x + 16, (int) position.y)) {
+                velocity = new Vector2();
+            }
+        } else if (((GameStage) getStage()).getGame().getMap()
+                .isPixelSolid((int) position.x, (int) position.y - 10)
+                || ((GameStage) getStage()).getGame().getMap()
+                .isPixelSolid((int) position.x - 1, (int) position.y)
+                || ((GameStage) getStage()).getGame().getMap()
+                .isPixelSolid((int) position.x + 16, (int) position.y)) {
+            velocity = new Vector2();
         }
-        sprite.setRotation(angle);
     }
 
     /**
@@ -416,9 +406,9 @@ public class Unit extends Group {
     }
 
     /**
-     * Calculate the acceleration per/turn by external forces.
+     * Calculate the acceleration per/turn.
      *
-     * @param gravity Downwards pulling force.
+     * @param gravity Downwards pulling.
      */
     private void setAcceleration(double gravity) {
         acceleration = new Vector2();

@@ -12,6 +12,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
+import com.badlogic.gdx.graphics.g2d.ParticleEffectPool.PooledEffect;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -20,6 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.wotf.game.classes.Game;
+import com.wotf.game.classes.Projectile;
 import com.wotf.game.classes.Team;
 import com.wotf.game.classes.TurnLogic.TurnState;
 import com.wotf.game.classes.Unit;
@@ -37,13 +42,19 @@ public class GameStage extends Stage {
 
     private final SpriteBatch batch;
     private final SpriteBatch guiBatch;
-    
+
     private final BitmapFont font;
-    
+
     private boolean showDebug = false;
-    
+
     private Actor focusedActor; // if this is set to an actor
-                                // have the camera follow it automatically, otherwise set it to null
+    // have the camera follow it automatically, otherwise set it to null
+
+    // particle effect objects
+    private ParticleEffectPool explosionEffectPool;
+    private List<PooledEffect> particles;
+
+    private ParticleEffect tempParticleEffects;
 
     /**
      * Constructor for GameStage that initializes everything required for the
@@ -65,6 +76,8 @@ public class GameStage extends Stage {
 
         font = new BitmapFont();
         font.setColor(Color.BLACK);
+
+        particles = new ArrayList<>();
     }
 
     /**
@@ -81,14 +94,15 @@ public class GameStage extends Stage {
     }
 
     /**
-     * Iterates through every team's units and determines a random spawn location
-     * 
-     * Spawn location is determined by the highest available pixel above
-     * a solid pixel at a randomly generated X-coordinate.
-     * 
+     * Iterates through every team's units and determines a random spawn
+     * location
+     *
+     * Spawn location is determined by the highest available pixel above a solid
+     * pixel at a randomly generated X-coordinate.
+     *
      */
     public void spawnUnits() {
-        boolean[][] terrain = game.getMap().getTerrain();        
+        boolean[][] terrain = game.getMap().getTerrain();
 
         // Adds every unit as an actor to this stage
         for (Team team : game.getTeams()) {
@@ -150,7 +164,7 @@ public class GameStage extends Stage {
 
         game.update(delta);
         guiStage.update();
-        
+
         // if focusedActor is set to an actor, we want the camera to follow it
         // otherwise, call the update() method on camera normally
         if (focusedActor != null) {
@@ -211,10 +225,21 @@ public class GameStage extends Stage {
                 game.getActiveTeam().getActiveUnit().decreaseHealth(100);
                 game.endTurn();
                 break;
-                
+
             case Keys.F4:
                 showDebug = !showDebug;
                 break;
+
+            case Keys.RIGHT:
+                if(game.getActiveTeam().getActiveUnit() != null)
+                    game.getActiveTeam().getActiveUnit().jump(true);
+                break;
+
+            case Keys.LEFT:
+                if(game.getActiveTeam().getActiveUnit() != null)
+                    game.getActiveTeam().getActiveUnit().jump(false);
+                break;
+
         }
 
         clampCamera();
@@ -245,7 +270,7 @@ public class GameStage extends Stage {
                 System.out.println("Firing bullet");
                 bulletLogic((int) rel.x, (int) rel.y);
             } else if (button == Input.Buttons.RIGHT) {
-                explode((int) rel.x, (int) rel.y, 30, 60);
+                explode((int) rel.x, (int) rel.y, 30, 0, false);
             }
 
             game.endTurn();
@@ -264,7 +289,7 @@ public class GameStage extends Stage {
 
         Texture backgroundTexture = game.getMap().getBackgroundTexture();
         Texture terrainTexture = game.getMap().getLandscapeTexture();
-        
+
         // draws background and foreground
         batch.draw(backgroundTexture, 0, 0, 0, 0,
                 backgroundTexture.getWidth(), backgroundTexture.getHeight(),
@@ -276,38 +301,52 @@ public class GameStage extends Stage {
                 1f, 1f, 0, 0, 0,
                 terrainTexture.getWidth(), terrainTexture.getHeight(),
                 false, true);
-        
+
+        // draws all particle effects
+        for (int i = particles.size() - 1; i >= 0; i--) {
+            PooledEffect effect = particles.get(i);
+            effect.update(Gdx.graphics.getDeltaTime());
+            effect.draw(batch, Gdx.graphics.getDeltaTime());
+
+            if (effect.isComplete()) {
+                effect.free();
+                particles.remove(i);
+
+                //effect.reset();
+            }
+        }
         batch.end();
 
         super.draw();
-        
+
         if (showDebug) {
             // guiBatch is primarily used to display text and miscellaneous graphics
             guiBatch.begin();
 
-            int offsetY = 200;
-            
-            font.draw(guiBatch, "Debug variables:", 0, this.getHeight() - offsetY);
-            font.draw(guiBatch, "Actors amount: " + this.getActors().size, 0, this.getHeight() - 20 - offsetY);
+            font.draw(guiBatch, "Debug variables:", 0, this.getHeight());
+            font.draw(guiBatch, "Actors amount: " + this.getActors().size, 0, this.getHeight() - 20);
 
-            if (this.game.getActiveTeam() != null) {
-                if (this.game.getActiveTeam().getActiveUnit() != null) {
-                    font.draw(guiBatch,
-                            String.format("Active actor: %s XY[%f, %f]",
-                                    this.game.getActiveTeam().getActiveUnit().getName(),
-                                    this.game.getActiveTeam().getActiveUnit().getX(),
-                                    this.game.getActiveTeam().getActiveUnit().getY()),
-                            0,
-                            this.getHeight() - 40 - offsetY);
-                } 
+            if (this.game.getActiveTeam().getActiveUnit() != null) {
+                font.draw(guiBatch,
+                        String.format("Active actor: %s XY[%f, %f]",
+                                this.game.getActiveTeam().getActiveUnit().getName(),
+                                this.game.getActiveTeam().getActiveUnit().getX(),
+                                this.game.getActiveTeam().getActiveUnit().getY()),
+                        0,
+                        this.getHeight() - 40);
             }
 
-            font.draw(guiBatch, String.format("Mouse position: screen [%d, %d], viewport %s", Gdx.input.getX(), game.getMap().getHeight() - Gdx.input.getY(), getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0))), 0, this.getHeight() - 60 - offsetY);
-            font.draw(guiBatch, String.format("Camera coords [%s], zoom %f", getCamera().position.toString(), ((OrthographicCamera) getCamera()).zoom), 0, this.getHeight() - 80 - offsetY);
-            font.draw(guiBatch, "Time remaining: " + (game.getGameSettings().getTurnTime() - (int) game.getTurnLogic().getElapsedTime()), 0, this.getHeight() - 100 - offsetY);
-            font.draw(guiBatch, String.format("FPS: %d", Gdx.graphics.getFramesPerSecond()), 0, this.getHeight() - 120 - offsetY);
+            font.draw(guiBatch, String.format("Mouse position: screen [%d, %d], viewport %s", Gdx.input.getX(), game.getMap().getHeight() - Gdx.input.getY(), getCamera().unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0))), 0, this.getHeight() - 60);
+            font.draw(guiBatch, String.format("Camera coords [%s], zoom %f", getCamera().position.toString(), ((OrthographicCamera) getCamera()).zoom), 0, this.getHeight() - 80);
+            font.draw(guiBatch, "Turn Time remaining: " + (game.getGameSettings().getTurnTime() - (int) game.getTurnLogic().getElapsedTime()), 0, this.getHeight() - 100);
+            font.draw(guiBatch, "Time remaining: " + (game.getGameSettings().getMaxTime() - (int) game.getTurnLogic().getTotalTime()), 0, this.getHeight() - 120);
+            font.draw(guiBatch, String.format("FPS: %d", Gdx.graphics.getFramesPerSecond()), 0, this.getHeight() - 140);
 
-            font.draw(guiBatch, "Wind: " + game.getMap().getWind().toString(), 0, this.getHeight() - 140 - offsetY);
+            if (game.getTurnLogic().getState() == TurnState.GAMEOVER) {
+                font.draw(guiBatch, "GAME OVER", this.getWidth() / 2, this.getHeight() / 2);
+            }
+
+            font.draw(guiBatch, "Wind: " + game.getMap().getWind().toString(), 0, this.getHeight() - 160);
 
             guiBatch.end();
         }
@@ -324,11 +363,52 @@ public class GameStage extends Stage {
      * @param damage Amount of damage the explosion does should it collide with
      * a Unit
      */
-    public void explode(int x, int y, int radius, int damage) {
+    public void explode(int x, int y, int radius, int damage, boolean cluster) {
         // calls radius destruction method in game map
         // which will update the boolean[][] and the terrain texture
         game.getMap().destroyRadius(x, y, radius);
-        
+
+        unitCollisionExplosion(x, radius, y, damage);
+
+        // adds effect to the list of effects to draw
+        PooledEffect effect = explosionEffectPool.obtain();
+        effect.setPosition(x, y);
+        //effect.scaleEffect(radius/100);
+        effect.start();
+        particles.add(effect);
+
+        if (cluster) {
+            fireCluster(x, y);
+        }
+    }
+
+    private void fireCluster(int x, int y) {
+        Sprite partSprite = new Sprite(new Texture(Gdx.files.internal("part.png")));
+
+        x = x - 3;
+        for (int i = 0; i <= 4; i++) {
+            Vector2 mousePos = new Vector2(x, y + 2);
+            Vector2 position = new Vector2(x + i * 2, y);
+            Projectile part = new Projectile(partSprite, tempParticleEffects);
+
+            //fire: fire from, fire towards, power, wind, gravity, radius, damage
+            part.fire(position, mousePos, 5, Vector2.Zero, 9.8, 10, 16);
+            part.updateShot();
+            addActor(part);
+        }
+    }
+
+    /**
+     * @param pEff sets the temporarily particle effect
+     */
+    public void setParticle(ParticleEffect pEff) {
+        tempParticleEffects = pEff;
+
+        explosionEffectPool = new ParticleEffectPool(tempParticleEffects, 1, 5);
+        //tempParticleEffects.setEmittersCleanUpBlendFunction(false);  
+    }
+
+    private void unitCollisionExplosion(int x, int radius, int y, int damage) {
         List<Unit> collidedUnits = new ArrayList<>();
 
         for (int xPos = x - radius; xPos <= x + radius; xPos++) {
@@ -350,26 +430,27 @@ public class GameStage extends Stage {
                 }
             }
         }
-        
+
         // if any units have taken damage, we want to update their health and team healthbars
         if (!collidedUnits.isEmpty()) {
-            
+
             // Iterates through all of the collided units and decreases their health
             // based on the damage caused by the explosion
             for (Unit u : collidedUnits) {
                 u.decreaseHealth(damage);
             }
-            
+
             guiStage.updateHealthBars();
         }
     }
 
     /**
      * Checks if a pixel at a given coordinate collides with a unit or not
+     *
      * @param x X-coordinate in world map
      * @param y Y-coordinate in world map
      * @return True if pixel if a collision was detected, false if not
-     */    
+     */
     public boolean isCollidedWithUnit(int x, int y) {
 
         for (Team t : game.getTeams()) {
@@ -379,7 +460,7 @@ public class GameStage extends Stage {
                 }
             }
         }
-        
+
         return false;
     }
 
@@ -405,32 +486,31 @@ public class GameStage extends Stage {
     }
 
     /**
-     * @author Jip Boesenkool 
-     * Function which handles the use case to fire a bullet,
-     * Get's called by mouseClick event. Trigger MUST BE inside game stage, else
-     * mouse Click won't get the right coordinates.
+     * @author Jip Boesenkool Function which handles the use case to fire a
+     * bullet, Get's called by mouseClick event. Trigger MUST BE inside game
+     * stage, else mouse Click won't get the right coordinates.
      * @param screenX Unprojected mouse position.x
      * @param screenY Unprojected mouse position.y
      */
     private void bulletLogic(int screenX, int screenY) {
         // get wind force from map
         Vector2 wind = game.getMap().getWind();
-        
+
         // get gravity force from map (Const atm)
         double gravity = game.getMap().getGravityModifier();
-        
+
         // get mouseposition to determine what direction the bullet must fly
         Vector2 mousePos = new Vector2(screenX, screenY);
-        
+
         // trigger the fire method in unit which holds the gun
         (game.getActiveTeam().getActiveUnit()).fire(
                 mousePos,
                 wind,
                 gravity
         );
-        
+
         // make camera follow bullet
-        focusedActor = (Actor)( game.getActiveTeam().getActiveUnit().getWeapon().getBullet() );
+        focusedActor = (Actor) (game.getActiveTeam().getActiveUnit().getWeapon().getBullet());
     }
 
     /**

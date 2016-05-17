@@ -15,19 +15,24 @@ import java.util.Map.Entry;
 import com.wotf.game.classes.Items.Item;
 import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
+import java.io.Serializable;
 import java.util.Iterator;
 
 /**
  * Team contains data that represent a team Contains a list of players, list of
  * units, a list of items including ammo, a name and a team colour
  */
-public class Team {
+public class Team implements Serializable{
 
-    private String name;
-    private Color color;
+    private String name; 
+    // This is used for RMI because the Color of GDX can't be serialized. But we need them both
+    private String colorname;
+    private transient Color color;
     private final List<Player> players;
-    private final List<Unit> units;
-    private final Map<Item, Integer> items; // The integer represents the ammo remaining
+    private Player onlineplayer;
+    private transient final List<Unit> units;
+    private transient final Map<Item, Integer> items; // The integer represents the ammo remaining
+    private int activeUnitIndex;
     private Unit activeUnit;
 
     /**
@@ -68,18 +73,18 @@ public class Team {
     /**
      * @return all the players of the team
      */
-    public List<Player> getPlayers() {
+    /*public List<Player> getPlayers() {
         return Collections.unmodifiableList(players);
-    }
+    }*/
 
     /**
      * Adds a player to the team
      *
      * @param p player
      */
-    public void addPlayer(Player p) {
+    /*public void addPlayer(Player p) {
         players.add(p);
-    }
+    }*/
 
     /**
      * TODO: Logic for kicking player out Removes a player from the team
@@ -91,6 +96,22 @@ public class Team {
         // TODO: Logic for kicking player out
     }
 
+    public void setOnlineplayer(Player p){
+        this.onlineplayer = p;
+    }
+    
+    public Player getOnlineplayer(){
+        return onlineplayer;
+    }
+    
+    public void setColorname(String colorname){
+        this.colorname = colorname;
+    }
+    
+    public String getColorname(){
+        return colorname;
+    }
+    
     /**
      * @return the team name
      */
@@ -178,6 +199,14 @@ public class Team {
                 }
             }
         }
+    }
+    
+    /**
+     * Removes all the units from the team.
+     * 
+     */
+    public void removeAllUnits(){
+        units.clear();
     }
 
     /**
@@ -315,6 +344,6 @@ public class Team {
      */
     @Override
     public String toString() {
-        return getName() + " - " + getColor();
+        return getName() + " - " + getColorname();
     }
 }

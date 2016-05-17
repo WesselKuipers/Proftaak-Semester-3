@@ -1,8 +1,6 @@
 package com.wotf.game.classes;
 
 import com.wotf.game.GameStage;
-import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
-import com.wotf.game.classes.Items.Item;
 import com.wotf.game.classes.TurnLogic.TurnState;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -137,9 +135,11 @@ public class Game {
             gameStage.setKeyboardFocus(team.getActiveUnit());
             gameStage.setCameraFocusToActor(team.getActiveUnit(), true);
 
-            // select first weapon
-            Item i = WEAPONS_ARMORY.get(0);
-            team.getActiveUnit().selectWeapon(i);
+//            // select first weapon
+//            Item i = WEAPONS_ARMORY.get(0);
+//            team.getActiveUnit().selectWeapon(i);
+            
+             team.getActiveUnit().selecting_weapon(0);
         } else {
             endTurn();
         }
@@ -181,10 +181,16 @@ public class Game {
         }
         
         // When the player has passed 
-        if(turnLogic.getState() == TurnState.WITHDRAW) {
+        if (turnLogic.getState() == TurnState.WITHDRAW) {
             if(turnLogic.getElapsedTime() >= gameSettings.getWithdrawTime()) {
                 beginTurn();
             }
+        }
+        
+        // If max time has exceeded end the game
+        if (turnLogic.getTotalTime() >= gameSettings.getMaxTime()) {
+            endTurn();
+            turnLogic.setState(TurnState.GAMEOVER);
         }
     }
 

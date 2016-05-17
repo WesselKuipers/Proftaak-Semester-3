@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -21,8 +22,11 @@ import com.wotf.game.WotFGame;
 import com.wotf.game.classes.Lobby;
 import com.wotf.game.classes.Player;
 import com.wotf.game.classes.Session;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
 import com.wotf.game.database.PlayerContext;
 import com.wotf.game.database.SessionContext;
+import com.wotf.game.database.SessionPlayerContext;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,9 +40,12 @@ public class LobbyGUI implements Screen {
     private Stage stage;
     private Skin skin;
     private List sessions;
+    private ArrayList<Session> sessionlist;
     private final Lobby lobby;
+    private Player player;
     private final SessionContext sessionContext;
     private final PlayerContext playerContext;
+    private final SessionPlayerContext sesplayContext;
 
     /**
      * Creates a new instance of the LobbyGUI based on the game.
@@ -49,12 +56,19 @@ public class LobbyGUI implements Screen {
      */
     public LobbyGUI(WotFGame game, Player player) throws SQLException {
         this.game = game;
+        this.player = player;
+        sessionlist = new ArrayList<>();
         lobby = new Lobby();
         sessionContext = new SessionContext();
         playerContext = new PlayerContext();
+        sesplayContext = new SessionPlayerContext();
 
         // Getting session out of database and sets it in lobby
         for (Session session : sessionContext.getAll()) {
+            for (Player sesplayer : sesplayContext.getPlayersFromSession(session)) {
+                // Get all the players of this session and put them in the list of players
+                session.addPlayer(sesplayer);
+            }
             lobby.addSession(session);
         }
     }
@@ -83,8 +97,8 @@ public class LobbyGUI implements Screen {
      * with the given position. There is a table around each section. There is a
      * list of players which shows the ping of the players. There is a list of
      * sessions which shows all the sessions There are buttons to create a
-     * session, join a session and to exit the LobbyGUI screen.
-     * Called when this screen becomes the current screen for a {@link Game}.
+     * session, join a session and to exit the LobbyGUI screen. Called when this
+     * screen becomes the current screen for a {@link Game}.
      */
     @Override
     public void show() {
@@ -98,9 +112,9 @@ public class LobbyGUI implements Screen {
 
         sessionstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"))));
         playerstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"))));
-        String[] playerlist = null;
+        Object[] playerlist = null;
         try {
-            playerlist = new String[playerContext.getAll().size()];
+            playerlist = new Object[playerContext.getAll().size()];
             int i = 0;
 
             for (Player player : playerContext.getAll()) {
@@ -115,10 +129,14 @@ public class LobbyGUI implements Screen {
         wotflabel.setPosition(Gdx.graphics.getWidth() / 2 - wotflabel.getWidth() / 2, 740);
         stage.addActor(wotflabel);
 
+        Label currentPlayer = new Label(player.getIp() + " " + player.getName(), skin);
+        currentPlayer.setPosition(Gdx.graphics.getWidth() / 2 - currentPlayer.getWidth() / 2, 680);
+        stage.addActor(currentPlayer);
+
         Label sessionslabel = new Label("Sessions", skin);
         sessionstable.add(sessionslabel).padRight(20);
         sessionstable.row();
-        sessions.setItems(lobby.getSessions());
+        sessions.setItems(lobby.getSessions().toArray());
         sessionstable.add(sessions).minWidth(250).height(200);
         sessionstable.setPosition(30, 260);
         sessionstable.setWidth(300);
@@ -144,7 +162,10 @@ public class LobbyGUI implements Screen {
         exit.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                PlayerContext pc = new PlayerContext();
                 game.setScreen(new MainMenu(game));
+                // The player has exited the LobbyGUI. It should remove the current player from the Database.
+                pc.delete(player);
             }
         });
 
@@ -155,12 +176,71 @@ public class LobbyGUI implements Screen {
         join.setPosition(30, 30);
         stage.addActor(join);
 
+        join.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                SessionContext sc = new SessionContext();
+                PlayerContext pc = new PlayerContext();
+                SessionPlayerContext part = new SessionPlayerContext();
+                if (sessions.getSelected() == null) {
+                    return;
+                }
+                try {
+                    // The currently selected session.
+                    Session selhost = (Session) sessions.getSelected();
+                    selhost = sc.getByHostId(selhost.getHost().getID());
+                    // Check if there aren't more players than allowed, if not, continue the if statement.
+                    if (part.getPlayersFromSession(selhost).size() < sc.getById(selhost.getID()).getGameSettings().getMaxPlayersSession()) {
+                        game.setScreen(new SessionOnlinePlayer(game, selhost, player));
+                    } else {
+                        // Alert for if the server is full.
+                        Dialog msgserverfull = new Dialog("Server is full.", skin);
+                        msgserverfull.text("The server is currently full, try again later.");
+                        msgserverfull.button("Ok");
+                        msgserverfull.show(stage);
+                    }
+                } catch (RemoteException ex) {
+                    pc.delete(player);
+                    Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SQLException ex) {
+                    Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+
         TextButton makesession = new TextButton("Make Session", skin); // Use the initialized skin
         makesession.setColor(Color.BLACK);
         makesession.setWidth(300);
         makesession.setHeight(60);
         makesession.setPosition(350, 30);
         stage.addActor(makesession);
+        makesession.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                SessionContext sc = new SessionContext();
+                PlayerContext pc = new PlayerContext();
+                try {
+                    // Logic for making session.
+                    Session session = new Session(player, "Room");
+                    sc.insert(session);
+                    session = sc.getLastAddedSession();
+                    session.createNewRegistry();
+                    game.setScreen(new SessionOnlineHost(game, session, player));
+                } catch (RemoteException ex) {
+                    pc.delete(player);
+                    Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SQLException ex) {
+                    Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+
+        TextButton refresh = new TextButton("Refresh", skin); // Use the initialized skin
+        refresh.setColor(Color.BLACK);
+        refresh.setWidth(100);
+        refresh.setHeight(30);
+        refresh.setPosition(30, 680);
+        stage.addActor(refresh);
 
     }
 
@@ -222,6 +302,8 @@ public class LobbyGUI implements Screen {
      */
     @Override
     public void dispose() {
+        PlayerContext pc = new PlayerContext();
+        pc.delete(player);
     }
 
 }
