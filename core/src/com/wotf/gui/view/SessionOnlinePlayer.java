@@ -407,7 +407,7 @@ public class SessionOnlinePlayer implements Screen {
 
         if (updateUnit) {
             int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
-            for (Team teamv : teamList) {
+            for (Team teamv : session.getGameSettings().getTeams()) {
                 addUnitsSingleTeam(selectedunitcount, teamv);
             }
             updateUnit = false;
@@ -490,7 +490,8 @@ public class SessionOnlinePlayer implements Screen {
      * @param managersession a copy of the host session object.
      */
     public void updateTeamList(Session managersession) {
-        if (managersession.getGameSettings().getTeams() != null) {
+        session = managersession;
+        if (session.getGameSettings().getTeams() != null) {
             // Set all the teambuttons to touchable first again.
             for (Team teamv : teamList) {
                 TextButton teamtb = (TextButton) stage.getRoot().findActor(teamv.getName());
@@ -498,13 +499,14 @@ public class SessionOnlinePlayer implements Screen {
             }
 
             teamList.clear();
-            teamList.addAll(managersession.getGameSettings().getTeams());
+            teamList.addAll(session.getGameSettings().getTeams());
 
             // For the color of the boxes and if it is touchable.
             for (Team teamv : teamList) {
                 TextButton teamtb = (TextButton) stage.getRoot().findActor(teamv.getName());
                 teamtb.setTouchable(Touchable.disabled);
                 teamtb.setColor(Color.LIGHT_GRAY);
+                
                 updateUnit = true;
             }
             teams.setItems(teamList.toArray());
@@ -579,11 +581,12 @@ public class SessionOnlinePlayer implements Screen {
     public void addUnitsSingleTeam(int selectedunitcount, Team team) {
         // The new units to the team. The name of the unit is the teamname + the number of the variable 'i'.
         for (int i = 0; i < selectedunitcount; i++) {
+            team.setColor(Color.BLACK);
             team.addUnit(team.getName() + Integer.toString(i), 100);
         }
-        //teamList.add(team);
-        //gameSettings.addTeam(team);
-        //teams.setItems(teamList.toArray());
+        teamList.add(team);
+        gameSettings.addTeam(team);
+        teams.setItems(teamList.toArray());
     }
 
     public void refreshUnitsForTeam(int selectedunitcount) {

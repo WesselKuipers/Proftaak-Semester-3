@@ -25,7 +25,7 @@ public class Team implements Serializable{
     private String colorname;
     private transient Color color;
     private Player player;
-    private transient final List<Unit> units;
+    private transient List<Unit> units;
     private transient final Map<Item, Integer> items; // The integer represents the ammo remaining
     private int activeUnitIndex;
     private Unit activeUnit;
@@ -116,6 +116,11 @@ public class Team implements Serializable{
      */
     public List<Unit> getUnits() {
         return Collections.unmodifiableList(units);
+    }
+    
+    public void makeUnitList() {
+        //Instantiating list of items
+        units = new ArrayList<>();
     }
 
     /**

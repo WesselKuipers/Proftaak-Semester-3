@@ -313,6 +313,11 @@ public class GameSettings implements Serializable {
      * @return list of teams in current game
      */
     public List<Team> getTeams() {
+        for(Team team : teams)
+        {
+            if(team.getUnits() == null)
+                team.makeUnitList();
+        }
         return teams;
     }
 }
