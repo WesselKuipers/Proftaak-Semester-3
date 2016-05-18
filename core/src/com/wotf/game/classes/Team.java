@@ -25,7 +25,7 @@ public class Team implements Serializable{
     private String colorname;
     private transient Color color;
     private Player player;
-    private transient List<Unit> units;
+    private List<Unit> units;
     private transient final Map<Item, Integer> items; // The integer represents the ammo remaining
     private int activeUnitIndex;
     private Unit activeUnit;

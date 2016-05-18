@@ -16,11 +16,12 @@ import com.badlogic.gdx.utils.Array;
 import com.wotf.game.classes.Items.Item;
 import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
+import java.io.Serializable;
 
 /**
  * Unit represents a playable character on the map
  */
-public class Unit extends Group {
+public class Unit extends Group implements Serializable {
 
     private float angle;
     private Vector2 acceleration;
