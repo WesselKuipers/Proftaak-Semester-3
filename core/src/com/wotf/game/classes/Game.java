@@ -132,7 +132,7 @@ public class Game {
      * Function to send the current beginTurn
      */
     public void beginTurn() {
-        if (playingPlayer.equals(host)) {
+        if (playingPlayer.getID() == host.getID()) {
             GameStage gameStage = (GameStage) teams.get(0).getUnit(0).getStage();
             
             map.calculateWind();
@@ -156,7 +156,7 @@ public class Game {
             for (Team team : teams) {
                 for (Unit unit : team.getUnits()) {
                     syncUnitsMsg.addParameter("u" + unitCount + "x", Float.toString(unit.getPosition().x));
-                    syncUnitsMsg.addParameter("u" + unitCount + "x", Float.toString(unit.getPosition().y));
+                    syncUnitsMsg.addParameter("u" + unitCount + "y", Float.toString(unit.getPosition().y));
                     syncUnitsMsg.addParameter("u" + unitCount + "hp", Integer.toString(unit.getHealth()));
                     unitCount++;
                 }
