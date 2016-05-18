@@ -5,23 +5,47 @@
  */
 package com.wotf.game.classes.Items;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
+import com.wotf.game.GameStage;
+import com.wotf.game.classes.Projectile;
+import java.util.Random;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
- *
  * @author chaos
  */
-public class Nuke extends MissileLauncher {
+public class Nuke extends Item {
 
-    /* Sprite clusterbomb_sprite = new Sprite(new Texture(Gdx.files.internal("clusterbomb.png")));
-    
-    String nm = "Clusterbomb";
-    int pw = 10;
-    int rad= 30;
-    int damage = 30;*/
-    public Nuke(String nm, int pw, int rad, int damage, Sprite weaponSprite, Sprite bulletSprite) {
-        super(nm, pw, rad, damage, weaponSprite, bulletSprite);
+    private final float power = 10;
+    private final int radius = 80;
+    private final int damage = 60;
+
+    public ParticleEffect p;
+    public String particleName = "effects/nuke_explosion.p";
+
+    private Sprite bullet_sprite;
+    private Sprite weapon_sprite;
+
+    private Projectile bullet;
+
+    /**
+     * {@inheritDoc}
+     */
+    public Nuke(String nm) {
+        super(nm);
+        p = new ParticleEffect();
+        p.load(Gdx.files.internal(particleName), Gdx.files.internal("effects"));
+
+        bullet_sprite = new Sprite(new Texture(Gdx.files.internal("nuclearbomb.png")));
+        weapon_sprite = new Sprite(new Texture(Gdx.files.internal("remote.png")));
+
+        this.bullet = new Projectile(bullet_sprite, p);
+
+        super.InitItemChildSuper(weapon_sprite);
     }
 
     /**
@@ -34,6 +58,80 @@ public class Nuke extends MissileLauncher {
      */
     @Override
     public void activate(Vector2 position, Vector2 mousePos, Vector2 Wind, double grav) {
-        super.activate(position, mousePos, Wind, grav);
+        //spawn bullet and add to scene
+        Projectile bullet = this.bullet;
+
+        //set new fire from position
+        Vector2 projectilePosition = position.cpy();          
+        projectilePosition.y = ((GameStage) this.getStage()).getHeight()+1;
+        projectilePosition.x = mousePos.x;
+
+        bullet.fire(projectilePosition, mousePos, this.power, Vector2.Zero, 8.0, this.radius, this.damage);
+        bullet.updateShot();
+        ((GameStage) this.getStage()).addActor(bullet);
+    }
+
+    /**
+     * @return particle affect
+     */
+    @Override
+    public ParticleEffect getParticle() {
+        return p;
+    }
+
+    /**
+     * @return particle affect
+     */
+    @Override
+      public Texture getProjectileTexture() {
+        return new Texture(Gdx.files.internal("nuclearbomb.png"));
+    }
+    
+    /**
+     * @return stprite image of the weapon
+     */
+    @Override
+    public Sprite getWeaponSprite() {
+        return weapon_sprite;
+    }
+    
+      /**
+     * @return stprite image of the weapon
+     */
+    @Override
+    public Sprite getProjectileSprite() {
+        return bullet_sprite;
+    }
+
+    /**
+     * @return gets the power of the item
+     */
+    @Override
+    public float getPower() {
+        return power;
+    }
+
+    /**
+     * @return gets the initial blastradius
+     */
+    @Override
+    public int getBlastRadius() {
+        return radius;
+    }
+
+    /**
+     * @return gets the bullet
+     */
+    @Override
+    public Projectile getBullet() {
+        return bullet;
+    }
+
+    /**
+     * @return gets the damage that this item can do
+     */
+    @Override
+    public int getDamage() {
+        return damage;
     }
 }

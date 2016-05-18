@@ -9,7 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
-import com.wotf.game.classes.Items.Bazooka;
+import com.wotf.game.classes.Items.Bazooka1;
 import com.wotf.game.classes.Items.Item;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -31,7 +31,7 @@ public class UnitTest {
         GameSettings gs = new GameSettings(true);
         team = new Team("Alpha", Color.BLUE, true);
         unit = new Unit("Unit1", 100, team, new Vector2(40, 80), true);
-        //bazooka = new Bazooka("Bazooka", 50, 40, 100, null, null);
+        //bazooka = new Bazooka1("Bazooka1", 50, 40, 100, null, null);
     }
 
     @Test

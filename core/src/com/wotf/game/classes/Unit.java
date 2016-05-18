@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import com.wotf.game.classes.Items.Item;
 import com.wotf.game.GameStage;
+import com.wotf.game.GuiStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 import java.io.Serializable;
 
@@ -70,15 +71,6 @@ public class Unit extends Group implements Serializable {
         addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if (keycode == Keys.RIGHT) {
-                    moveRight = true;
-                    jump();
-                }
-
-                if (keycode == Keys.LEFT) {
-                    moveRight = false;
-                    jump();
-                }
 // <editor-fold defaultstate="collapsed" desc=" switching between weapons ">
                 if (keycode == Keys.NUM_1) {
                     selecting_weapon(0);
@@ -95,9 +87,9 @@ public class Unit extends Group implements Serializable {
                 if (keycode == Keys.NUM_5) {
                     selecting_weapon(4);
                 }
-                if (keycode == Keys.NUM_6) {
-                    selecting_weapon(5);
-                }
+//                if (keycode == Keys.NUM_6) {
+//                    selecting_weapon(5);
+//                }
 // </editor-fold>
                 return true;
             }
@@ -143,6 +135,7 @@ public class Unit extends Group implements Serializable {
             Image weaponImage = new Image(w.getWeaponSprite());
             weaponImage.setPosition(Unit.this.getX(), Unit.this.getY());
             Unit.this.addActor(weaponImage);
+            
         } else {
             System.out.println("Selected weapon not found");
         }
@@ -154,6 +147,7 @@ public class Unit extends Group implements Serializable {
      * @param i Item object that you want to select
      */
     public void selectWeapon(Item i) {
+        Unit.this.clearChildren();
         destroyWeapon();
         weapon = i;
         //i.initActor();
@@ -289,8 +283,8 @@ public class Unit extends Group implements Serializable {
         updateJump(delta);
 
         // flashes active unit to white and back to its original colour
-        if (((GameStage)this.getStage()).getGame().getActiveTeam().equals(team)) {
-            if (((GameStage)this.getStage()).getGame().getTurnLogic().getElapsedTime() % 2 == 1) {           
+        if (((GameStage) this.getStage()).getGame().getActiveTeam().equals(team)) {
+            if (((GameStage) this.getStage()).getGame().getTurnLogic().getElapsedTime() % 2 == 1) {
                 font.setColor(Color.WHITE);
             } else {
                 font.setColor(team.getColor());
@@ -321,8 +315,11 @@ public class Unit extends Group implements Serializable {
      * setAcceleration with the gravity - setVelocity with the force
      *
      * Then the act calls the updateJump().
+     *
+     * @param moveRight
      */
-    public void jump() {
+    public void jump(boolean moveRight) {
+        this.moveRight = moveRight;
         // Jumping once
         if (velocity.x != 0 && velocity.y != 0) {
             return;
@@ -331,8 +328,15 @@ public class Unit extends Group implements Serializable {
 
         if (moveRight) {
             nextPos = new Vector2(position.x + 20, position.y + 20);
+            if (((GameStage) getStage()).getGame().getMap()
+                    .isPixelSolid((int) nextPos.x + 5, (int) position.y + 3)) {
+                return;
+            }
         } else {
             nextPos = new Vector2(position.x - 20, position.y + 20);
+            if (((GameStage) getStage()).getGame().getMap()
+                    .isPixelSolid((int) nextPos.x + 5, (int) position.y + 3))
+                return;
         }
 
         setAngle(position, nextPos);
@@ -369,32 +373,23 @@ public class Unit extends Group implements Serializable {
     }
 
     public void checkSolid() {
-        boolean isSolidX = false;
 
         if (velocity.y >= -2) {
             if (((GameStage) getStage()).getGame().getMap()
-                    .isPixelSolid((int) position.x, (int) position.y)) {
+                    .isPixelSolid((int) position.x, (int) position.y)
+                    || ((GameStage) getStage()).getGame().getMap()
+                    .isPixelSolid((int) position.x - 1, (int) position.y)
+                    || ((GameStage) getStage()).getGame().getMap()
+                    .isPixelSolid((int) position.x + 16, (int) position.y)) {
                 velocity = new Vector2();
             }
-        } else {
-            if (((GameStage) getStage()).getGame().getMap()
-                    .isPixelSolid((int) position.x, (int) position.y - 10)) {
-                velocity = new Vector2();
-            }
-        }
-
-        if (!moveRight) {
-            isSolidX = ((GameStage) getStage()).getGame().getMap()
-                    .isPixelSolid((int) position.x - 1, (int) position.y);
-            if (isSolidX) {
-                velocity = new Vector2(0, 0);
-            }
-        } else {
-            isSolidX = ((GameStage) getStage()).getGame().getMap()
-                    .isPixelSolid((int) position.x + 16, (int) position.y);
-            if (isSolidX) {
-                velocity = new Vector2(0, 0);
-            }
+        } else if (((GameStage) getStage()).getGame().getMap()
+                .isPixelSolid((int) position.x, (int) position.y - 10)
+                || ((GameStage) getStage()).getGame().getMap()
+                .isPixelSolid((int) position.x - 1, (int) position.y)
+                || ((GameStage) getStage()).getGame().getMap()
+                .isPixelSolid((int) position.x + 16, (int) position.y)) {
+            velocity = new Vector2();
         }
     }
 
