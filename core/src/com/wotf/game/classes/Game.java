@@ -143,9 +143,10 @@ public class Game {
             GameStage gameStage = (GameStage) teams.get(0).getUnit(0).getStage();
             
             map.calculateWind();
+          
             // add terrain solid booleans to parameters
-            boolean[][] terrain = map.getTerrain();
-  /*            for (int x = 0; x < terrain.length; x++) {
+       /*        boolean[][] terrain = map.getTerrain();
+           for (int x = 0; x < terrain.length; x++) {
                 NetworkMessage terrainMsg = new NetworkMessage( Command.TERRAIN );
                 terrainMsg.addParameter("x", Integer.toString(x));
                 for (int y = 0; y < terrain[0].length; y++) {
@@ -181,20 +182,18 @@ public class Game {
             gameStage.getNetworkingUtil().sendToHost( beginTurnMsg );
             
             // run action for host too
-            beginTurnReceive(terrain, windForce);
+            beginTurnReceive(windForce);
         }
     }
     
     /**
      * Function for network to receive a begin turn by the clients
      * This will set the wind, set the next active unit
-     * @param terrain 
      * @param windForce 
      */
-    public void beginTurnReceive(boolean[][] terrain, Vector2 windForce) {
+    public void beginTurnReceive(Vector2 windForce) {
         turnState = true;
         Team activeTeam = getActiveTeam();
-        map.setTerrain(terrain);
         map.setWind(windForce);
         turnLogic.beginTurn();
         activeTeam.beginTurn();
@@ -228,6 +227,7 @@ public class Game {
      * whether team and its units are still alive.
      */
     public void endTurn() {
+        turnState = false;
         Team activeTeam = getActiveTeam();
         activeTeam.endTurn();
         turnLogic.endTurn();
