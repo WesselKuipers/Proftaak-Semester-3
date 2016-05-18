@@ -4,8 +4,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.wotf.game.GameStage;
 import com.wotf.game.Networking.Command;
 import com.wotf.game.Networking.NetworkMessage;
-import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
-import com.wotf.game.classes.Items.Item;
 import com.wotf.game.classes.TurnLogic.TurnState;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +24,8 @@ public class Game {
     private final GamePhysics gamePhysics;
     private final GameSettings gameSettings;
     private final TurnLogic turnLogic;
-
+    
+    private boolean turnState;
     /**
      * Constructor of Game, assign params to properties. Add new game physics
      * and add a turn logic based on amount of teams
@@ -127,6 +126,14 @@ public class Game {
     public Map getMap() {
         return map;
     }
+    
+    /**
+     * 
+     * @return boolean if there is a current player in turn
+     */
+    public Boolean getTurnState(){
+        return turnState;
+    }
 
     /**
      * Function to send the current beginTurn
@@ -138,8 +145,8 @@ public class Game {
             map.calculateWind();
           
             // add terrain solid booleans to parameters
-            boolean[][] terrain = map.getTerrain();
-  /*            for (int x = 0; x < terrain.length; x++) {
+       /*        boolean[][] terrain = map.getTerrain();
+           for (int x = 0; x < terrain.length; x++) {
                 NetworkMessage terrainMsg = new NetworkMessage( Command.TERRAIN );
                 terrainMsg.addParameter("x", Integer.toString(x));
                 for (int y = 0; y < terrain[0].length; y++) {
@@ -175,19 +182,18 @@ public class Game {
             gameStage.getNetworkingUtil().sendToHost( beginTurnMsg );
             
             // run action for host too
-            beginTurnReceive(terrain, windForce);
+            beginTurnReceive(windForce);
         }
     }
     
     /**
      * Function for network to receive a begin turn by the clients
      * This will set the wind, set the next active unit
-     * @param terrain 
      * @param windForce 
      */
-    public void beginTurnReceive(boolean[][] terrain, Vector2 windForce) {
+    public void beginTurnReceive(Vector2 windForce) {
+        turnState = true;
         Team activeTeam = getActiveTeam();
-        map.setTerrain(terrain);
         map.setWind(windForce);
         turnLogic.beginTurn();
         activeTeam.beginTurn();
@@ -204,9 +210,11 @@ public class Game {
             gameStage.setKeyboardFocus(team.getActiveUnit());
             gameStage.setCameraFocusToActor(team.getActiveUnit(), true);
 
-            // select first weapon
-            Item i = WEAPONS_ARMORY.get(0);
-            team.getActiveUnit().selectWeapon(i);
+//            // select first weapon
+//            Item i = WEAPONS_ARMORY.get(0);
+//            team.getActiveUnit().selectWeapon(i);
+            
+             team.getActiveUnit().selecting_weapon(0);
         } else {
             endTurn();
         }
@@ -219,6 +227,7 @@ public class Game {
      * whether team and its units are still alive.
      */
     public void endTurn() {
+        turnState = false;
         Team activeTeam = getActiveTeam();
         activeTeam.endTurn();
         turnLogic.endTurn();

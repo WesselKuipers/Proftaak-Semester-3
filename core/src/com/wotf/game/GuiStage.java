@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -22,6 +23,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider.SliderStyle;
 import com.badlogic.gdx.utils.Align;
 import com.wotf.game.classes.Game;
+import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
+import com.wotf.game.classes.Items.Item;
 import com.wotf.game.classes.Team;
 import com.wotf.game.classes.TurnLogic;
 import java.util.HashMap;
@@ -49,6 +52,9 @@ public final class GuiStage extends Stage {
     
     private Image windContainer;
     
+    private Image weaponSelector;
+    private Image weaponHotbar;
+       
     private boolean gameOver = false;
     private boolean turnStarting = false;
     
@@ -67,6 +73,7 @@ public final class GuiStage extends Stage {
         initializeTurnTimers();
         initializeTeamHealthBars();
         initializeWindIndicator();
+        initializeWeaponSelection();
     }
     
     public void initializeTurnTimers() {
@@ -161,10 +168,50 @@ public final class GuiStage extends Stage {
             y -= 20;
         }
     }
+    
+    public void initializeWeaponSelection() {
+       //weapon hotbar setup
+        Texture weaponHotbarTexture = new Texture(Gdx.files.internal("GUI/itemBar.png"));
+    
+        weaponHotbar = new Image(weaponHotbarTexture);
+        weaponHotbar.setTouchable(Touchable.disabled);
+        weaponHotbar.setPosition(this.getWidth() - weaponHotbar.getWidth()-1, this.getHeight() - weaponHotbar.getHeight()-1);
+        
+        //weapon selector setup
+        Texture weaponSelectorTexture = new Texture(Gdx.files.internal("GUI/selectedItem.png"));
+    
+        weaponSelector = new Image(weaponSelectorTexture);
+        weaponSelector.setTouchable(Touchable.disabled);
+        weaponSelector.setPosition(this.getWidth()-weaponHotbar.getWidth()-1,this.getHeight() - weaponSelector.getHeight());
+        
+        //add item icons to hotbar
+         int weaponNR = 0;
+       for(Item i : WEAPONS_ARMORY){
+           Texture ProjectileTexture = i.getProjectileTexture();
+           Image ProjectileImage = new Image(ProjectileTexture);
+           ProjectileImage.setSize(25, 25);
+           ProjectileImage.setPosition((this.getWidth()-weaponHotbar.getWidth()-1)+(40*weaponNR)+11, this.getHeight() - weaponHotbar.getHeight()-1+5);
+           weaponNR++;
+                      
+           this.addActor(ProjectileImage);
+       }
+        
+        //adding actors
+        this.addActor(weaponHotbar);
+        this.addActor(weaponSelector);
+        
+    }
 
     public void update() {
         // update the turn and total time
         updateTime();
+        
+        //weapon selector update mechanism
+        int indexWeapon = 0;
+        if(game.getTurnState()){
+            indexWeapon = WEAPONS_ARMORY.indexOf(game.getActiveTeam().getActiveUnit().getWeapon());
+        }
+        UpdateSelectedWeaponHotbar(indexWeapon);
         
         Label healthBarLabel = healthBarLabels.get(game.getActiveTeam());
         
@@ -196,6 +243,10 @@ public final class GuiStage extends Stage {
         // scrolls the wind indicators to indicate movement in this direction
         leftWindRegion.scroll(0.05f, 0);
         rightWindRegion.scroll(-0.05f, 0);
+    }
+    
+    public void UpdateSelectedWeaponHotbar(int weaponNR){
+       weaponSelector.setPosition((this.getWidth()-weaponHotbar.getWidth()-1)+(40*weaponNR),this.getHeight() - weaponSelector.getHeight());
     }
     
     /**
