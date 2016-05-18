@@ -503,6 +503,7 @@ public class SessionOnlinePlayer implements Screen {
             // For the color of the boxes and if it is touchable.
             for (Team teamv : session.getGameSettings().getTeams()) {
                 teamList.add(teamv);
+                gameSettings.addTeam(teamv);
                 TextButton teamtb = (TextButton) stage.getRoot().findActor(teamv.getName());
                 teamtb.setTouchable(Touchable.disabled);
                 teamtb.setColor(Color.LIGHT_GRAY);
@@ -584,11 +585,8 @@ public class SessionOnlinePlayer implements Screen {
         for (int i = 0; i < selectedunitcount; i++) {
             team.addUnit(team.getName() + Integer.toString(i), 100);
         }
-        
-        teamList.add(team);
-        gameSettings.addTeam(team);
-        teams.setItems(teamList.toArray());
     }
+
     // TODO: NEEDS TO RECHECK
     public void refreshUnitsForTeam(int selectedunitcount) {
         // For each team in the list remove all the units first and remove it from the gamesettings.
