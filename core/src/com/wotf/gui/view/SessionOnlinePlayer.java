@@ -72,6 +72,7 @@ public class SessionOnlinePlayer implements Screen {
     private SelectBox maxplayerbox;
     private int switchscreencheck;
     private int startGame;
+    private boolean updateUnit;
 
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting
@@ -101,6 +102,7 @@ public class SessionOnlinePlayer implements Screen {
         manager = new SessionManager(session, this);
         addPlayerToDB();
         getPlayersOfSession();
+        updateUnit = false;
     }
 
     public void getPlayersOfSession() {
@@ -403,7 +405,13 @@ public class SessionOnlinePlayer implements Screen {
             game.setScreen(new GameEngine(game, session, player));
         }
 
-
+        if (updateUnit) {
+            int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
+            for (Team teamv : session.getGameSettings().getTeams()) {
+                addUnitsSingleTeam(selectedunitcount, teamv);
+            }
+            updateUnit = false;
+        }
         Gdx.gl.glClearColor((float) 122 / 255, (float) 122 / 255, (float) 122 / 255, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -488,17 +496,20 @@ public class SessionOnlinePlayer implements Screen {
                 TextButton teamtb = (TextButton) stage.getRoot().findActor(teamv.getName());
                 teamtb.setColor(Color.valueOf(teamv.getColorname()));
             }
-            
+
             teamList.clear();
-            teamList.addAll(session.getGameSettings().getTeams());
 
             // For the color of the boxes and if it is touchable.
-            for (Team teamv : teamList) {
+            for (Team teamv : session.getGameSettings().getTeams()) {
+                teamList.add(teamv);
                 TextButton teamtb = (TextButton) stage.getRoot().findActor(teamv.getName());
                 teamtb.setTouchable(Touchable.disabled);
                 teamtb.setColor(Color.LIGHT_GRAY);
+                teamv.setColor(Color.valueOf(teamv.getColorname()));
+                teamv.intializeForClient();
             }
             teams.setItems(teamList.toArray());
+            updateUnit = true;
         }
     }
 
@@ -525,6 +536,7 @@ public class SessionOnlinePlayer implements Screen {
             // MaxUnitCount selected
             String maxunitcount = Integer.toString(managersession.getGameSettings().getMaxUnitCount());
             unitbox.setSelected(maxunitcount);
+            refreshUnitsForTeam(Integer.parseInt(maxunitcount));
         }
     }
 
@@ -564,5 +576,29 @@ public class SessionOnlinePlayer implements Screen {
         // Updating the playerList before lauch
         getPlayersOfSession();
         session.setPlayerList(playerList);
+    }
+
+    public void addUnitsSingleTeam(int selectedunitcount, Team team) {
+        // The new units to the team. The name of the unit is the teamname + the number of the variable 'i'.
+        for (int i = 0; i < selectedunitcount; i++) {
+            team.addUnit(team.getName() + Integer.toString(i), 100);
+        }
+        
+        teamList.add(team);
+        gameSettings.addTeam(team);
+        teams.setItems(teamList.toArray());
+    }
+    // TODO: NEEDS TO RECHECK
+    public void refreshUnitsForTeam(int selectedunitcount) {
+        // For each team in the list remove all the units first and remove it from the gamesettings.
+        for (Team teamv : teamList) {
+            gameSettings.removeTeam(teamv);
+            teamv.removeAllUnits();
+            // The new units to the team. The name of the unit is the teamname + the number of the variable 'i'.
+            for (int i = 0; i < selectedunitcount; i++) {
+                teamv.addUnit(teamv.getName() + Integer.toString(i), 100);
+            }
+            gameSettings.addTeam(teamv);
+        }
     }
 }
