@@ -88,13 +88,14 @@ public class SessionOnlineHost implements Screen {
         getPlayersOfSession();
     }
 
-    public void getPlayersOfSession() {
+    public ArrayList<Player> getPlayersOfSession() {
         try {
             SessionPlayerContext sp = new SessionPlayerContext();
-            playerList = sp.getPlayersFromSession(session);
+            return sp.getPlayersFromSession(session);
         } catch (SQLException ex) {
             Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return null;
     }
 
     public void addPlayerToDB() {

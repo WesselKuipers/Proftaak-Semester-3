@@ -101,17 +101,18 @@ public class SessionOnlinePlayer implements Screen {
         // This manager will be used to connect to the registry of the host.
         manager = new SessionManager(session, this);
         addPlayerToDB();
-        getPlayersOfSession();
+        playerList = getPlayersOfSession(session);
         updateUnit = false;
     }
 
-    public void getPlayersOfSession() {
+    public ArrayList<Player> getPlayersOfSession(Session session) {
         try {
             SessionPlayerContext sp = new SessionPlayerContext();
-            playerList = sp.getPlayersFromSession(manager.getSession());
+            return sp.getPlayersFromSession(session);
         } catch (SQLException ex) {
             Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return null;
     }
 
     public void addPlayerToDB() {
@@ -574,7 +575,7 @@ public class SessionOnlinePlayer implements Screen {
     public void startGame() {
         startGame = 1;
         // Updating the playerList before lauch
-        getPlayersOfSession();
+        playerList = getPlayersOfSession(session);
         session.setPlayerList(playerList);
     }
 
