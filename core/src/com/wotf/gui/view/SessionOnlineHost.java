@@ -85,10 +85,10 @@ public class SessionOnlineHost implements Screen {
         teamList = new ArrayList<>();
         playerList = new ArrayList<>();
         addPlayerToDB();
-        getPlayersOfSession();
+        playerList = getPlayersOfSession(session);
     }
 
-    public ArrayList<Player> getPlayersOfSession() {
+    public ArrayList<Player> getPlayersOfSession(Session session) {
         try {
             SessionPlayerContext sp = new SessionPlayerContext();
             return sp.getPlayersFromSession(session);
@@ -534,7 +534,7 @@ public class SessionOnlineHost implements Screen {
                     session.setGameSettings(gameSettings);
                     
                     // Updating the playerList before lauch
-                    getPlayersOfSession();
+                    playerList = getPlayersOfSession(session);
                     session.setPlayerList(playerList);
 
                     // Check if there are at least 2 teams otherwise return

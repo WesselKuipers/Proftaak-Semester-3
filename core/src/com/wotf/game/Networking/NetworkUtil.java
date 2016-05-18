@@ -59,7 +59,7 @@ public class NetworkUtil {
      * @param hostIP Ip Address of the host.
      */
     private void initNetworkListener( Player host ) {
-        if (scene.getGame().getPlayingPlayer().equals(host)) {
+        if (scene.getGame().getPlayingPlayer().getID() == host.getID() ) {
             ServerSocketHints serverSocketHint = new ServerSocketHints();
 
             // This prevents the host from dropping out, when in production set it to an appropiate value
