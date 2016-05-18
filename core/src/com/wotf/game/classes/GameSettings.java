@@ -83,15 +83,6 @@ public class GameSettings implements Serializable {
      * TODO!
      */
     private void fillWeapons() {
-        /*Sprite bullet_sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
-        Sprite bazooka_sprite = new Sprite(new Texture(Gdx.files.internal("Bazooka.png")));
-
-        Sprite grenade_sprite = new Sprite(new Texture(Gdx.files.internal("grenade.png")));
-        Sprite clusterbomb_sprite = new Sprite(new Texture(Gdx.files.internal("clusterbomb.png")));
-
-        Sprite nuke_sprite = new Sprite(new Texture(Gdx.files.internal("nuclearbomb.png")));
-        Sprite remote_sprite = new Sprite(new Texture(Gdx.files.internal("remote.png")));*/
-
         WEAPONS_ARMORY.add(new Bazooka("Bazooka"));
         WEAPONS_ARMORY.add(new Nuke("Nuke"));
         WEAPONS_ARMORY.add(new Grenade("Grenade"));

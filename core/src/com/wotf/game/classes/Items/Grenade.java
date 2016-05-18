@@ -73,6 +73,14 @@ public class Grenade extends Item {
         return p;
     }
 
+      /**
+     * @return particle affect
+     */
+    @Override
+      public Texture getProjectileTexture() {
+        return new Texture(Gdx.files.internal("grenade.png"));
+    }
+      
     /**
      * @return stprite image of the weapon
      */
@@ -81,6 +89,14 @@ public class Grenade extends Item {
         return weapon_sprite;
     }
 
+      /**
+     * @return stprite image of the weapon
+     */
+    @Override
+    public Sprite getProjectileSprite() {
+        return bullet_sprite;
+    }
+    
     /**
      * @return gets the power of the item
      */

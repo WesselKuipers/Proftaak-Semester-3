@@ -80,11 +80,27 @@ public class Nuke extends Item {
     }
 
     /**
+     * @return particle affect
+     */
+    @Override
+      public Texture getProjectileTexture() {
+        return new Texture(Gdx.files.internal("nuclearbomb.png"));
+    }
+    
+    /**
      * @return stprite image of the weapon
      */
     @Override
     public Sprite getWeaponSprite() {
         return weapon_sprite;
+    }
+    
+      /**
+     * @return stprite image of the weapon
+     */
+    @Override
+    public Sprite getProjectileSprite() {
+        return bullet_sprite;
     }
 
     /**

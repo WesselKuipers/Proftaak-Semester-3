@@ -20,6 +20,8 @@ public class Game {
     private final GamePhysics gamePhysics;
     private final GameSettings gameSettings;
     private final TurnLogic turnLogic;
+    
+    private boolean turnState;
 
     /**
      * Constructor of Game, assign params to properties. Add new game physics
@@ -112,11 +114,20 @@ public class Game {
     public Map getMap() {
         return map;
     }
+    
+    /**
+     * 
+     * @return boolean if there is a current player in turn
+     */
+    public Boolean getTurnState(){
+        return turnState;
+    }
 
     /**
      * Set keyboard & camera focus to active unit
      */
     public void beginTurn() {
+        turnState = true;
         map.calculateWind();
         
         Team activeTeam = getActiveTeam();
@@ -152,6 +163,7 @@ public class Game {
      * whether team and its units are still alive.
      */
     public void endTurn() {
+        turnState = false;
         Team activeTeam = getActiveTeam();
         activeTeam.endTurn();
         turnLogic.endTurn();

@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import com.wotf.game.classes.Items.Item;
 import com.wotf.game.GameStage;
+import com.wotf.game.GuiStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 
 /**
@@ -133,6 +134,7 @@ public class Unit extends Group {
             Image weaponImage = new Image(w.getWeaponSprite());
             weaponImage.setPosition(Unit.this.getX(), Unit.this.getY());
             Unit.this.addActor(weaponImage);
+            
         } else {
             System.out.println("Selected weapon not found");
         }

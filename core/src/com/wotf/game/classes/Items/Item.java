@@ -1,5 +1,6 @@
 package com.wotf.game.classes.Items;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
@@ -13,20 +14,8 @@ import java.io.Serializable;
  */
 public abstract class Item extends Actor implements Serializable{
 
-    /*
-    NOTES: create weapons and items accordingly
-    Weapons extend item and implement e.g. IExplosion \/ IReplace \/ IHeal \/ IHeal \/ ICluster
-    weapons/items have own implementation of these interfaces 
-    
-    Weapons logic should be remodeled in the next version when it is mapped where what function goes
-     */
     private String name;
-//    private float power;
-//    private int blastRadius;
-    // private Sprite weaponSprite;
-
-//    private Projectile bullet;
-//    private int damage;
+    
     /**
      * Main constructor of Item used to initialize all necessary fields
      *
@@ -37,16 +26,8 @@ public abstract class Item extends Actor implements Serializable{
      * @param weaponSprite Sprite of the weapon of the item
      * @param bulletSprite Sprite of the bullet/projectile of the item
      */
-    public Item(String nm /*, float pw, int rad, int damage, Sprite weaponSprite, Sprite bulletSprite*/) {
-        //graphics
-        // this.weaponSprite = weaponSprite;
+    public Item(String nm ) {
         this.name = nm;
-
-        /*
-        this.power = pw;
-        this.blastRadius = rad;
-        this.damage = damage;
-        this.bullet = new Projectile(bulletSprite);*/
     }
 
     public void InitItemChildSuper(Sprite weapon_Sprite) {
@@ -56,17 +37,15 @@ public abstract class Item extends Actor implements Serializable{
     }
 
     /**
-     * Constructor of Item used to initialize all necessary fields
-     *
-     * @param nm Name of the item
-     * @param pw Power of the item
-     * @param weaponSprite Sprite of the weapon of the item
-     * @param bulletSprite Sprite of the bullet/projectile of the item
+     * @return sprite image of the projectile/bullet
      */
-    /* public Item(String nm, float pw, Sprite weaponSprite, Sprite bulletSprite) {
-        this(nm, pw, 1, 25, weaponSprite, bulletSprite);
-    }
+     public abstract Texture getProjectileTexture();
+         
+    /**
+     * @return sprite image of the projectile/bullet
      */
+     public abstract Sprite getProjectileSprite();
+     
     /**
      * @return stprite image of the weapon
      */

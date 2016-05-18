@@ -78,7 +78,23 @@ public class AirStrike extends Item {
     public ParticleEffect getParticle() {
         return p;
     }
+    
+    /**
+     * @return particle affect
+     */
+    @Override
+      public Texture getProjectileTexture() {
+        return new Texture(Gdx.files.internal("rocket.png"));
+    }
 
+    /**
+     * @return stprite image of the weapon
+     */
+    @Override
+    public Sprite getProjectileSprite() {
+        return weapon_sprite;
+    }
+    
     /**
      * @return stprite image of the weapon
      */
