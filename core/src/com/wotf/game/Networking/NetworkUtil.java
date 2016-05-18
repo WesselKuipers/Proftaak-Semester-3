@@ -97,7 +97,7 @@ public class NetworkUtil {
                         if (isHost) {
                             for (Player player : scene.getGame().getPlayers()) {
                                 // Dont send the message to host else it will do the action twice!
-                                if (!player.equals(host)) {
+                                if (player.getID() != host.getID()) {
                                     sendToClient(message, player.getIp());
                                 }
                             }
@@ -120,7 +120,7 @@ public class NetworkUtil {
             socket.getOutputStream().write((nMsg.toString() + System.lineSeparator()).getBytes());
             
             // If its the host that is sending the message, you have to run the action for the host too
-            if (scene.getGame().getPlayingPlayer().equals(host)) {
+            if (scene.getGame().getPlayingPlayer().getID() == host.getID()) {
                 receiveMessage(nMsg.toString());
             }
             
@@ -188,7 +188,7 @@ public class NetworkUtil {
             case BEGINTURN:
                 beginTurn( nMsg );
             case ENDTURN:
-                endTurn ( nMsg );
+                //endTurn ( nMsg );
                 break;
             case INITGAME:
                 initGame( nMsg );
@@ -270,7 +270,7 @@ public class NetworkUtil {
     public void beginTurn( NetworkMessage nMsg ) {
         try {
             // host has already ran this action when sending this message, so we want to apply it only on the connected clients 
-            if (!scene.getGame().getPlayingPlayer().equals(host)) {
+            if (scene.getGame().getPlayingPlayer().getID() != host.getID()) {
                 // set the wind force
                 String windXStr = nMsg.getParameter("windX");
                 String windYStr = nMsg.getParameter("windY");
@@ -280,7 +280,7 @@ public class NetworkUtil {
 
                 Vector2 windForce = new Vector2( windX, windY );
                 
-                scene.getGame().beginTurnReceive(terrain, windForce);
+                scene.getGame().beginTurnReceive(windForce);
             }
         }
         catch( InvalidParameterException ipe ) {
@@ -318,6 +318,7 @@ public class NetworkUtil {
         try {   
             List<Team> teams = scene.getGame().getTeams();
             int unitCount = 0;
+            int unitAmount = scene.getGame().getTeam(0).getUnits().size() * scene.getGame().getTeams().size();
             
             for (Team team : teams) {
                 for (Unit unit : team.getUnits()) {
@@ -330,7 +331,7 @@ public class NetworkUtil {
                     Vector2 unitPosition = new Vector2( unitX, unitY );
 
                     // When no positions are yet added, add them to the array, else we are going to sync the current positions and the unit health
-                    if (unitPositions == null || unitPositions.size() < 1) {
+                    if (unitPositions == null || unitPositions.size() != unitAmount) {
                         unitPositions.add(unitPosition);
                     } else {
                         unit.setPosition(unitPosition);

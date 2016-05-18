@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import com.wotf.game.WotFGame;
 import com.wotf.game.classes.Session;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Wrapper class that contains the Game object
@@ -112,7 +114,17 @@ public class GameEngine implements Screen {
         viewport.setWorldSize(map.getWidth(), map.getHeight());
         viewport.getCamera().position.set(viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2, 0);
         viewport.apply();
-
+        
+        // WARNING: THIS IS A TEMPORARY FIX. This makes the client sleep so it can receive all gamesettings sent by the host, else it will crash.
+        // TODO: Make the client wait until the settings are loaded from the host by the client?
+        if (session.getHost().getID() != playingPlayer.getID()) {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
         // Initializes game object using game settings
         Game gameclass = new Game(gameSettings, map, session.getPlayers(), playingPlayer);
 

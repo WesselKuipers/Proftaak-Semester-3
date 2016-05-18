@@ -14,7 +14,7 @@ public class DBCon {
     private static Connection connection;
 
     // TODO: 6-3-2016 Refactor this so that the username and password are loaded from a file instead of being hard-coded
-    private static final String ConnectionPath = "jdbc:mysql://89.98.157.235:3306/school"; // example oracle string: "jdbc:oracle:thin:@localhost:1521:XE";
+    private static final String ConnectionPath = "jdbc:mysql://192.168.2.132:3306/school"; // example oracle string: "jdbc:oracle:thin:@localhost:1521:XE";
     private static final String Username = "connect";
     private static final String Password = "admin";
 

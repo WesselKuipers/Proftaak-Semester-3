@@ -99,15 +99,16 @@ public class GameStage extends Stage {
         networkingUtil = new NetworkUtil( game.getHost(), this );
         
         // Initialize the game by host, after that send it to all connected clients
-        if (game.getPlayingPlayer().equals(game.getHost())) {
+        if (game.getPlayingPlayer().getID() == game.getHost().getID()) {
             
             // Send all the random spawn locations in one message
             int unitCount = 0;
+            List<Vector2> randomSpawnLocations = getRandomSpawnLocations();
             NetworkMessage syncUnitsMsg = new NetworkMessage ( Command.SYNCUNITS );
             
-            for (Vector2 spawnLocation : getRandomSpawnLocations()) {
+            for (Vector2 spawnLocation : randomSpawnLocations) {
                 syncUnitsMsg.addParameter("u" + unitCount + "x", Float.toString(spawnLocation.x));
-                syncUnitsMsg.addParameter("u" + unitCount + "x", Float.toString(spawnLocation.y));
+                syncUnitsMsg.addParameter("u" + unitCount + "y", Float.toString(spawnLocation.y));
                 unitCount++;
             }
             
@@ -152,7 +153,7 @@ public class GameStage extends Stage {
     public List<Vector2> getRandomSpawnLocations() {
         boolean[][] terrain = game.getMap().getTerrain(); 
         List<Vector2> spawnLocations = new ArrayList<>();
-        int unitAmount = game.getGameSettings().getMaxUnitCount() * game.getTeams().size();
+        int unitAmount = game.getTeam(0).getUnits().size() * game.getTeams().size();
         float unitWidth = game.getTeam(0).getUnit(0).getWidth();
 
         for (int i = unitAmount; i >= 0; i--) {
@@ -306,7 +307,7 @@ public class GameStage extends Stage {
         Vector3 rel = getCamera().unproject(new Vector3(screenX, screenY, 0));
         
         // Check if the playing player is allowed to do actions
-        //if (game.getPlayingPlayer().equals(game.getActiveTeam().getPlayer())) {
+        if (game.getPlayingPlayer().getID() == game.getActiveTeam().getPlayer().getID()) {
             // TODO: Input listener for Unit Movement within this if statement
             
             // Check if 
@@ -324,7 +325,7 @@ public class GameStage extends Stage {
                     explode((int) rel.x, (int) rel.y, 30, 0);
                 }
             }
-        //}
+        }
         return true;
     }
 
