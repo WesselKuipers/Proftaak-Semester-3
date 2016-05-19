@@ -199,6 +199,8 @@ public class NetworkUtil {
             case TERRAIN:
                 addTerrainX ( nMsg );
                 break;
+            case SWITCHUNIT:
+                switchUnit ( nMsg );
             default: 
                 System.out.println("Command was not processed");
                 break;
@@ -277,6 +279,8 @@ public class NetworkUtil {
 
                 float windX = Float.parseFloat( windXStr );
                 float windY = Float.parseFloat( windYStr );
+                
+                System.out.println("Wind received: "+windX + ", "+windY);
 
                 Vector2 windForce = new Vector2( windX, windY );
                 
@@ -356,7 +360,11 @@ public class NetworkUtil {
         try {
             String direction = nMsg.getParameter("direction");
             
-            //scene.getGame().getActiveTeam().getActiveUnit().jump()
+            if ("right".equals(direction)) {
+                scene.getGame().getActiveTeam().getActiveUnit().jump(true);
+            } else {
+                scene.getGame().getActiveTeam().getActiveUnit().jump(false);
+            }
         }
         catch( InvalidParameterException ipe ) {
             //TODO: what do we do when message went wrong ? ask host aggain ?
@@ -367,5 +375,15 @@ public class NetworkUtil {
 
     private void endTurn(NetworkMessage nMsg) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private void switchUnit( NetworkMessage nMsg ) {
+        try {
+            scene.getGame().getActiveTeam().setNextActiveUnit();
+        }
+        catch( InvalidParameterException ipe ) {
+            //TODO: what do we do when message went wrong ? ask host aggain ?
+            Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
+        }
     }
 }

@@ -177,6 +177,8 @@ public class Game {
             Vector2 windForce = map.getWind();
             beginTurnMsg.addParameter("windX", Float.toString(windForce.x));
             beginTurnMsg.addParameter("windY", Float.toString(windForce.y));
+            
+            System.out.println("Wind sent: "+windForce.x + ", "+windForce.y);
 
             // send message to host and after that, all clients        
             gameStage.getNetworkingUtil().sendToHost( beginTurnMsg );

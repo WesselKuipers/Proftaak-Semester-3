@@ -234,6 +234,7 @@ public class GameStage extends Stage {
 
         OrthographicCamera cam = (OrthographicCamera) getCamera();
 
+        // Always allow these controls (camera controls)
         switch (keyCode) {
             // Camera controls (position)
             case Keys.NUMPAD_2:
@@ -252,7 +253,6 @@ public class GameStage extends Stage {
                 cam.translate(new Vector2(50f, 0));
                 focusedActor = null;
                 break;
-
             // Camera controls (zoom)
             case Keys.PLUS:
                 cam.zoom -= 0.05f;
@@ -263,31 +263,40 @@ public class GameStage extends Stage {
             case Keys.ENTER:
                 cam.zoom = 1;
                 break;
-
-            // Unit selection
-            case Keys.TAB:
-                game.getActiveTeam().setNextActiveUnit();
-                break;
-
-            // Debug key for killing current unit
-            case Keys.G:
-                game.getActiveTeam().getActiveUnit().decreaseHealth(100);
-                game.endTurn();
-                break;
-
-            case Keys.F4:
-                showDebug = !showDebug;
-                break;
-
-            case Keys.RIGHT:
-                if(game.getActiveTeam().getActiveUnit() != null)
-                    game.getActiveTeam().getActiveUnit().jump(true);
-                break;
-
-            case Keys.LEFT:
-                if(game.getActiveTeam().getActiveUnit() != null)
-                    game.getActiveTeam().getActiveUnit().jump(false);
-                break;
+        }
+        
+        // Only allow these controls for the current playing player
+        if (game.getPlayingPlayer().getID() == game.getActiveTeam().getPlayer().getID()) {
+            switch (keyCode) {
+                // Unit selection
+                case Keys.TAB:
+                    game.getActiveTeam().setNextActiveUnit();
+                    NetworkMessage switchUnitMsg = new NetworkMessage( Command.SWITCHUNIT );
+                    networkingUtil.sendToHost( switchUnitMsg );
+                    break;
+                // Debug key for killing current unit
+                case Keys.G:
+                    game.getActiveTeam().getActiveUnit().decreaseHealth(100);
+                    game.endTurn();
+                    break;
+                case Keys.F4:
+                    showDebug = !showDebug;
+                    break;
+                case Keys.RIGHT:
+                    if(game.getActiveTeam().getActiveUnit() != null) {
+                        NetworkMessage moveMsg = new NetworkMessage( Command.MOVE );
+                        moveMsg.addParameter("direction", "right");
+                        networkingUtil.sendToHost( moveMsg );
+                    }    
+                    break;
+                case Keys.LEFT:
+                    if(game.getActiveTeam().getActiveUnit() != null) {
+                        NetworkMessage moveMsg = new NetworkMessage( Command.MOVE );
+                        moveMsg.addParameter("direction", "left");
+                        networkingUtil.sendToHost( moveMsg );
+                    }
+                    break;
+            }
         }
 
         clampCamera();
@@ -312,16 +321,15 @@ public class GameStage extends Stage {
         
         // Check if the playing player is allowed to do actions
         if (game.getPlayingPlayer().getID() == game.getActiveTeam().getPlayer().getID()) {
-            // TODO: Input listener for Unit Movement within this if statement
             
-            // Check if 
+            // Check if turn state is playing
             if (game.getTurnLogic().getState() == TurnState.PLAYING) {
                 if (button == Input.Buttons.LEFT) {
                     //create fire message to send to host
                     NetworkMessage fireMsg = new NetworkMessage( Command.FIRE );
                     fireMsg.addParameter( "mousePosX", Float.toString(  rel.x ));
                     fireMsg.addParameter( "mousePosY", Float.toString(  rel.y ));
-
+                    
                     //send message to host
                     networkingUtil.sendToHost( fireMsg );
 
