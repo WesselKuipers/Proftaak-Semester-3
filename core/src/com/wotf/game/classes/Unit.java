@@ -66,34 +66,6 @@ public class Unit extends Group implements Serializable {
         this.setWidth(sprite.getWidth());
         this.setHeight(sprite.getHeight());
         setAcceleration(9.8);
-
-        // Input listener for every unit
-        addListener(new InputListener() {
-            @Override
-            public boolean keyDown(InputEvent event, int keycode) {
-// <editor-fold defaultstate="collapsed" desc=" switching between weapons ">
-                if (keycode == Keys.NUM_1) {
-                    selecting_weapon(0);
-                }
-                if (keycode == Keys.NUM_2) {
-                    selecting_weapon(1);
-                }
-                if (keycode == Keys.NUM_3) {
-                    selecting_weapon(2);
-                }
-                if (keycode == Keys.NUM_4) {
-                    selecting_weapon(3);
-                }
-                if (keycode == Keys.NUM_5) {
-                    selecting_weapon(4);
-                }
-//                if (keycode == Keys.NUM_6) {
-//                    selecting_weapon(5);
-//                }
-// </editor-fold>
-                return true;
-            }
-        });
     }
 
     /**
