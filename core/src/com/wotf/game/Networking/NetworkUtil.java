@@ -199,6 +199,9 @@ public class NetworkUtil {
             case TERRAIN:
                 addTerrainX ( nMsg );
                 break;
+            case SELECTWEAPON:
+                selectWeapon ( nMsg );
+                break;
             case SWITCHUNIT:
                 switchUnit ( nMsg );
             default: 
@@ -386,4 +389,37 @@ public class NetworkUtil {
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
     }
+    
+    /**
+     * method used by networking that makes sure the active unit selects the right weapon
+     * @param nMsg string from the network device that contains the needed information. 
+     */
+     private void selectWeapon( NetworkMessage nMsg ) {
+        try {
+            int weapon = 0;
+             String weaponIndex = nMsg.getParameter("WeaponIndex");
+             if (tryParseInt(weaponIndex)) {  
+                weapon = Integer.parseInt(weaponIndex);  
+               }             
+             
+            scene.getGame().getActiveTeam().getActiveUnit().selecting_weapon(weapon);
+        }
+        catch( InvalidParameterException ipe ) {
+            //TODO: what do we do when message went wrong ? ask host aggain ?
+            Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
+        }
+    }
+      /**
+       * test if the given string is a integer
+       * @param value string to be tested
+       * @return boolean if it is safe to parse the content as an integer
+       */
+     public static boolean tryParseInt(String value) {  
+     try {  
+         Integer.parseInt(value);  
+         return true;  
+      } catch (NumberFormatException e) {  
+         return false;  
+      }  
+}
 }

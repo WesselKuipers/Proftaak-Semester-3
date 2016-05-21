@@ -20,7 +20,8 @@ public enum Command {
     INITGAME,
     SYNCUNITS,
     TERRAIN, 
-    SWITCHUNIT;
+    SWITCHUNIT,
+    SELECTWEAPON;
     
     /**
      * Helper method which converts a string into command enum.
