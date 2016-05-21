@@ -29,7 +29,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.wotf.game.WotFGame;
 import com.wotf.game.classes.GameSettings;
-import com.wotf.game.classes.Map;
 import com.wotf.game.classes.Player;
 import com.wotf.game.classes.Session;
 import com.wotf.game.classes.SessionManager;
@@ -42,7 +41,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -72,6 +70,7 @@ public class SessionOnlineHost implements Screen {
     private Timer timer;
     private SelectBox maxplayerbox;
     private SelectBox unitbox;
+
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting
      *
@@ -86,16 +85,17 @@ public class SessionOnlineHost implements Screen {
         teamList = new ArrayList<>();
         playerList = new ArrayList<>();
         addPlayerToDB();
-        getPlayersOfSession();
+        playerList = getPlayersOfSession(session);
     }
 
-    public void getPlayersOfSession() {
+    public ArrayList<Player> getPlayersOfSession(Session session) {
         try {
             SessionPlayerContext sp = new SessionPlayerContext();
-            playerList = sp.getPlayersFromSession(session);
+            return sp.getPlayersFromSession(session);
         } catch (SQLException ex) {
             Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return null;
     }
 
     public void addPlayerToDB() {
@@ -178,8 +178,8 @@ public class SessionOnlineHost implements Screen {
 
                         ArrayList<Team> teamlistcopy = new ArrayList<>(teamList);
                         for (Team fteam : teamlistcopy) {
-                            if (fteam.getOnlineplayer().getName().equals(selectedplayer.getName())) {
-                                fteam.setOnlineplayer(null);
+                            if (fteam.getPlayer().getName().equals(selectedplayer.getName())) {
+                                fteam.setPlayer(null);
 
                                 TextButton teamtb = (TextButton) stage.getRoot().findActor(fteam.getName());
                                 teamtb.setTouchable(Touchable.enabled);
@@ -190,10 +190,10 @@ public class SessionOnlineHost implements Screen {
                             }
                         }
 
-                        teamalpha.setOnlineplayer(selectedplayer);
-                        
-                        addUnitsSingleTeam(selectedunitcount, teamalpha);
+                        teamalpha.setPlayer(selectedplayer);
 
+                        addUnitsSingleTeam(selectedunitcount, teamalpha);
+                        
                         session.setGameSettings(gameSettings);
 
                         btnteamalpha.setTouchable(Touchable.disabled);
@@ -222,8 +222,8 @@ public class SessionOnlineHost implements Screen {
 
                         ArrayList<Team> teamlistcopy = new ArrayList<>(teamList);
                         for (Team fteam : teamlistcopy) {
-                            if (fteam.getOnlineplayer().getName().equals(selectedplayer.getName())) {
-                                fteam.setOnlineplayer(null);
+                            if (fteam.getPlayer().getName().equals(selectedplayer.getName())) {
+                                fteam.setPlayer(null);
 
                                 TextButton teamtb = (TextButton) stage.getRoot().findActor(fteam.getName());
                                 teamtb.setTouchable(Touchable.enabled);
@@ -234,10 +234,10 @@ public class SessionOnlineHost implements Screen {
                             }
                         }
 
-                        teambeta.setOnlineplayer(selectedplayer);
+                        teambeta.setPlayer(selectedplayer);
 
                         addUnitsSingleTeam(selectedunitcount, teambeta);
-                        
+
                         session.setGameSettings(gameSettings);
 
                         btnteambeta.setTouchable(Touchable.disabled);
@@ -269,8 +269,8 @@ public class SessionOnlineHost implements Screen {
 
                         ArrayList<Team> teamlistcopy = new ArrayList<>(teamList);
                         for (Team fteam : teamlistcopy) {
-                            if (fteam.getOnlineplayer().getName().equals(selectedplayer.getName())) {
-                                fteam.setOnlineplayer(null);
+                            if (fteam.getPlayer().getName().equals(selectedplayer.getName())) {
+                                fteam.setPlayer(null);
 
                                 TextButton teamtb = (TextButton) stage.getRoot().findActor(fteam.getName());
                                 teamtb.setTouchable(Touchable.enabled);
@@ -281,7 +281,7 @@ public class SessionOnlineHost implements Screen {
                             }
                         }
 
-                        teamgamma.setOnlineplayer(selectedplayer);
+                        teamgamma.setPlayer(selectedplayer);
 
                         addUnitsSingleTeam(selectedunitcount, teamgamma);
 
@@ -464,7 +464,6 @@ public class SessionOnlineHost implements Screen {
         }
 
         map1 = new Image(new Texture(mapslist.get(0)));
-        gameSettings.setMapIndex(0);
         try {
             session.setGameSettings(gameSettings);
         } catch (RemoteException ex) {
@@ -476,6 +475,10 @@ public class SessionOnlineHost implements Screen {
         mapstable.addActor(map1);
         SelectBox chooseMap = new SelectBox(skin);
         chooseMap.setItems(mapslist.toArray());
+        
+        gameSettings.setMapIndex(chooseMap.getSelectedIndex());
+        gameSettings.setMapName(chooseMap.getSelected().toString());
+        
         chooseMap.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -522,15 +525,27 @@ public class SessionOnlineHost implements Screen {
         start.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                timer.cancel();
-                // Check if there are at least 2 teams otherwise return
-                if (teamList.size() < 2) {
-                    return;
-                }
+                try {
+                    timer.cancel();
 
-                // Create the map
-                Map map = new Map(chooseMap.getSelected().toString());
-                game.setScreen(new GameEngine(game, gameSettings, map));
+                    // Updating map before lauch
+                    gameSettings.setMapName(chooseMap.getSelected().toString());
+                    gameSettings.setMapIndex(chooseMap.getSelectedIndex());
+                    session.setGameSettings(gameSettings);
+                    
+                    // Updating the playerList before lauch
+                    playerList = getPlayersOfSession(session);
+                    session.setPlayerList(playerList);
+
+                    // Check if there are at least 2 teams otherwise return
+                    if (teamList.size() < 2) {
+                        return;
+                    }
+                    session.startGame();
+                    game.setScreen(new GameEngine(game, session, player));
+                } catch (RemoteException ex) {
+                    Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
 

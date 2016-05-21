@@ -6,8 +6,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -16,6 +14,7 @@ import java.util.Random;
 public class Map {
 
     private final double gravityModifier = 9.8;
+    private final int windRange = 20;
     private int waterLevel;
     private int width;
     private int height;
@@ -39,6 +38,8 @@ public class Map {
         // Generates and initializes background and foreground textures
         generateBackgroundTexture();
         initializeTerrainTexture(filename);
+        
+        windForce = new Vector2(0,0);
     }
 
     /**
@@ -287,13 +288,10 @@ public class Map {
     public void calculateWind() {
         Random random = new Random();
 
-        int range = 20;
-
-        float x = (random.nextInt(range) - range / 2);
-        float y = 0; //(random.nextInt(range) - range / 2);
+        float x = (random.nextInt(windRange) - windRange / 2);
+        float y = (random.nextInt(windRange) - windRange / 2);
 
         this.windForce = new Vector2(x, y);
-        System.out.println(windForce.toString());
     }
 
     /**
@@ -303,6 +301,15 @@ public class Map {
      */
     public Vector2 getWind() {
         return this.windForce;
+    }
+    
+    /**
+     * Function that sets the current wind force.
+     *
+     * @param windForce
+     */
+    public void setWind(Vector2 windForce) {
+        this.windForce = windForce;
     }
     
     /**

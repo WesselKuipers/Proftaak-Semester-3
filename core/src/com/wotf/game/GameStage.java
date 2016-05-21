@@ -23,6 +23,9 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.wotf.game.Networking.Command;
+import com.wotf.game.Networking.NetworkMessage;
+import com.wotf.game.Networking.NetworkUtil;
 import com.wotf.game.classes.Game;
 import com.wotf.game.classes.Projectile;
 import com.wotf.game.classes.Team;
@@ -42,11 +45,12 @@ public class GameStage extends Stage {
 
     private final SpriteBatch batch;
     private final SpriteBatch guiBatch;
-
+    
+    private NetworkUtil networkingUtil;
+    
     private final BitmapFont font;
-
+    
     private boolean showDebug = false;
-
     private Actor focusedActor; // if this is set to an actor
     // have the camera follow it automatically, otherwise set it to null
 
@@ -55,7 +59,6 @@ public class GameStage extends Stage {
     private List<PooledEffect> particles;
 
     private ParticleEffect tempParticleEffects;
-
     /**
      * Constructor for GameStage that initializes everything required for the
      * game to run Generates the initial texture based on the data contained
@@ -85,64 +88,101 @@ public class GameStage extends Stage {
      * actors Spawns the units at random collision-free locations
      */
     public void init() {
-        // spawning users and adding them as actors
-        spawnUnits();
-
         getCamera().update();
-        game.beginTurn();
+        
+        networkingUtil = new NetworkUtil( game.getHost(), this );
+        
+        // Initialize the game by host, after that send it to all connected clients
+        if (game.getPlayingPlayer().getID() == game.getHost().getID()) {
+            
+            // Send all the random spawn locations in one message
+            int unitCount = 0;
+            List<Vector2> randomSpawnLocations = getRandomSpawnLocations();
+            NetworkMessage syncUnitsMsg = new NetworkMessage ( Command.SYNCUNITS );
+            
+            for (Vector2 spawnLocation : randomSpawnLocations) {
+                syncUnitsMsg.addParameter("u" + unitCount + "x", Float.toString(spawnLocation.x));
+                syncUnitsMsg.addParameter("u" + unitCount + "y", Float.toString(spawnLocation.y));
+                unitCount++;
+            }
+            
+            networkingUtil.sendToHost( syncUnitsMsg );
+
+            NetworkMessage initGameMsg = new NetworkMessage( Command.INITGAME );
+            networkingUtil.sendToHost( initGameMsg );
+        }
+        
         guiStage.updateWind();
     }
 
     /**
-     * Iterates through every team's units and determines a random spawn
-     * location
-     *
-     * Spawn location is determined by the highest available pixel above a solid
-     * pixel at a randomly generated X-coordinate.
-     *
+     * Iterates through every team's units and determines a random spawn location
+     * 
+     * Spawn location is determined by the highest available pixel above
+     * a solid pixel at a randomly generated X-coordinate.
+     * 
+     * @param spawnLocations
      */
-    public void spawnUnits() {
-        boolean[][] terrain = game.getMap().getTerrain();
-
+    public void spawnUnits(List<Vector2> spawnLocations) {       
+        int i = 0;
         // Adds every unit as an actor to this stage
         for (Team team : game.getTeams()) {
             for (Unit unit : team.getUnits()) {
-                // Generates a random X position and attempts to find the highest collision-free position
-                // and spawns the unit at that position, will continue looping until a position has been found
-                boolean spawned = false;
-                int posX = 0;
-                int posY = 0;
 
-                while (!spawned) {
-                    posX = MathUtils.random(0 + (int) unit.getWidth(), (int) game.getMap().getWidth() - (int) unit.getWidth());
-                    posY = -1;
-
-                    // loops through terrain[x ± half its width][y] to check for collision free locations
-                    for (int x = posX; x < posX + unit.getWidth(); x++) {
-                        for (int y = terrain[0].length - 1; y > 0; y--) {
-                            if (terrain[x][y]) {
-                                if (y > posY) {
-                                    posY = y;
-                                }
-                            }
-                        }
-                    }
-
-                    // if a position has been found, we can exit the loop
-                    if (posY != -1) {
-                        spawned = true;
-                        break;
-                    }
-                }
-
-                // since [posX][posY] is solid, we want to spawn the unit one pixel higher
-                unit.spawn(new Vector2(posX, posY + 1));
+                // spawn a unit
+                unit.spawn(spawnLocations.get(i));
 
                 // formally adds the unit as an actor to the stage
                 this.addActor(unit);
+                i++;
             }
         }
     }
+    
+    /**
+     * 
+     * @param unitAmount
+     * @return a list with random spawn locations 
+     */
+    public List<Vector2> getRandomSpawnLocations() {
+        boolean[][] terrain = game.getMap().getTerrain(); 
+        List<Vector2> spawnLocations = new ArrayList<>();
+        int unitAmount = game.getTeam(0).getUnits().size() * game.getTeams().size();
+        float unitWidth = game.getTeam(0).getUnit(0).getWidth();
+
+        for (int i = unitAmount; i >= 0; i--) {
+            // Generates a random X position and attempts to find the highest collision-free position
+            // and spawns the unit at that position, will continue looping until a position has been found
+            boolean spawned = false;
+            int posX = 0;
+            int posY = 0;
+
+            while (!spawned) {
+                posX = MathUtils.random(0 + (int) unitWidth, (int) game.getMap().getWidth() - (int) unitWidth);
+                posY = -1;
+
+                // loops through terrain[x ± half its width][y] to check for collision free locations
+                for (int x = posX; x < posX + unitWidth; x++) {
+                    for (int y = terrain[0].length - 1; y > 0; y--) {
+                        if (terrain[x][y]) {
+                            if (y > posY) {
+                                posY = y;
+                            }
+                        }
+                    }
+                }
+
+                // if a position has been found, we can exit the loop
+                if (posY != -1) {
+                    spawned = true;
+                    spawnLocations.add(new Vector2(posX, posY + 1));
+                    break;
+                }
+            }
+        }
+        
+        return spawnLocations;
+    }  
 
     /**
      * Returns game object associated with this stage
@@ -151,6 +191,15 @@ public class GameStage extends Stage {
      */
     public Game getGame() {
         return this.game;
+    }
+    
+    /**
+     * Returns network distribution object associated with this stage
+     *
+     * @return Object of type Network Distribution
+     */
+    public NetworkUtil getNetworkingUtil() {
+        return this.networkingUtil;
     }
 
     /**
@@ -185,6 +234,7 @@ public class GameStage extends Stage {
 
         OrthographicCamera cam = (OrthographicCamera) getCamera();
 
+        // Always allow these controls (camera controls)
         switch (keyCode) {
             // Camera controls (position)
             case Keys.NUMPAD_2:
@@ -203,7 +253,6 @@ public class GameStage extends Stage {
                 cam.translate(new Vector2(50f, 0));
                 focusedActor = null;
                 break;
-
             // Camera controls (zoom)
             case Keys.PLUS:
                 cam.zoom -= 0.05f;
@@ -214,32 +263,40 @@ public class GameStage extends Stage {
             case Keys.ENTER:
                 cam.zoom = 1;
                 break;
-
-            // Unit selection
-            case Keys.TAB:
-                game.getActiveTeam().setNextActiveUnit();
-                break;
-
-            // Debug key for killing current unit
-            case Keys.G:
-                game.getActiveTeam().getActiveUnit().decreaseHealth(100);
-                game.endTurn();
-                break;
-
-            case Keys.F4:
-                showDebug = !showDebug;
-                break;
-
-            case Keys.RIGHT:
-                if(game.getActiveTeam().getActiveUnit() != null)
-                    game.getActiveTeam().getActiveUnit().jump(true);
-                break;
-
-            case Keys.LEFT:
-                if(game.getActiveTeam().getActiveUnit() != null)
-                    game.getActiveTeam().getActiveUnit().jump(false);
-                break;
-
+        }
+        
+        // Only allow these controls for the current playing player
+        if (game.getPlayingPlayer().getID() == game.getActiveTeam().getPlayer().getID()) {
+            switch (keyCode) {
+                // Unit selection
+                case Keys.TAB:
+                    game.getActiveTeam().setNextActiveUnit();
+                    NetworkMessage switchUnitMsg = new NetworkMessage( Command.SWITCHUNIT );
+                    networkingUtil.sendToHost( switchUnitMsg );
+                    break;
+                // Debug key for killing current unit
+                case Keys.G:
+                    game.getActiveTeam().getActiveUnit().decreaseHealth(100);
+                    game.endTurn();
+                    break;
+                case Keys.F4:
+                    showDebug = !showDebug;
+                    break;
+                case Keys.RIGHT:
+                    if(game.getActiveTeam().getActiveUnit() != null) {
+                        NetworkMessage moveMsg = new NetworkMessage( Command.MOVE );
+                        moveMsg.addParameter("direction", "right");
+                        networkingUtil.sendToHost( moveMsg );
+                    }    
+                    break;
+                case Keys.LEFT:
+                    if(game.getActiveTeam().getActiveUnit() != null) {
+                        NetworkMessage moveMsg = new NetworkMessage( Command.MOVE );
+                        moveMsg.addParameter("direction", "left");
+                        networkingUtil.sendToHost( moveMsg );
+                    }
+                    break;
+            }
         }
 
         clampCamera();
@@ -261,19 +318,25 @@ public class GameStage extends Stage {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         Vector3 rel = getCamera().unproject(new Vector3(screenX, screenY, 0));
+        
+        // Check if the playing player is allowed to do actions
+        if (game.getPlayingPlayer().getID() == game.getActiveTeam().getPlayer().getID()) {
+            
+            // Check if turn state is playing
+            if (game.getTurnLogic().getState() == TurnState.PLAYING) {
+                if (button == Input.Buttons.LEFT) {
+                    //create fire message to send to host
+                    NetworkMessage fireMsg = new NetworkMessage( Command.FIRE );
+                    fireMsg.addParameter( "mousePosX", Float.toString(  rel.x ));
+                    fireMsg.addParameter( "mousePosY", Float.toString(  rel.y ));
+                    
+                    //send message to host
+                    networkingUtil.sendToHost( fireMsg );
 
-        if (game.getTurnLogic().getState() == TurnState.PLAYING) {
-            System.out.println(String.format("Touchdown event (%d, %d) button %d", screenX, screenY, button));
-            System.out.println(String.format("Relative Touchdown event (%f, %f) button %d", rel.x, rel.y, button));
-
-            if (button == Input.Buttons.LEFT) {
-                System.out.println("Firing bullet");
-                bulletLogic((int) rel.x, (int) rel.y);
-            } else if (button == Input.Buttons.RIGHT) {
-                explode((int) rel.x, (int) rel.y, 30, 0, false);
+                } else if (button == Input.Buttons.RIGHT) {
+                    explode((int) rel.x, (int) rel.y, 30, 0, false);
+                }
             }
-
-            game.endTurn();
         }
         return true;
     }
@@ -311,7 +374,7 @@ public class GameStage extends Stage {
             if (effect.isComplete()) {
                 effect.free();
                 particles.remove(i);
-
+                
                 //effect.reset();
             }
         }
@@ -376,7 +439,6 @@ public class GameStage extends Stage {
         //effect.scaleEffect(radius/100);
         effect.start();
         particles.add(effect);
-
         if (cluster) {
             fireCluster(x, y);
         }
@@ -410,7 +472,7 @@ public class GameStage extends Stage {
 
     private void unitCollisionExplosion(int x, int radius, int y, int damage) {
         List<Unit> collidedUnits = new ArrayList<>();
-
+        
         for (int xPos = x - radius; xPos <= x + radius; xPos++) {
             for (int yPos = y - radius; yPos <= y + radius; yPos++) {
                 // scan square area around radius to determine which pixels are within the radius
@@ -433,20 +495,19 @@ public class GameStage extends Stage {
 
         // if any units have taken damage, we want to update their health and team healthbars
         if (!collidedUnits.isEmpty()) {
-
+            
             // Iterates through all of the collided units and decreases their health
             // based on the damage caused by the explosion
             for (Unit u : collidedUnits) {
                 u.decreaseHealth(damage);
             }
-
+            
             guiStage.updateHealthBars();
         }
     }
 
     /**
      * Checks if a pixel at a given coordinate collides with a unit or not
-     *
      * @param x X-coordinate in world map
      * @param y Y-coordinate in world map
      * @return True if pixel if a collision was detected, false if not
@@ -492,7 +553,7 @@ public class GameStage extends Stage {
      * @param screenX Unprojected mouse position.x
      * @param screenY Unprojected mouse position.y
      */
-    private void bulletLogic(int screenX, int screenY) {
+    public void fire( float screenX, float screenY ) {
         // get wind force from map
         Vector2 wind = game.getMap().getWind();
 
@@ -510,7 +571,10 @@ public class GameStage extends Stage {
         );
 
         // make camera follow bullet
-        focusedActor = (Actor) (game.getActiveTeam().getActiveUnit().getWeapon().getBullet());
+        focusedActor = (Actor)( game.getActiveTeam().getActiveUnit().getWeapon().getBullet() );
+        
+        // End the turn after unit has fired
+        game.endTurn();
     }
 
     /**

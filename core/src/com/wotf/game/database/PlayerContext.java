@@ -75,7 +75,6 @@ public class PlayerContext extends EntityContext<Player> {
         while (res.next()) {
             players.add(getById(res.getInt("ID")));
         }
-
         return players;
     }
 

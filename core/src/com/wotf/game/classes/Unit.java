@@ -17,17 +17,18 @@ import com.wotf.game.classes.Items.Item;
 import com.wotf.game.GameStage;
 import com.wotf.game.GuiStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
+import java.io.Serializable;
 
 /**
  * Unit represents a playable character on the map
  */
-public class Unit extends Group {
+public class Unit extends Group implements Serializable {
 
     private float angle;
     private Vector2 acceleration;
     private TextureRegion unitStand;
     private Vector2 velocity = new Vector2();
-    public boolean moveRight;
+    public  boolean moveRight;
     private int health;
     private String name;
     private Sprite sprite;

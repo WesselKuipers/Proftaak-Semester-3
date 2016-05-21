@@ -13,11 +13,9 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
@@ -25,27 +23,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
-import com.badlogic.gdx.utils.Array;
 import com.wotf.game.WotFGame;
 import com.wotf.game.classes.GameSettings;
-import com.wotf.game.classes.Map;
 import com.wotf.game.classes.Player;
 import com.wotf.game.classes.Session;
 import com.wotf.game.classes.SessionManager;
 import com.wotf.game.classes.Team;
 import com.wotf.game.database.PlayerContext;
 import com.wotf.game.database.SessionPlayerContext;
-import fontyspublisher.IRemotePropertyListener;
-import java.beans.PropertyChangeEvent;
-import java.rmi.AccessException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Timer;
@@ -83,6 +71,9 @@ public class SessionOnlinePlayer implements Screen {
     private Timer timer;
     private SelectBox maxplayerbox;
     private int switchscreencheck;
+    private int startGame;
+    private boolean updateUnit;
+    private boolean refreshUnit;
 
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting
@@ -92,6 +83,7 @@ public class SessionOnlinePlayer implements Screen {
      */
     public SessionOnlinePlayer(WotFGame game, Session session, Player player) throws RemoteException {
         switchscreencheck = 0;
+        startGame = 0;
         this.player = player;
         this.game = game;
         gameSettings = new GameSettings();
@@ -110,16 +102,19 @@ public class SessionOnlinePlayer implements Screen {
         // This manager will be used to connect to the registry of the host.
         manager = new SessionManager(session, this);
         addPlayerToDB();
-        getPlayersOfSession();
+        playerList = getPlayersOfSession(session);
+        updateUnit = false;
+        refreshUnit = false;
     }
 
-    public void getPlayersOfSession() {
+    public ArrayList<Player> getPlayersOfSession(Session session) {
         try {
             SessionPlayerContext sp = new SessionPlayerContext();
-            playerList = sp.getPlayersFromSession(manager.getSession());
+            return sp.getPlayersFromSession(session);
         } catch (SQLException ex) {
             Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return null;
     }
 
     public void addPlayerToDB() {
@@ -409,6 +404,30 @@ public class SessionOnlinePlayer implements Screen {
             }
         }
 
+        if (startGame != 0) {
+            game.setScreen(new GameEngine(game, session, player));
+        }
+
+        if (updateUnit) {
+            int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
+            for (Team teamv : session.getGameSettings().getTeams()) {
+                addUnitsSingleTeam(selectedunitcount, teamv);
+            }
+            updateUnit = false;
+        }
+
+        if (refreshUnit) {
+            int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
+            // For each team in the list remove all the units first and remove it from the gamesettings.
+            for (Team teamv : session.getGameSettings().getTeams()) {
+                teamv.removeAllUnits();
+                // The new units to the team. The name of the unit is the teamname + the number of the variable 'i'.
+                for (int i = 0; i < selectedunitcount; i++) {
+                    teamv.addUnit(teamv.getName() + Integer.toString(i), 100);
+                }
+            }
+            refreshUnit = false;
+        }
         Gdx.gl.glClearColor((float) 122 / 255, (float) 122 / 255, (float) 122 / 255, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -486,7 +505,8 @@ public class SessionOnlinePlayer implements Screen {
      * @param managersession a copy of the host session object.
      */
     public void updateTeamList(Session managersession) {
-        if (managersession.getGameSettings().getTeams() != null) {
+        session = managersession;
+        if (session.getGameSettings().getTeams() != null) {
             // Set all the teambuttons to touchable first again.
             for (Team teamv : teamList) {
                 TextButton teamtb = (TextButton) stage.getRoot().findActor(teamv.getName());
@@ -494,15 +514,19 @@ public class SessionOnlinePlayer implements Screen {
             }
 
             teamList.clear();
-            teamList.addAll(managersession.getGameSettings().getTeams());
 
             // For the color of the boxes and if it is touchable.
-            for (Team teamv : teamList) {
+            for (Team teamv : session.getGameSettings().getTeams()) {
+                teamList.add(teamv);
+                gameSettings.addTeam(teamv);
                 TextButton teamtb = (TextButton) stage.getRoot().findActor(teamv.getName());
                 teamtb.setTouchable(Touchable.disabled);
                 teamtb.setColor(Color.LIGHT_GRAY);
+                teamv.setColor(Color.valueOf(teamv.getColorname()));
+                teamv.intializeForClient();
             }
             teams.setItems(teamList.toArray());
+            updateUnit = true;
         }
     }
 
@@ -529,6 +553,7 @@ public class SessionOnlinePlayer implements Screen {
             // MaxUnitCount selected
             String maxunitcount = Integer.toString(managersession.getGameSettings().getMaxUnitCount());
             unitbox.setSelected(maxunitcount);
+            refreshUnit = true;
         }
     }
 
@@ -561,5 +586,19 @@ public class SessionOnlinePlayer implements Screen {
     public void backToLobby() {
         // Solution could be to change a variable which will be checked and then change screen.
         switchscreencheck = 1;
+    }
+
+    public void startGame() {
+        startGame = 1;
+        // Updating the playerList before lauch
+        playerList = getPlayersOfSession(session);
+        session.setPlayerList(playerList);
+    }
+
+    public void addUnitsSingleTeam(int selectedunitcount, Team team) {
+        // The new units to the team. The name of the unit is the teamname + the number of the variable 'i'.
+        for (int i = 0; i < selectedunitcount; i++) {
+            team.addUnit(team.getName() + Integer.toString(i), 100);
+        }
     }
 }

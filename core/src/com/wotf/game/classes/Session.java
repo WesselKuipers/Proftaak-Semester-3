@@ -45,6 +45,7 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
         publisher = new RemotePublisher();
         publisher.registerProperty("sessionsettingsprop");
         publisher.registerProperty("cancelgameprop");
+        publisher.registerProperty("startgameprop");
     }
 
     public void createNewRegistry() throws RemoteException {
@@ -113,6 +114,10 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
         players.remove(p);
         // TODO: logic for kicking players
     }
+    
+    public void setPlayerList(ArrayList<Player> playerList){
+        this.players = playerList;
+    }
 
     public String getRoomName() {
         return roomName;
@@ -130,7 +135,7 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
      * Initializes the game screen
      */
     public void startGame() throws RemoteException {
-        // TODO: handle code for creating game object
+        publisher.inform("startgameprop", 0, 1);
     }
 
     @Override
@@ -145,6 +150,7 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
 
     @Override
     public String toString() {
+        if(this.host == null || this.gameSettings == null) return "Remove session from DB";
         return host.getName() + " " + this.roomName + "     " + this.getPlayers().size() + "/" + this.gameSettings.getMaxPlayersSession();
     }
 

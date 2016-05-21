@@ -1,9 +1,6 @@
 package com.wotf.game.classes;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import java.util.ArrayList;
@@ -16,7 +13,6 @@ import com.wotf.game.classes.Items.Item;
 import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 import java.io.Serializable;
-import java.util.Iterator;
 
 /**
  * Team contains data that represent a team Contains a list of players, list of
@@ -28,10 +24,9 @@ public class Team implements Serializable{
     // This is used for RMI because the Color of GDX can't be serialized. But we need them both
     private String colorname;
     private transient Color color;
-    private final List<Player> players;
-    private Player onlineplayer;
-    private transient final List<Unit> units;
-    private transient final Map<Item, Integer> items; // The integer represents the ammo remaining
+    private Player player;
+    private transient List<Unit> units;
+    private transient Map<Item, Integer> items; // The integer represents the ammo remaining
     private int activeUnitIndex;
     private Unit activeUnit;
 
@@ -52,7 +47,6 @@ public class Team implements Serializable{
         this.color = color;
 
         //Instantiating list of items
-        players = new ArrayList<>();
         units = new ArrayList<>();
     }
 
@@ -66,42 +60,23 @@ public class Team implements Serializable{
         this.color = color;
 
         //Instantiating list of items
-        players = new ArrayList<>();
         units = new ArrayList<>();
     }
-
-    /**
-     * @return all the players of the team
-     */
-    /*public List<Player> getPlayers() {
-        return Collections.unmodifiableList(players);
-    }*/
-
-    /**
-     * Adds a player to the team
-     *
-     * @param p player
-     */
-    /*public void addPlayer(Player p) {
-        players.add(p);
-    }*/
-
-    /**
-     * TODO: Logic for kicking player out Removes a player from the team
-     *
-     * @param p player
-     */
-    public void removePlayer(Player p) {
-        players.remove(p);
-        // TODO: Logic for kicking player out
-    }
-
-    public void setOnlineplayer(Player p){
-        this.onlineplayer = p;
+    
+    public void intializeForClient(){
+        items = new HashMap<>();
+        for(Item i : WEAPONS_ARMORY){
+            items.put(i, 99);
+        }
+        units = new ArrayList<>();
     }
     
-    public Player getOnlineplayer(){
-        return onlineplayer;
+    public void setPlayer(Player player){
+        this.player = player;
+    }
+    
+    public Player getPlayer(){
+        return player;
     }
     
     public void setColorname(String colorname){
@@ -149,6 +124,11 @@ public class Team implements Serializable{
      */
     public List<Unit> getUnits() {
         return Collections.unmodifiableList(units);
+    }
+    
+    public void makeUnitList() {
+        //Instantiating list of items
+        units = new ArrayList<>();
     }
 
     /**
