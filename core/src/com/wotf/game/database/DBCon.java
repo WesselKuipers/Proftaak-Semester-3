@@ -1,11 +1,13 @@
 package com.wotf.game.database;
 
 import com.badlogic.gdx.Gdx;
+import com.sun.rowset.CachedRowSetImpl;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import javax.sql.rowset.CachedRowSet;
 
 /**
  * Helper class for making database calls
@@ -17,6 +19,10 @@ public class DBCon {
     private static String ConnectionPath;
     private static String Username;
     private static String Password;
+    // TODO: 6-3-2016 Refactor this so that the username and password are loaded from a file instead of being hard-coded
+//    private static final String ConnectionPath = "jdbc:mysql://192.168.2.132:3306/school"; // example oracle string: "jdbc:oracle:thin:@localhost:1521:XE";
+//    private static final String Username = "connect";
+//    private static final String Password = "admin";
 
     private static final String NumericDefault = "0";
 
@@ -56,6 +62,7 @@ public class DBCon {
 
     /**
      * Executes an update query
+     *
      * @param query Query to run
      * @return Number of rows afflicted
      */
@@ -70,8 +77,11 @@ public class DBCon {
      * @return Number of rows afflicted
      */
     public static int executeUpdate(String query, List<Object> parameters) {
-        Connection con = getConnection();
-        try (PreparedStatement ps = con.prepareCall(query)) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        try {
+            con = getConnection();
+            ps = con.prepareCall(query);
 
             // If the list of parameters isn't empty, adds them to the prepared statement
             if (parameters != null) {
@@ -86,8 +96,9 @@ public class DBCon {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally{
+            closeQuietly(con, ps);
         }
-
         // If we've reached this point, it means the query didn't succeed, return -1
         return -1;
     }
@@ -101,16 +112,20 @@ public class DBCon {
         return executeResultSet(query, null);
     }
 
-     /**
+    /**
      * Executes a query and returns the resulting ResultSet object
      * @param query Query to run
      * @param parameters Parameters to add to the prepared statement
      * @return ResultSet of the query
      */
     public static ResultSet executeResultSet(String query, List<Object> parameters) {
-        Connection con = getConnection();
-        
-        try (PreparedStatement ps = con.prepareCall(query)) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet result = null;
+        try {
+            con = getConnection();
+            ps = con.prepareCall(query);
+
             // If the list of parameters isn't empty, adds them to the prepared statement
             if (parameters != null) {
                 for (int i = 1; i <= parameters.size(); i++) {
@@ -120,17 +135,24 @@ public class DBCon {
 
             // If the query returned a ResultSet, we can safely return it (or at least the first one)
             if (ps.execute()) {
-                return ps.getResultSet();
+                result = ps.getResultSet();
+                
+                CachedRowSet rowset;
+                rowset = new CachedRowSetImpl();
+                rowset.populate(result);
+
+                return rowset;
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally{
+            closeQuietly(con, ps, result);
         }
-
         // If we've reached this point, it means the query didn't succeed, return null
         return null;
     }
 
-     /**
+    /**
      * Executes a query and converts its result set as a List of Strings
      * @param query Query to run
      * @return List of String[] representing every row returned from the query
@@ -146,9 +168,11 @@ public class DBCon {
      * @return List of String[] representing every row returned from the query
      */
     public static List<String[]> executeResultSetAsList(String query, List<Object> parameters) {
-        Connection con = getConnection();
-
-        try (PreparedStatement ps = con.prepareCall(query)) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        try {
+            con = getConnection();
+            ps = con.prepareCall(query);
 
             // If the list of parameters isn't empty, adds them to the prepared statement
             if (parameters != null) {
@@ -191,14 +215,27 @@ public class DBCon {
 
                     result.add(record);
                 }
-
+                rs.close();
                 return result;
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }finally{
+            closeQuietly(con, ps);
         }
-
         // If we've reached this point, it means the query didn't succeed, return null
         return null;
     }
+    
+    public static void closeQuietly(AutoCloseable ... closeables) {
+    for (AutoCloseable c : closeables) {
+        if (c != null) {
+            try {
+                c.close();
+            } catch (Exception e) {
+                // log or ignore, we can't do anything about it really
+            }
+        }
+    }
+}
 }

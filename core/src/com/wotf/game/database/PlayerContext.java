@@ -38,8 +38,13 @@ public class PlayerContext extends EntityContext<Player> {
      * @throws SQLException
      */
     public Player getLastAddedPlayer() throws SQLException {
-        String query = "SELECT MAX(ID) FROM player";
-        return getEntityFromRecord(DBCon.executeResultSet(query));
+        String query = "SELECT MAX(ID) AS ID FROM player";
+        ResultSet result = DBCon.executeResultSet(query);
+        int id = 0;
+        while (result.next()) {
+            id = result.getInt("ID");
+        }
+        return getById(id);
     }
 
     /**
@@ -70,7 +75,6 @@ public class PlayerContext extends EntityContext<Player> {
         while (res.next()) {
             players.add(getById(res.getInt("ID")));
         }
-
         return players;
     }
 
@@ -120,8 +124,11 @@ public class PlayerContext extends EntityContext<Player> {
 
     @Override
     protected Player getEntityFromRecord(ResultSet record) throws SQLException {
-        Player player = new Player(record.getString("IPAddress"), record.getString("IngameName"));
-        player.setId(record.getInt("ID"));
+        Player player = null;
+        while (record.next()) {
+            player = new Player(record.getString("IPAddress"), record.getString("IngameName"));
+            player.setId(record.getInt("ID"));
+        }
         return player;
     }
 

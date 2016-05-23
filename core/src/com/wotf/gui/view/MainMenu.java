@@ -94,7 +94,7 @@ public class MainMenu implements Screen {
         online.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                    game.setScreen(new Username(game));
+                game.setScreen(new Username(game));
             }
         });
         stage.addActor(online);

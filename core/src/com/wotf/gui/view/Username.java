@@ -39,7 +39,7 @@ public class Username implements Screen {
         Gdx.input.setInputProcessor(stage);// Make the stage consume events
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
-        TextField username = new TextField("djdino56", skin);
+        TextField username = new TextField("Your username", skin);
         username.setWidth(300);
         username.setHeight(60);
         username.setPosition(500, 400);
@@ -52,6 +52,18 @@ public class Username implements Screen {
         join.setPosition(500, 300);
         stage.addActor(join);
 
+        TextButton main = new TextButton("Back to main menu", skin); // Use the initialized skin
+        main.setColor(Color.BLACK);
+        main.setWidth(300);
+        main.setHeight(60);
+        main.setPosition(500, 200);
+        stage.addActor(main);
+        main.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new MainMenu(game));
+            }
+        });
         join.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -69,7 +81,7 @@ public class Username implements Screen {
                         Logger.getLogger(Username.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                
+
                 try {
                     game.setScreen(new LobbyGUI(game, player));
                 } catch (SQLException ex) {

@@ -59,5 +59,10 @@ nb-configuration.xml
 .gradle
 build/
 /.nb-gradle/
+<<<<<<< HEAD
 /core/src/com/.sonar/
 /core/assets/dbc.properties
+=======
+
+dbc.properties
+>>>>>>> refs/remotes/origin/master

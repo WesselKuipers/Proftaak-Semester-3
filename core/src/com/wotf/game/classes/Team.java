@@ -12,18 +12,22 @@ import java.util.Map.Entry;
 import com.wotf.game.classes.Items.Item;
 import com.wotf.game.GameStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
+import java.io.Serializable;
 
 /**
  * Team contains data that represent a team Contains a list of players, list of
  * units, a list of items including ammo, a name and a team colour
  */
-public class Team {
+public class Team implements Serializable{
 
-    private String name;
-    private Color color;
-    private final List<Player> players;
-    private final List<Unit> units;
-    private final Map<Item, Integer> items; // The integer represents the ammo remaining
+    private String name; 
+    // This is used for RMI because the Color of GDX can't be serialized. But we need them both
+    private String colorname;
+    private transient Color color;
+    private Player player;
+    private transient List<Unit> units;
+    private transient Map<Item, Integer> items; // The integer represents the ammo remaining
+    private int activeUnitIndex;
     private Unit activeUnit;
 
     /**
@@ -42,7 +46,6 @@ public class Team {
         this.color = color;
 
         //Instantiating list of items
-        players = new ArrayList<>();
         units = new ArrayList<>();
     }
 
@@ -56,36 +59,33 @@ public class Team {
         this.color = color;
 
         //Instantiating list of items
-        players = new ArrayList<>();
         units = new ArrayList<>();
     }
-
-    /**
-     * @return all the players of the team
-     */
-    public List<Player> getPlayers() {
-        return Collections.unmodifiableList(players);
+    
+    public void intializeForClient(){
+        items = new HashMap<>();
+        for(Item i : WEAPONS_ARMORY){
+            items.put(i, 99);
+        }
+        units = new ArrayList<>();
     }
-
-    /**
-     * Adds a player to the team
-     *
-     * @param p player
-     */
-    public void addPlayer(Player p) {
-        players.add(p);
+    
+    public void setPlayer(Player player){
+        this.player = player;
     }
-
-    /**
-     * TODO: Logic for kicking player out Removes a player from the team
-     *
-     * @param p player
-     */
-    public void removePlayer(Player p) {
-        players.remove(p);
-        // TODO: Logic for kicking player out
+    
+    public Player getPlayer(){
+        return player;
     }
-
+    
+    public void setColorname(String colorname){
+        this.colorname = colorname;
+    }
+    
+    public String getColorname(){
+        return colorname;
+    }
+    
     /**
      * @return the team name
      */
@@ -123,6 +123,11 @@ public class Team {
      */
     public List<Unit> getUnits() {
         return Collections.unmodifiableList(units);
+    }
+    
+    public void makeUnitList() {
+        //Instantiating list of items
+        units = new ArrayList<>();
     }
 
     /**
@@ -173,6 +178,14 @@ public class Team {
                 }
             }
         }
+    }
+    
+    /**
+     * Removes all the units from the team.
+     * 
+     */
+    public void removeAllUnits(){
+        units.clear();
     }
 
     /**
@@ -310,6 +323,6 @@ public class Team {
      */
     @Override
     public String toString() {
-        return getName() + " - " + getColor();
+        return getName() + " - " + getColorname();
     }
 }

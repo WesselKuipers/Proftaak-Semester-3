@@ -13,7 +13,8 @@ import java.util.Random;
  */
 public class Map {
 
-    private static final double GravityModifier = 9.8;
+    private final double gravityModifier = 9.8;
+    private final int windRange = 20;
     private int waterLevel;
     private int width;
     private int height;
@@ -37,6 +38,8 @@ public class Map {
         // Generates and initializes background and foreground textures
         generateBackgroundTexture();
         initializeTerrainTexture(filename);
+        
+        windForce = new Vector2(0,0);
     }
 
     /**
@@ -161,7 +164,7 @@ public class Map {
      * @return Gravity value used for falling objects
      */
     public double getGravityModifier() {
-        return GravityModifier;
+        return gravityModifier;
     }
 
     /**
@@ -285,13 +288,9 @@ public class Map {
     public void calculateWind() {
         Random random = new Random();
 
-        int range = 20;
-
-        float x = random.nextInt(range) - range / 2;
-        float y = 0;
-
+        float x = (random.nextInt(windRange) - windRange / 2);
+        float y = (random.nextInt(windRange) - windRange / 2);
         this.windForce = new Vector2(x, y);
-        System.out.println(windForce.toString());
     }
 
     /**
@@ -301,6 +300,15 @@ public class Map {
      */
     public Vector2 getWind() {
         return this.windForce;
+    }
+    
+    /**
+     * Function that sets the current wind force.
+     *
+     * @param windForce
+     */
+    public void setWind(Vector2 windForce) {
+        this.windForce = windForce;
     }
     
     /**

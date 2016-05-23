@@ -1,8 +1,9 @@
 package com.wotf.game.classes;
 
+import com.badlogic.gdx.math.Vector2;
 import com.wotf.game.GameStage;
-import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
-import com.wotf.game.classes.Items.Item;
+import com.wotf.game.Networking.Command;
+import com.wotf.game.Networking.NetworkMessage;
 import com.wotf.game.classes.TurnLogic.TurnState;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,13 +17,14 @@ public class Game {
 
     private final Player host;
     private final List<Player> players;
+    private final Player playingPlayer;
     private final List<Team> teams;
     private final Map map;
 
     private final GamePhysics gamePhysics;
     private final GameSettings gameSettings;
     private final TurnLogic turnLogic;
-
+    private boolean turnState;
     /**
      * Constructor of Game, assign params to properties. Add new game physics
      * and add a turn logic based on amount of teams
@@ -31,10 +33,11 @@ public class Game {
      * @param map
      * @param players
      */
-    public Game(GameSettings gameSettings, Map map, List<Player> players) {
+    public Game(GameSettings gameSettings, Map map, List<Player> players, Player playingPlayer) {
         this.gameSettings = gameSettings;
-        this.host = players.get(0);
         this.players = players;
+        this.host = this.players.get(0);
+        this.playingPlayer = playingPlayer;
         this.teams = this.gameSettings.getTeams();
         this.gamePhysics = new GamePhysics();
         this.turnLogic = new TurnLogic(this.teams.size());
@@ -73,6 +76,17 @@ public class Game {
 
     /**
      *
+<<<<<<< HEAD
+=======
+     * @return the player that is currently playing the game
+     */
+    public Player getPlayingPlayer() {
+        return playingPlayer;
+    }
+
+    /**
+     *
+>>>>>>> refs/remotes/origin/master
      * @return the player that is host
      */
     public Player getHost() {
@@ -114,14 +128,77 @@ public class Game {
     public Map getMap() {
         return map;
     }
+    
+    /**
+     * 
+     * @return boolean if there is a current player in turn
+     */
+    public Boolean getTurnState(){
+        return turnState;
+    }
 
     /**
-     * Set keyboard & camera focus to active unit
+     * Function to send the current beginTurn
      */
     public void beginTurn() {
-        map.calculateWind();
+        if (playingPlayer.getId()== host.getId()) {
+            GameStage gameStage = (GameStage) teams.get(0).getUnit(0).getStage();
+            
+            map.calculateWind();
+          
+            // add terrain solid booleans to parameters
+       /*        boolean[][] terrain = map.getTerrain();
+           for (int x = 0; x < terrain.length; x++) {
+                NetworkMessage terrainMsg = new NetworkMessage( Command.TERRAIN );
+                terrainMsg.addParameter("x", Integer.toString(x));
+                for (int y = 0; y < terrain[0].length; y++) {
+                    terrainMsg.addParameter("y"+y, Integer.toString(y));
+                    terrainMsg.addParameter("val"+y, Boolean.toString(terrain[x][y]));
+                }
+                gameStage.getNetworkingUtil().sendToHost( terrainMsg );
+            }*/
+  
+            // Sync units position and health
+            int unitCount = 0;
+            NetworkMessage syncUnitsMsg = new NetworkMessage ( Command.SYNCUNITS );
+
+            for (Team team : teams) {
+                for (Unit unit : team.getUnits()) {
+                    syncUnitsMsg.addParameter("u" + unitCount + "x", Float.toString(unit.getPosition().x));
+                    syncUnitsMsg.addParameter("u" + unitCount + "y", Float.toString(unit.getPosition().y));
+                    syncUnitsMsg.addParameter("u" + unitCount + "hp", Integer.toString(unit.getHealth()));
+                    unitCount++;
+                }
+            }
+            
+            gameStage.getNetworkingUtil().sendToHost( syncUnitsMsg );
         
+            NetworkMessage beginTurnMsg = new NetworkMessage( Command.BEGINTURN );
+
+            // add wind to parameters
+            Vector2 windForce = map.getWind();
+            beginTurnMsg.addParameter("windX", Float.toString(windForce.x));
+            beginTurnMsg.addParameter("windY", Float.toString(windForce.y));
+            
+            System.out.println("Wind sent: "+windForce.x + ", "+windForce.y);
+
+            // send message to host and after that, all clients        
+            gameStage.getNetworkingUtil().sendToHost( beginTurnMsg );
+            
+            // run action for host too
+            beginTurnReceive(windForce);
+        }
+    }
+    
+    /**
+     * Function for network to receive a begin turn by the clients
+     * This will set the wind, set the next active unit
+     * @param windForce 
+     */
+    public void beginTurnReceive(Vector2 windForce) {
+        turnState = true;
         Team activeTeam = getActiveTeam();
+        map.setWind(windForce);
         turnLogic.beginTurn();
         activeTeam.beginTurn();
         setActiveUnit(activeTeam);
@@ -136,10 +213,11 @@ public class Game {
             GameStage gameStage = (GameStage) team.getActiveUnit().getStage();
             gameStage.setKeyboardFocus(team.getActiveUnit());
             gameStage.setCameraFocusToActor(team.getActiveUnit(), true);
-
-            // select first weapon
-            Item i = WEAPONS_ARMORY.get(0);
-            team.getActiveUnit().selectWeapon(i);
+//            // select first weapon
+//            Item i = WEAPONS_ARMORY.get(0);
+//            team.getActiveUnit().selectWeapon(i);
+            
+             team.getActiveUnit().selecting_weapon(0);
         } else {
             endTurn();
         }
@@ -152,6 +230,7 @@ public class Game {
      * whether team and its units are still alive.
      */
     public void endTurn() {
+        turnState = false;
         Team activeTeam = getActiveTeam();
         activeTeam.endTurn();
         turnLogic.endTurn();

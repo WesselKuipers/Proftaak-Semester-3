@@ -5,12 +5,11 @@
  */
 package com.wotf.game.classes;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.wotf.game.classes.Items.*;
 import com.wotf.game.classes.Items.Item;
+import java.io.Serializable;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,24 +17,29 @@ import java.util.List;
  * Contains the settings used to determine some of the rules the game has to
  * follow
  */
-public class GameSettings {
+public class GameSettings implements Serializable {
 
     /**
      * List of weapons in the game
      */
-    protected static final List<Item> WEAPONS_ARMORY = new ArrayList<>();
+    public static List<Item> WEAPONS_ARMORY;
     
     /**
      * List of teams in the game
      */
     private final List<Team> teams;
 
+    private int mapindex;
+    private String mapname;
     private int maxTurns;
     private int maxTime;
     private int turnTime;
     private int withdrawTime;
+    private int maxPlayersSession;
+    private int maxunitCount;
     private boolean fallingDamage;
     private boolean suddenDeath;
+    private boolean physics;
 
     /**
      * Main constructor for GameSettings Sets all variables to the default rules
@@ -48,11 +52,13 @@ public class GameSettings {
         teams = new ArrayList<>();
 
         maxTurns = 30;
-        maxTime = 30 * 60;
-        turnTime = 30;
+        maxTime = 60 * 60;
+        turnTime = 40;
         withdrawTime = 3;
+        maxPlayersSession = 2;
         fallingDamage = true;
         suddenDeath = true;
+        physics = true;
     }
 
     /**
@@ -74,19 +80,81 @@ public class GameSettings {
      * TODO!
      */
     private void fillWeapons() {
-        Sprite bullet_sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
-        Sprite bazooka_sprite = new Sprite(new Texture(Gdx.files.internal("Bazooka.png")));
-        
-        Sprite grenade_sprite = new Sprite(new Texture(Gdx.files.internal("grenade.png")));
-        Sprite clusterbomb_sprite = new Sprite(new Texture(Gdx.files.internal("clusterbomb.png")));
-        
-        Sprite nuke_sprite = new Sprite(new Texture(Gdx.files.internal("nuclearbomb.png")));
-        Sprite remote_sprite = new Sprite(new Texture(Gdx.files.internal("remote.png")));
+        WEAPONS_ARMORY.add(new Bazooka("Bazooka"));
+        WEAPONS_ARMORY.add(new Nuke("Nuke"));
+        WEAPONS_ARMORY.add(new Grenade("Grenade"));
+        WEAPONS_ARMORY.add(new Clusterbomb("Clusterbomb"));
+        WEAPONS_ARMORY.add(new AirStrike("Airstrike"));
+    }
+ 
+    /**
+     * Sets the index of the map with the settings
+     *
+     * @param mapindex
+     */
+    public void setMapIndex(int mapindex) {
+        this.mapindex = mapindex;
+    }
 
-        WEAPONS_ARMORY.add(new Bazooka("Bazooka", 15, 30, 40, bazooka_sprite, bullet_sprite));
-        WEAPONS_ARMORY.add(new Nuke("Nuke", 5, 60, 80, remote_sprite, nuke_sprite));
-        WEAPONS_ARMORY.add(new Grenade("Grenade", 10, 10, 20, grenade_sprite, grenade_sprite));
-        WEAPONS_ARMORY.add(new Clusterbomb("Clusterbomb", 10, 20, 45, clusterbomb_sprite, clusterbomb_sprite));
+    /**
+     * Gets the index of the map
+     *
+     * @return the index of the name
+     */
+    public int getMapIndex() {
+        return mapindex;
+    }
+
+    /**
+     * Sets the name of the map with the settings
+     *
+     * @param mapname
+     */
+    public void setMapName(String mapname) {
+        this.mapname = mapname;
+    }
+
+    /**
+     * Gets the name of the map
+     *
+     * @return the String of the name
+     */
+    public String getMapName() {
+        return mapname;
+    }
+
+    /**
+     * Sets the physics of the game
+     *
+     * @param physics
+     */
+    public void setPhysics(boolean physics) {
+        this.physics = physics;
+    }
+
+    /**
+     * Returns the physics of the game
+     *
+     * @return boolean if the physics are turned on or not.
+     */
+    public boolean getPhysics() {
+        return physics;
+    }
+
+    public void setMaxPlayersSession(int maxplayers) throws RemoteException {
+        this.maxPlayersSession = maxplayers;
+    }
+
+    public int getMaxPlayersSession() {
+        return maxPlayersSession;
+    }
+    
+    public void setMaxUnitCount(int maxunitcount){
+        this.maxunitCount = maxunitcount;
+    }
+    
+    public int getMaxUnitCount(){
+        return this.maxunitCount;
     }
 
     /**

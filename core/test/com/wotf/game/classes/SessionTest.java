@@ -22,7 +22,7 @@ public class SessionTest {
     @Before
     public void initSession() {
         host = new Player("127.0.0.1", "DinoHost");
-        session = new Session(host, true);
+        //session = new Session(host, true);
         playerRemco = new Player("127.0.0.1", "RemcoPlayer");
         session.addPlayer(playerRemco);
     }

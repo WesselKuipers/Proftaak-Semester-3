@@ -1,8 +1,8 @@
 package com.wotf.game.classes;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -11,13 +11,13 @@ import com.wotf.game.GameStage;
 /**
  *
  * @author Jip Boesenkool
- * @Date 29-03-'16
- * Class which holds all the data and functionality to display an bullet and update the logic.
+ * @Date 29-03-'16 Class which holds all the data and functionality to display
+ * an bullet and update the logic.
  */
 public class Projectile extends Actor {
 
     private final Sprite sprite;
-    
+
     //projectile trajectory variables
     private float angle;
     private Vector2 velocity;
@@ -27,42 +27,51 @@ public class Projectile extends Actor {
     //position
     private Vector2 position;
 
+    //visual effects
+    public ParticleEffect p;
+    public boolean isCluster = false;
+ 
     //projectile information
     private int blastRadius;
     private int damage;
-    
+
     /**
-     * /**
+     * 
      * Projectile constructor to initialize visual appearence of the bullet.
+     * 
      * @param sprite Bullet sprite
+     * @param ParticleEffect effect of the particle explosion
      */
-    public Projectile(Sprite sprite) {
+    public Projectile(Sprite sprite, ParticleEffect effect) {
         //graphics
         this.sprite = sprite;
         sprite.setOriginCenter();
         sprite.flip(true, false);
 
+        this.p = effect;
+
         this.setBounds(getX(), getY(), sprite.getWidth(), sprite.getHeight());
         this.setWidth(sprite.getWidth());
         this.setHeight(sprite.getHeight());
     }
-    
+
     /**
      * Function that handles the shooting of the bullet with physics.
-     * @param unitPos       Start position from which the bullet is fired from.
-     * @param mousePos      position where the mouse was clicked.
-     * @param force         Force of the projectile in the direction of mousePos.
-     * @param wind          Vector2 wind physics.
-     * @param gravity       Pulling force towards the ground.
-     * @param blastRadius   Impact radius of the bullet on the terrain.
-     * @param damage        Damage this projectile should do should it collide with a unit.
+     *
+     * @param unitPos Start position from which the bullet is fired from.
+     * @param mousePos position where the mouse was clicked.
+     * @param force Force of the projectile in the direction of mousePos.
+     * @param wind Vector2 wind physics.
+     * @param gravity Pulling force towards the ground.
+     * @param blastRadius Impact radius of the bullet on the terrain.
+     * @param damage Damage this projectile should do should it collide with a
+     * unit.
      */
     public void fire(Vector2 unitPos, Vector2 mousePos,
-            float force, Vector2 wind, double gravity, int blastRadius, int damage){
-     
+        float force, Vector2 wind, double gravity, int blastRadius, int damage) {
         //game data
         position = unitPos.cpy();
-        
+
         //projectile information
         this.blastRadius = blastRadius;
         this.damage = damage;
@@ -75,13 +84,14 @@ public class Projectile extends Actor {
 
         //create acceleration from wind resistance and gravity
         setAcceleration(wind, gravity);
-        
+
         //start updateLoop
         updateShot();
-    }
-
+    } 
+  
     /**
      * Calculate the velocity in x and y coordinates by angle.
+     *
      * @param force Force towards direction.
      */
     private void setVelocity(float force) {
@@ -96,6 +106,7 @@ public class Projectile extends Actor {
 
     /**
      * Calculate and set the angle by 2 vectors.
+     *
      * @param startPos first x,y position.
      * @param destPos second x, y position.
      */
@@ -156,8 +167,9 @@ public class Projectile extends Actor {
 
     /**
      * LibGDX function which is responsible for writing the sprite.
-     * @param batch         ?
-     * @param parentAlpha   ?
+     *
+     * @param batch ?
+     * @param parentAlpha ?
      */
     @Override
     public void draw(Batch batch, float parentAlpha) {
@@ -166,7 +178,8 @@ public class Projectile extends Actor {
 
     /**
      * LibGDX function which handles the update loop for this object.
-     * @param delta     Time passed since last update.
+     *
+     * @param delta Time passed since last update.
      */
     @Override
     public void act(float delta) {
@@ -186,36 +199,39 @@ public class Projectile extends Actor {
         if (!(this.getX() >= 0 && this.getY() >= 0 && this.getX() < terrain.length && this.getY() < terrain[0].length)) {
             return;
         }
-        
+
         // checking collision with units
-        ((GameStage) getStage()).isCollidedWithUnit((int) getX(), (int)getY());
-        
+        ((GameStage) getStage()).isCollidedWithUnit((int) getX(), (int) getY());
+
         // checking collision with terrain
         terrainCollision();
     }
-    
-    
+
     /**
      * Function to check if bullet has collided with the terrain.
-     * @param terrain Nested boolean array [x][y] which determines if pixel is activated or not.
+     *
+     * @param terrain Nested boolean array [x][y] which determines if pixel is
+     * activated or not.
      */
     private void terrainCollision() {
         // Terrain and unit collision
         if (((GameStage) getStage()).getGame().getMap()
-            .isPixelSolid((int) getX(), (int) getY())) {
-            
+                .isPixelSolid((int) getX(), (int) getY())) {
+
             // Projectile collided with terrain
             System.out.println("Bullet collided at " + this.getX() + " " + this.getY());
-
-            ((GameStage) getStage()).explode((int) getX(), (int) getY(), blastRadius, damage);
+            
+            ((GameStage) getStage()).setParticle(p);
+            ((GameStage) getStage()).explode((int) getX(), (int) getY(), blastRadius, damage, isCluster);
             this.remove();
         }
     }
-    
+
     /**
      * Function to check if projectile is within bounds.
-     * @param gameMap   map object which holds data about the map
-     * @return          True if projectile is out of bounds, false otherwise.
+     *
+     * @param gameMap map object which holds data about the map
+     * @return True if projectile is out of bounds, false otherwise.
      */
     private boolean isProjectileOutOfBounds(Map gameMap) {
         return this.getX() - this.getWidth() > gameMap.getWidth()
