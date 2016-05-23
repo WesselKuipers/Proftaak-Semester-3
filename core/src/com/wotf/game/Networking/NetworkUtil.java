@@ -328,7 +328,7 @@ public class NetworkUtil {
                     Vector2 unitPosition = new Vector2(unitX, unitY);
 
                     // When no positions are yet added, add them to the array, else we are going to sync the current positions and the unit health
-                    if (unitPositions == null || unitPositions.size() != unitAmount) {
+                    if (unitPositions.size() != unitAmount) {
                         unitPositions.add(unitPosition);
                     } else {
                         unit.setPosition(unitPosition);
