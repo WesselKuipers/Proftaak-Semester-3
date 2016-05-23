@@ -130,8 +130,9 @@ public class Map {
                 }
             }
         }
-        
-        updateTerrain();
+        Gdx.app.postRunnable(() -> {
+            updateTerrain();  
+        });
     }
     
     /**
