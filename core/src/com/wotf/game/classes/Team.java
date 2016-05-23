@@ -18,9 +18,9 @@ import java.io.Serializable;
  * Team contains data that represent a team Contains a list of players, list of
  * units, a list of items including ammo, a name and a team colour
  */
-public class Team implements Serializable{
+public class Team implements Serializable {
 
-    private String name; 
+    private String name;
     // This is used for RMI because the Color of GDX can't be serialized. But we need them both
     private String colorname;
     private transient Color color;
@@ -38,7 +38,7 @@ public class Team implements Serializable{
      */
     public Team(String name, Color color) {
         items = new HashMap<>();
-        for(Item i : WEAPONS_ARMORY){
+        for (Item i : WEAPONS_ARMORY) {
             items.put(i, 99);
         }
         //items.put(WEAPONS_ARMORY.get(0), 99);
@@ -62,31 +62,31 @@ public class Team implements Serializable{
         //Instantiating list of items
         units = new ArrayList<>();
     }
-    
-    public void intializeForClient(){
+
+    public void intializeForClient() {
         items = new HashMap<>();
-        for(Item i : WEAPONS_ARMORY){
+        for (Item i : WEAPONS_ARMORY) {
             items.put(i, 99);
         }
         units = new ArrayList<>();
     }
-    
-    public void setPlayer(Player player){
+
+    public void setPlayer(Player player) {
         this.player = player;
     }
-    
-    public Player getPlayer(){
+
+    public Player getPlayer() {
         return player;
     }
-    
-    public void setColorname(String colorname){
+
+    public void setColorname(String colorname) {
         this.colorname = colorname;
     }
-    
-    public String getColorname(){
+
+    public String getColorname() {
         return colorname;
     }
-    
+
     /**
      * @return the team name
      */
@@ -125,7 +125,7 @@ public class Team implements Serializable{
     public List<Unit> getUnits() {
         return Collections.unmodifiableList(units);
     }
-    
+
     public void makeUnitList() {
         //Instantiating list of items
         units = new ArrayList<>();
@@ -180,12 +180,12 @@ public class Team implements Serializable{
             }
         }
     }
-    
+
     /**
      * Removes all the units from the team.
-     * 
+     *
      */
-    public void removeAllUnits(){
+    public void removeAllUnits() {
         units.clear();
     }
 
@@ -197,11 +197,10 @@ public class Team implements Serializable{
             units.remove(unit);
         }
     }
-    
+
     /**
-     * Begin turn for team
-     * If its the first time for the team and there's no active unit set it to the first
-     * After that get next active unit
+     * Begin turn for team If its the first time for the team and there's no
+     * active unit set it to the first After that get next active unit
      */
     public void beginTurn() {
         if (activeUnit == null) {
@@ -211,8 +210,8 @@ public class Team implements Serializable{
     }
 
     /**
-     * end turn for team
-     * When unit has lower or equal than 0 health, remove the unit from the team
+     * end turn for team When unit has lower or equal than 0 health, remove the
+     * unit from the team
      */
     public void endTurn() {
         List<Unit> unitsToRemove = new ArrayList<>();
@@ -225,13 +224,29 @@ public class Team implements Serializable{
             removeUnit(unitsToRemove.get(i));
         }
     }
-    
+
+    /**
+     * JUST FOR UNIT TESTING..
+     *
+     */
+    public void endTurn(boolean any) {
+        List<Unit> unitsToRemove = new ArrayList<>();
+        for (Unit unit : units) {
+            if (unit.getHealth() <= 0) {
+                unitsToRemove.add(unit);
+            }
+        }
+        for (int i = 0; i < unitsToRemove.size(); i++) {
+            removeUnit(unitsToRemove.get(i), true);
+        }
+    }
+
     /**
      * Set the next active unit in the team
      */
     public void setNextActiveUnit() {
         int activeUnitIndex = units.indexOf(activeUnit);
-        
+
         // Change the active unit index if its not at the end of the list
         if (activeUnitIndex < (units.size() - 1)) {
             activeUnitIndex++;
@@ -243,6 +258,7 @@ public class Team implements Serializable{
 
     /**
      * Set active unit
+     *
      * @param unit unit
      */
     public void setActiveUnit(Unit unit) {

@@ -46,52 +46,29 @@ public class TeamTest {
     }
 
     @Test
-    public void testgetPlayers() {
-        /**
-         *
-         * @return all the players of the team
-         */
-        // I added one player so the size of this list should be one.
-        //assertEquals(1, team.getPlayers().size());
-    }
-
-    @Test
-    public void testaddPlayer() {
+    public void testsetandgetPlayer() {
         /**
          * Adds a player to team
          *
          * @param p player
          */
         // First add a new player.
-        //team.addPlayer(new Player("127.0.0.2", "Rens"));
+        Player rens = new Player("127.0.0.2", "Rens");
+        team.setPlayer(rens);
         // Test if the size is 2 now. This means it's added.
-        //assertEquals(2, team.getPlayers().size());
+        assertEquals(rens, team.getPlayer());
     }
 
     @Test
-    public void testremovePlayer() {
-        /**
-         * TODO: Logic for kicking player out Removes a player from the team
-         *
-         * @param p player
-         */
-        // Remove the first created player.
-        team.removePlayer(player);
-        // Test if the size is 0 again now.
-        //assertEquals(0, team.getPlayers().size());
+    public void testsetandgetColorname() {
+        // Set a colorname 
+        team.setColorname("color");
+        // Check if nothing goes wrong..
+        assertEquals("color", team.getColorname());
     }
 
     @Test
-    public void testgetName() {
-        /**
-         *
-         * @return the team name
-         */
-        assertEquals("Alpha", team.getName());
-    }
-
-    @Test
-    public void testsetName() {
+    public void testgetandsetName() {
         /**
          * Set the name of the team
          *
@@ -136,6 +113,19 @@ public class TeamTest {
     }
 
     @Test
+    public void testmakeUnitList() {
+        // Make new list because there already are units for 'team'.
+        Team team2 = new Team("Gamza", Color.BLACK, true);
+        // Test if the list indeed is null before.
+        // It will only be if a team sends a list which does have a unit list as transient
+        assertNull(team2.getUnits());
+        // Then make the list..
+        team2.makeUnitList();
+        // Check if it still is null or not.
+        assertEquals(0, team2.getUnits().size());
+    }
+
+    @Test
     public void testgetActiveUnit() {
         /**
          *
@@ -143,6 +133,7 @@ public class TeamTest {
          */
         // The name of the unit which is added to the team.
         String unitname = "AlphaUnit";
+        team.setActiveUnit(new Unit("AlphaUnit", 100, team, new Vector2(20, 20), true));
         assertEquals(unitname, team.getActiveUnit().getName());
     }
 
@@ -174,22 +165,29 @@ public class TeamTest {
     }
 
     @Test
-    public void testgetActiveUnitIndex() {
+    public void testNextActiveUnit() {
         /**
-         * TODO: removed getActiveUnitIndex
-         * @return active unit index
+         * Set the next active unit in the team
          */
-        assertEquals(0, team.getActiveUnit());
+        team.setNextActiveUnit();
+        // The first unit is set, because it starts at null. 
+        assertEquals("AlphaUnit", team.getActiveUnit().getName());
+        // This means if I do it 2 times.
+        team.setNextActiveUnit();
+        assertEquals("AlphaUnit2", team.getActiveUnit().getName());
     }
 
     @Test
     public void testendTurn() {
         /**
-         * TODO: removed getActiveUnitIndex
-         * end turn for team, add new active unit index for team
+         * end turn for team When unit has lower or equal than 0 health, remove
+         * the unit from the team
          */
-        team.endTurn();
-        // If we end the turn, the active unit index will be set +1. So AlphaUnit2 will now be active.
-        assertEquals(1, team.getActiveUnit());
+        // Add a unit with 0 hp. And check the size.
+        team.addUnit("AlphaUnit3", 0, new Vector2(20, 20), true);
+        assertEquals(3, team.getUnits().size());
+        // End the turn and see if the unit with 0 hp is removed.
+        team.endTurn(true);
+        assertEquals(2, team.getUnits().size());
     }
 }

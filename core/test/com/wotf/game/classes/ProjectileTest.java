@@ -7,6 +7,7 @@ package com.wotf.game.classes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import java.io.File;
@@ -25,14 +26,14 @@ public class ProjectileTest {
 
     @Before
     public void initProjectile() {
-
         /**
          * Projectile constructor to initialize visual appearence of the bullet.
          *
          * @param sprite
          */
+
         sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
-        projectile = new Projectile(sprite);
+        //projectile = new Projectile(sprite, ?);
     }
 
     @Test
@@ -71,7 +72,6 @@ public class ProjectileTest {
         int blastradius = 40;
 
         // Can't be tested because it has no getter for the values this method changed.
-        
     }
 
     @Test
@@ -81,15 +81,15 @@ public class ProjectileTest {
          *
          * @param startPos first x,y position.
          */
-        Vector2 startpos = new Vector2(20,60);
+        Vector2 startpos = new Vector2(20, 60);
         /**
          * @param destPos second x, y position.
          */
-        Vector2 destpos = new Vector2(140,80);
+        Vector2 destpos = new Vector2(140, 80);
         // 9.462322184
         // This should be the result, can't be tested. Sprite in the method which means a crash.
         // Also there is no getter.
-        
+
     }
 
     @Test
@@ -102,8 +102,8 @@ public class ProjectileTest {
         float force = 20;
         //projectile.setVelocity(force);
     }
-    
-   /* @Test
+
+    /* @Test
     public void testupdateShot(){
 
     }*/

@@ -108,7 +108,7 @@ public class SessionContext extends EntityContext<Session> {
         List<Object> parameters = new ArrayList<>();
         parameters.add(session.getRoomName());
         parameters.add(session.getGameSettings().getMaxPlayersSession());
-        parameters.add(session.getID());
+        parameters.add(session.getId());
 
         return DBCon.executeUpdate(query, parameters) >= 1;
     }
@@ -136,7 +136,7 @@ public class SessionContext extends EntityContext<Session> {
             } catch (RemoteException ex) {
                 Logger.getLogger(SessionContext.class.getName()).log(Level.SEVERE, null, ex);
             }
-            session.setID(record.getInt("ID"));
+            session.setId(record.getInt("ID"));
         }
         return session;
     }

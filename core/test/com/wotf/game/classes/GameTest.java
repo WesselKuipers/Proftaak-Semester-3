@@ -48,7 +48,7 @@ public class GameTest {
         // Finally initialize the Game class.
         // The map is null because the map can't be initialized from the test classes.
         // It looks like a Pixmap can't be made while in the tests.
-        game = new Game(gamesetting, null, players);
+        game = new Game(gamesetting, null, players, playerrens);
     }
 
     @Test
@@ -85,54 +85,67 @@ public class GameTest {
         // Test if it fails for another index.
         assertNotEquals(playerrens, selplayer);
     }
-    
+
     @Test
-    public void testgetHost(){
+    public void testGetPlayingPlayer() {
+        // Gets the current playingplayer.
+        // I added rens as playing player, it isn't switched yet.
+        assertEquals(playerrens, game.getPlayingPlayer());
+    }
+
+    @Test
+    public void testgetHost() {
         // The host is the player with index 0. Like in the previous testcase, playerdino is the one with index 0.
         assertEquals(playerrens, game.getHost());
     }
 
     @Test
-    public void testgetTeams(){
+    public void testgetTeams() {
         // The amount of teams in the current game. Alpha and Beta have been added so it should be 2.
         assertEquals(2, game.getTeams().size());
     }
-    
+
     @Test
-    public void testgetTeam(){
+    public void testgetTeam() {
         // Get the team with the given index. The first team added is alpha so this will have the index 0.
         assertEquals(alpha, game.getTeam(0));
     }
-    
+
     @Test
-    public void testgetActiveTeam(){
+    public void testgetActiveTeam() {
         // Get the current active team. It will probably be the first one added, which is alpha.
         assertEquals(alpha, game.getActiveTeam());
     }
-    
+
     @Test
-    public void testMap(){
+    public void testMap() {
         // Get the active map. In this example it is null.
         assertNull(game.getMap());
     }
     
     @Test
-    public void testEndTurn(){
+    public void testgetState() {
+        // The value is not set yet so it will return false probably.
+        assertFalse(game.getTurnState());
+    }
+
+    @Test
+    public void testEndTurn() {
         // Run the EndTurn method. After that run the getActiveTeam which should be different than the default Team 0.
         game.endTurn();
         // Test if the ActiveTeam is 1 now.
         // Can't be tested because there is no stage with actors in the testclass.
         assertEquals(beta, game.getActiveTeam());
     }
-    
+
     @Test
-    public void testgetGameSettings(){
+    public void testgetGameSettings() {
         // Get the current gamesettings. Test if it is the same as the GameSettings object created above.
         assertEquals(gamesetting, game.getGameSettings());
     }
-    
+
     @Test
-    public void testTurnLogic(){
+    public void testTurnLogic() {
         // Get the current TurnLogic and test if it equals the team size.
         TurnLogic turnlogic = new TurnLogic(game.getTeams().size());
         // Can't be tested because there is nothing to compare. 

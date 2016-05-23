@@ -42,7 +42,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Screen that shows the local sessions menu
+ * Screen that shows the sessions menu for a connected player
  *
  * @author Gebruiker
  */
@@ -77,9 +77,13 @@ public class SessionOnlinePlayer implements Screen {
 
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting
+     * Connects to the parameter session in the SessionManager class.
+     * Initializes global tables.
+     * Makes a list of Textures where all internal maps are saved
+     * Update the playerlist of the current session
      *
-     * @param game
-     * @param session
+     * @param game current
+     * @param session from host
      */
     public SessionOnlinePlayer(WotFGame game, Session session, Player player) throws RemoteException {
         switchscreencheck = 0;
@@ -107,6 +111,12 @@ public class SessionOnlinePlayer implements Screen {
         refreshUnit = false;
     }
 
+    /**
+     * Get all the players for a given session.
+     * 
+     * @param session
+     * @return 
+     */
     public ArrayList<Player> getPlayersOfSession(Session session) {
         try {
             SessionPlayerContext sp = new SessionPlayerContext();
@@ -117,11 +127,19 @@ public class SessionOnlinePlayer implements Screen {
         return null;
     }
 
+    /**
+     * Adds a single player to the session to the DB.
+     * 
+     */
     public void addPlayerToDB() {
         SessionPlayerContext sp = new SessionPlayerContext();
         sp.insert(player, manager.getSession());
     }
 
+    /**
+     * Sets a list of the maps which are located in the internal /maps folder.
+     * 
+     */
     public void setMapsList() {
         mapslist = new ArrayList<>();
         FileHandle dirHandle = Gdx.files.internal("maps");
@@ -155,7 +173,9 @@ public class SessionOnlinePlayer implements Screen {
     }
 
     /**
-     * {@inheritDoc}
+     * The screen for the client(player). This screen is based on what the SessionManager receives from the host.
+     * The selectboxes etc. are updated when the host changes a value/selectbox.
+     * 
      */
     @Override
     public void show() {
@@ -175,13 +195,63 @@ public class SessionOnlinePlayer implements Screen {
         teamselecttable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 100, 100, 160, 160)));
         playerstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 125, 125, 160, 160)));
 
+        setPlayerList(playerstable);
+
+        addTeamsTable(teamselecttable);
+
+        setTitelLabel();
+
+        setIp(settingstable);
+
+        setTurnTimevals(settingstable);
+
+        setMaxPlayervals(settingstable);
+
+        setSpeedvals(settingstable);
+
+        setPhysicsvals(settingstable);
+
+        setWeaponvals(settingstable);
+
+        setTimervals(settingstable);
+
+        setUnitvals(settingstable);
+
+        settingstable.setWidth(300);
+        settingstable.setHeight(200);
+        settingstable.setPosition(30, 110);
+        stage.addActor(settingstable);
+
+        setMaps();
+
+        setTeamsToTable(teamstable);
+
+        exitGame();
+
+        refreshPlayers();
+    }
+
+    /**
+     * Sets the players from the DB to the GUI list.
+     *
+     * @param playerstable
+     */
+    private void setPlayerList(Table playerstable) {
         players.setItems(playerList.toArray());
         playerstable.add(players);
         playerstable.setWidth(250);
         playerstable.setHeight(320);
         playerstable.setPosition(1020, 360);
         stage.addActor(playerstable);
+    }
 
+    /**
+     * Sets the teamslist to a table of teams. Adds new TextButtons for each
+     * team.
+     *
+     * @param teamstable
+     */
+    private void addTeamsTable(Table teamselecttable) {
         Label selectteamlabel = new Label("Team selection", skin);
         teamselecttable.add(selectteamlabel).padBottom(15);
         teamselecttable.row();
@@ -206,17 +276,37 @@ public class SessionOnlinePlayer implements Screen {
         teamselecttable.setHeight(320);
         teamselecttable.setPosition(500, 360);
         stage.addActor(teamselecttable);
+    }
 
+    /**
+     * Sets the title label to the name of the game.
+     *
+     */
+    private void setTitelLabel() {
         Label wotflabel = new Label("War of the Figures", skin);
         wotflabel.setPosition(Gdx.graphics.getWidth() / 2 - wotflabel.getWidth() / 2, 740);
         stage.addActor(wotflabel);
+    }
 
+    /**
+     * Set the IP adress of the host. To the settingstable.
+     *
+     * @param settingstable
+     */
+    private void setIp(Table settingstable) {
         Label iplabel = new Label("IP :", skin);
         settingstable.add(iplabel).width(120);
         Label ipvallabel = new Label(session.getHost().getIp(), skin);
         settingstable.add(ipvallabel).width(180);
         settingstable.row();
+    }
 
+    /**
+     * Sets the turn times to the settingstable.
+     *
+     * @param settingstable
+     */
+    private void setTurnTimevals(Table settingstable) {
         Object[] turntimevals = new Object[6];
         turntimevals[0] = "10";
         turntimevals[1] = "20";
@@ -233,7 +323,15 @@ public class SessionOnlinePlayer implements Screen {
 
         settingstable.add(turntimebox).width(180);
         settingstable.row();
+    }
 
+    /**
+     * Sets the max player selectbox to the current value. Also make initial
+     * values. Add this to the gamesettings.
+     *
+     * @param settingstable
+     */
+    private void setMaxPlayervals(Table settingstable) {
         Label playerslabel = new Label("Players :", skin);
         settingstable.add(playerslabel).width(120);
         Object[] maxplayervals = new Object[4];
@@ -247,13 +345,28 @@ public class SessionOnlinePlayer implements Screen {
         maxplayerbox.setTouchable(Touchable.disabled);
         settingstable.add(maxplayerbox).width(180);
         settingstable.row();
+    }
 
+    /**
+     * Sets the label for Speeds which isn't currently used.
+     *
+     * @param settingstable
+     */
+    private void setSpeedvals(Table settingstable) {
         Label speedslabel = new Label("Speeds :", skin);
         settingstable.add(speedslabel).width(120);
         Label speedsvallabel = new Label("Marathon", skin);
         settingstable.add(speedsvallabel).width(180);
         settingstable.row();
+    }
 
+    /**
+     * Sets the selectbox with values true and false. Also add it to the
+     * gamesettings.
+     *
+     * @param settingstable
+     */
+    private void setPhysicsvals(Table settingstable) {
         Object[] physicsvals = new Object[2];
         physicsvals[0] = "true";
         physicsvals[1] = "false";
@@ -266,7 +379,15 @@ public class SessionOnlinePlayer implements Screen {
 
         settingstable.add(physicsbox).width(180);
         settingstable.row();
+    }
 
+    /**
+     * Sets the weapon selectbox with values. Not added to the gamesettings yet.
+     * It doesn't have a functional use.
+     *
+     * @param settingstable
+     */
+    private void setWeaponvals(Table settingstable) {
         Object[] weaponsvals = new Object[3];
         weaponsvals[0] = "All Weapons";
         weaponsvals[1] = "Non-Explosive";
@@ -278,7 +399,15 @@ public class SessionOnlinePlayer implements Screen {
         weaponsbox.setTouchable(Touchable.disabled);
         settingstable.add(weaponsbox).width(180);
         settingstable.row();
+    }
 
+    /**
+     * Sets the MaxTime selectbox with values. Adds the selected maxtime to the
+     * gamesettings list.
+     *
+     * @param settingstable
+     */
+    private void setTimervals(Table settingstable) {
         Object[] timervals = new Object[3];
         timervals[0] = "60";
         timervals[1] = "30";
@@ -291,7 +420,15 @@ public class SessionOnlinePlayer implements Screen {
         timerbox.setTouchable(Touchable.disabled);
         settingstable.add(timerbox).width(180);
         settingstable.row();
+    }
 
+    /**
+     * Sets the current units with values. Adds the selected units to the
+     * gamesettings list.
+     *
+     * @param settingstable
+     */
+    private void setUnitvals(Table settingstable) {
         Object[] unitvals = new Object[4];
         unitvals[0] = "1";
         unitvals[1] = "2";
@@ -305,12 +442,16 @@ public class SessionOnlinePlayer implements Screen {
         unitbox.setSelected(unitstr);
         unitbox.setTouchable(Touchable.disabled);
         settingstable.add(unitbox).width(180);
+    }
 
-        settingstable.setWidth(300);
-        settingstable.setHeight(200);
-        settingstable.setPosition(30, 110);
-        stage.addActor(settingstable);
-
+    /**
+     * Sets the map to the current map. Get the map index from the list of maps
+     * internal.
+     *
+     * @param mapstable
+     * @return
+     */
+    private void setMaps() {
         map1 = new Image(new Texture(mapslist.get(session.getGameSettings().getMapIndex())));
         map1.setPosition(20, 70);
         map1.setWidth(400);
@@ -327,7 +468,14 @@ public class SessionOnlinePlayer implements Screen {
         mapstable.setHeight(320);
         mapstable.setWidth(440);
         stage.addActor(mapstable);
+    }
 
+    /**
+     * Sets the teamslist to a table of teams.
+     *
+     * @param teamstable
+     */
+    private void setTeamsToTable(Table teamstable) {
         Label teamslabel = new Label("Teams", skin);
         teamstable.setPosition(730, 360);
         teamstable.add(teamslabel);
@@ -345,14 +493,15 @@ public class SessionOnlinePlayer implements Screen {
         teamstable.setWidth(260);
         teamstable.setHeight(320);
         stage.addActor(teamstable);
+    }
 
-        TextButton start = new TextButton("Start", skin); // Use the initialized skin
-        start.setColor(Color.BLACK);
-        start.setWidth(300);
-        start.setHeight(60);
-        start.setPosition(590, 180);
-        stage.addActor(start);
-
+    /**
+     * When clicked the client exits the session, cancels the timer to refresh
+     * the players, removes the registry it is connected to, remove the player
+     * from the current session from db, sets the screen back to the lobby.
+     *
+     */
+    private void exitGame() {
         TextButton exit = new TextButton("Exit", skin); // Use the initialized skin
         exit.setColor(Color.BLACK);
         exit.setWidth(300);
@@ -373,6 +522,13 @@ public class SessionOnlinePlayer implements Screen {
                 }
             }
         });
+    }
+
+    /**
+     * Refresh the players in the session each 7 seconds. From the DB
+     *
+     */
+    private void refreshPlayers() {
         SessionPlayerContext sc = new SessionPlayerContext();
         timer = new Timer("PlayerRefresh");
         timer.schedule(new TimerTask() {
@@ -490,6 +646,11 @@ public class SessionOnlinePlayer implements Screen {
         part.deletePlayerFromSession(player, session);
     }
 
+    /**
+     * The player should not be removed from the db because it only quitted to the lobby.
+     * If it quits to the lobby we execute the dispose above.
+     * 
+     */
     public void disposeWithoutPlayer() {
         timer.cancel();
 
@@ -588,6 +749,12 @@ public class SessionOnlinePlayer implements Screen {
         switchscreencheck = 1;
     }
 
+    /**
+     * Change variable startGame to 1 if this method is called. 
+     * This will be checked in the render. For a change from 0 to 1.
+     * Updates the playerlist before launch.
+     * 
+     */
     public void startGame() {
         startGame = 1;
         // Updating the playerList before lauch
@@ -595,6 +762,12 @@ public class SessionOnlinePlayer implements Screen {
         session.setPlayerList(playerList);
     }
 
+    /**
+     * Create units for a single team based on how many units there should be created.
+     * 
+     * @param selectedunitcount amount of units to create
+     * @param team selected
+     */
     public void addUnitsSingleTeam(int selectedunitcount, Team team) {
         // The new units to the team. The name of the unit is the teamname + the number of the variable 'i'.
         for (int i = 0; i < selectedunitcount; i++) {

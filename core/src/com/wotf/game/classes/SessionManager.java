@@ -19,7 +19,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * To connect a client to a session there must be a SessionManager instance.
+ * This class makes it possible to connect to a specific registry/session based on the hostIP.
+ * 
  * @author Remco
  */
 public class SessionManager extends UnicastRemoteObject implements IRemotePropertyListener {
@@ -30,9 +32,22 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
     private GameSettings gamesettings;
     private SessionOnlinePlayer GUI;
 
-    public SessionManager() throws RemoteException {
+    /**
+     * Private empty constructor for initializing UnicastRemoteObject.
+     *
+     * @throws RemoteException
+     */
+    private SessionManager() throws RemoteException {
     }
 
+    /**
+     * Initialize attributes, an empty constructor for the unicastremoteobject,
+     * connect to the registry of the given session (host) 
+     * 
+     * @param session where the client will connect to
+     * @param GUI which will be shown for the client
+     * @throws RemoteException 
+     */
     public SessionManager(Session session, SessionOnlinePlayer GUI) throws RemoteException {
         this();
         this.session = session;
@@ -40,6 +55,15 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
         getSessionRegistry();
     }
 
+    /**
+     * Connect to the given registry of the session(host)
+     * Also subscribe to the remote properties like :
+     * Cancelgame
+     * Startgame
+     * Session gamesettings property. Will be called for the client if any gamesetting changes.
+     * Also set the gamesettings for the client for one time. We need to know the current settings of the host.
+     * 
+     */
     public void getSessionRegistry() {
         // REGISTER AREA
         try {
@@ -62,10 +86,19 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
         }
     }
 
+    /**
+     * 
+     * @return the current session with the current gameSettings.
+     */
     public Session getSession() {
         return session;
     }
     
+    /**
+     * Set the registry for a client back to null. This means the registry is removed.
+     * Also unsubscribe from the properties it was subscribed to.
+     * 
+     */
     public void removeRegistry(){
         try {
             registry = null;
@@ -77,6 +110,24 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
         }
     }
 
+    /**
+     * If one of the subscribed properties changes it will run this method.
+     * Check which property changed and then run the needed methods.
+     * 
+     * If it is the sessionsettingsprop this means there are new settings 
+     * -> set the new settings for the client
+     * -> update the list of teams
+     * -> update the selectboxes to the new settings
+     * -> update the image/selectbox map to the map of the gamesettings.
+     * 
+     * If it is the cancelgameprop the game will quit for the clients.
+     * -> call a method from the GUI which will change a variable which will be constantly checked in the render method.
+     * 
+     * If it is the startgameprop the game will start for the clients.
+     * -> call a method from the GUI which will change a variable which will be constantly checked in the render method.
+     * @param evt
+     * @throws RemoteException 
+     */
     @Override
     public void propertyChange(PropertyChangeEvent evt) throws RemoteException {
         if (evt.getPropertyName().equals("sessionsettingsprop")) {

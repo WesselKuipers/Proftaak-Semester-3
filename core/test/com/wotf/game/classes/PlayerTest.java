@@ -47,4 +47,13 @@ public class PlayerTest {
         // Test if the name is set correctly.
         assertEquals("Rens", player.getName());
     }
+    
+    @Test
+    public void testgetandsetId(){
+        // Sets the id.
+        player.setID(2);
+        
+        // Check if it is 2 now.
+        assertEquals(2, player.getID());
+    }
 }
