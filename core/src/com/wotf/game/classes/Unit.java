@@ -99,11 +99,11 @@ public class Unit extends Group implements Serializable {
      *
      * @param number number of the weapon that needs to be found
      */
-    public void selecting_weapon(int number) {
+    public void selectWeaponIndex(int number) {
         if (team.selectItem(WEAPONS_ARMORY.get(number))) {
             Item w = WEAPONS_ARMORY.get(number);
             Unit.this.clearChildren();
-            selectWeapon(w);
+            Unit.this.selectWeapon(w);
             Image weaponImage = new Image(w.getWeaponSprite());
             weaponImage.setPosition(Unit.this.getX(), Unit.this.getY());
             Unit.this.addActor(weaponImage);
@@ -264,7 +264,8 @@ public class Unit extends Group implements Serializable {
         } else {
             font.setColor(team.getColor());
         }
-        //make weapons move with the unit
+        
+        // make weapons move with the unit
         Array<Actor> children = this.getChildren();
         if (children.size > 0) {
             children.first().setPosition(Unit.this.getX(), Unit.this.getY());

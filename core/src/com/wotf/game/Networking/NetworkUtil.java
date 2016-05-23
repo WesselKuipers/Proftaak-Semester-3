@@ -36,7 +36,7 @@ import java.util.List;
 public class NetworkUtil {
     
     private final Player host;
-    private final int _PORT = 9021;
+    private final int port = 9021;
     private final GameStage scene;
     private Socket socket;
     private final List<Vector2> unitPositions = new ArrayList<>();
@@ -65,7 +65,7 @@ public class NetworkUtil {
             serverSocketHint.acceptTimeout = 0;
 
             // Create the socket server using TCP protocol and listening on 9021
-            ServerSocket serverSocket = Gdx.net.newServerSocket(Net.Protocol.TCP, _PORT, serverSocketHint);
+            ServerSocket serverSocket = Gdx.net.newServerSocket(Net.Protocol.TCP, port, serverSocketHint);
 
             // Accept any incoming connections
             this.socket = serverSocket.accept(null);
@@ -73,7 +73,7 @@ public class NetworkUtil {
             messageListener(true);
         } else {
             SocketHints socketHints = new SocketHints();
-            this.socket = Gdx.net.newClientSocket(Net.Protocol.TCP, host.getIp(), _PORT, socketHints);
+            this.socket = Gdx.net.newClientSocket(Net.Protocol.TCP, host.getIp(), port, socketHints);
             messageListener(false);
         }
     }
@@ -303,18 +303,18 @@ public class NetworkUtil {
             
             String xStr = nMsg.getParameter("x");
             for (int y = 0; y < terrain[0].length; y++) {
-                String yStr = nMsg.getParameter("y"+y);
-                String valStr = nMsg.getParameter("val"+y);
+                String yStr = nMsg.getParameter("y" + y);
+                String valStr = nMsg.getParameter("val" + y);
                 
-                yVal = Integer.parseInt( yStr );
+                yVal = Integer.parseInt(yStr);
                 val = Boolean.parseBoolean(valStr);
             }
             
-            int x = Integer.parseInt( xStr );
+            int x = Integer.parseInt(xStr);
             
             terrain[x][yVal] = val;
         }
-        catch( InvalidParameterException ipe ) {
+        catch(InvalidParameterException ipe) {
             //TODO: what do we do when message went wrong ? ask host aggain ?
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
@@ -401,7 +401,7 @@ public class NetworkUtil {
                 weapon = Integer.parseInt(weaponIndex);  
             }             
 
-            scene.getGame().getActiveTeam().getActiveUnit().selecting_weapon(weapon);
+            scene.getGame().getActiveTeam().getActiveUnit().selectWeaponIndex(weapon);
         }
         catch(InvalidParameterException ipe) {
             //TODO: what do we do when message went wrong ? ask host aggain ?

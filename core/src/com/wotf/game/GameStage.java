@@ -293,22 +293,22 @@ public class GameStage extends Stage {
                     }
                     break;
                 case Keys.NUM_0:
-                    game.getActiveTeam().getActiveUnit().selecting_weapon(0);
+                    game.getActiveTeam().getActiveUnit().selectWeaponIndex(0);
                     break;
                 case Keys.NUM_1:
-                    game.getActiveTeam().getActiveUnit().selecting_weapon(1);
+                    game.getActiveTeam().getActiveUnit().selectWeaponIndex(1);
                     break;
                 case Keys.NUM_2:
-                    game.getActiveTeam().getActiveUnit().selecting_weapon(2);
+                    game.getActiveTeam().getActiveUnit().selectWeaponIndex(2);
                     break;
                 case Keys.NUM_3:
-                    game.getActiveTeam().getActiveUnit().selecting_weapon(3);
+                    game.getActiveTeam().getActiveUnit().selectWeaponIndex(3);
                     break;
                 case Keys.NUM_4:
-                    game.getActiveTeam().getActiveUnit().selecting_weapon(4);
+                    game.getActiveTeam().getActiveUnit().selectWeaponIndex(4);
                     break;
                 case Keys.NUM_5:
-                    game.getActiveTeam().getActiveUnit().selecting_weapon(5);
+                    game.getActiveTeam().getActiveUnit().selectWeaponIndex(5);
                     break;
                     
             }

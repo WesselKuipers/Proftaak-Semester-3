@@ -215,7 +215,7 @@ public class Game {
 //            Item i = WEAPONS_ARMORY.get(0);
 //            team.getActiveUnit().selectWeapon(i);
             
-             team.getActiveUnit().selecting_weapon(0);
+             team.getActiveUnit().selectWeaponIndex(0);
         } else {
             endTurn();
         }
