@@ -461,7 +461,7 @@ public class GameStage extends Stage {
         //if (cluster) {
            // fireCluster(x, y);
         //}
-        
+        game.getActiveTeam().getActiveUnit().getWeapon().getBullet().remove();
         // End the turn after unit has fired
         game.endTurn();
     }

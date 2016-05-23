@@ -202,6 +202,7 @@ public class Projectile extends Actor {
         // if projectile is out of bounds, remove it from the stage
         if (isProjectileOutOfBounds(gameMap)) {
             this.remove();
+            ((GameStage) getStage()).getGame().endTurn();
             return;
         }
 

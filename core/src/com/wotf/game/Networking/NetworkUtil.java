@@ -207,6 +207,7 @@ public class NetworkUtil {
                 break;
             case SYNCCOLLISION:
                 syncCollision ( nMsg );
+                break;
             default: 
                 System.out.println("Command was not processed");
                 break;
@@ -436,7 +437,7 @@ public class NetworkUtil {
             int posY = Integer.parseInt(posYStr);
             
             scene.explode(posX, posY, 50, 30, false);
-            scene.getGame().getActiveTeam().getActiveUnit().getWeapon().getBullet().remove();
+            //scene.getGame().getActiveTeam().getActiveUnit().getWeapon().getBullet().remove();
         }
         catch( InvalidParameterException ipe ) {
             //TODO: what do we do when message went wrong ? ask host aggain ?
