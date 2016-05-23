@@ -1,12 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.wotf.game.classes;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -51,7 +45,6 @@ public class Projectile extends Actor {
     public Projectile(Sprite sprite, ParticleEffect effect) {
         //graphics
         this.sprite = sprite;
-        sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
         sprite.setOriginCenter();
         sprite.flip(true, false);
 
@@ -75,8 +68,7 @@ public class Projectile extends Actor {
      * unit.
      */
     public void fire(Vector2 unitPos, Vector2 mousePos,
-            float force, Vector2 wind, double gravity, int blastRadius, int damage) {
-
+        float force, Vector2 wind, double gravity, int blastRadius, int damage) {
         //game data
         position = unitPos.cpy();
 
@@ -103,8 +95,8 @@ public class Projectile extends Actor {
      * @param force Force towards direction.
      */
     private void setVelocity(float force) {
-        final double DEG2RAD = Math.PI / 180;
-        double ang = angle * DEG2RAD;
+        final double deg2Rad = Math.PI / 180;
+        double ang = angle * deg2Rad;
 
         velocity = new Vector2(
                 (float) (force * Math.cos(ang)),

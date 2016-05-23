@@ -41,7 +41,6 @@ public class Team implements Serializable{
         for(Item i : WEAPONS_ARMORY){
             items.put(i, 99);
         }
-        //items.put(WEAPONS_ARMORY.get(0), 99);
 
         this.name = name;
         this.color = color;
@@ -268,7 +267,7 @@ public class Team implements Serializable{
     public Item containsKey(Item item) {
         Item result = null;
         for (Entry<Item, Integer> entry : items.entrySet()) {
-            if ((entry.getKey().getName().equals(item.getName()))) {
+            if (entry.getKey().getName().equals(item.getName())) {
                 result = entry.getKey();
                 break;
             }
@@ -297,7 +296,7 @@ public class Team implements Serializable{
         if (items.containsKey(item)) {
 
             if (items.get(item) > 0) {
-                increaseItemAmount(item, (items.get(item) - 1));
+                increaseItemAmount(item, items.get(item) - 1);
             }
             if (items.get(item) == 0 || items.get(item) < 0) {
                 //TODO: handle what happens when unlimited ammo (-1) or out of ammo

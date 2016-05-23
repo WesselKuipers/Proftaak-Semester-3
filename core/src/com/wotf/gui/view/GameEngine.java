@@ -5,11 +5,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.wotf.game.GameStage;
 import com.wotf.game.GuiStage;
@@ -17,9 +13,6 @@ import com.wotf.game.classes.Game;
 import com.wotf.game.classes.GameSettings;
 import com.wotf.game.classes.Map;
 import com.wotf.game.classes.Player;
-import com.wotf.game.classes.Team;
-import java.util.ArrayList;
-import java.util.List;
 import com.wotf.game.WotFGame;
 import com.wotf.game.classes.Session;
 import java.util.logging.Level;
@@ -33,12 +26,11 @@ public class GameEngine implements Screen {
     private final WotFGame game;
     private GameStage stage;
     private GuiStage stageGUI;
-    private Skin skin;
-    private List<Team> teams;
     private GameSettings gameSettings;
     private Session session;
     private Map map;
     private Player playingPlayer;
+    private Skin skin;
 
     /**
      * Constructor of GameEngine
@@ -89,26 +81,7 @@ public class GameEngine implements Screen {
         Player playingPlayer = players.get(0);*/
 
         map.setWaterLevel(30);
-        
-        /* Debug map:
-        // Creates a new terrain mask and assigns a flat rectangle as terrain
-        boolean[][] terrain = new boolean[map.getWidth()][map.getHeight()];
-        for (int x = 100; x < (map.getWidth() - 100); x++) {
-            for (int y = 0; y < 80; y++) {
-                terrain[x][y] = true;
-            }
-        }
-        
-        // Creates a platform on the debug map
-        for(int x = (map.getWidth() / 2); x < (map.getWidth() / 2 + 50); x++) {
-            for(int y = 80; y < 120; y++) {
-                terrain[x][y] = true;
-            }
-        }
 
-        map.setTerrain(terrain);
-        */
-        
         // Initializes a viewport and a camera object
         ScreenViewport viewport = new ScreenViewport(new OrthographicCamera(1280, 720));
         viewport.setWorldSize(map.getWidth(), map.getHeight());
@@ -117,7 +90,7 @@ public class GameEngine implements Screen {
         
         // WARNING: THIS IS A TEMPORARY FIX. This makes the client sleep so it can receive all gamesettings sent by the host, else it will crash.
         // TODO: Make the client wait until the settings are loaded from the host by the client?
-        if (session.getHost().getID() != playingPlayer.getID()) {
+        if (session.getHost().getId()!= playingPlayer.getId()) {
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException ex) {

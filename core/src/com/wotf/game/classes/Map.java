@@ -290,7 +290,6 @@ public class Map {
 
         float x = (random.nextInt(windRange) - windRange / 2);
         float y = (random.nextInt(windRange) - windRange / 2);
-
         this.windForce = new Vector2(x, y);
     }
 

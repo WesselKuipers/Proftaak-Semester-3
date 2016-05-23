@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.wotf.game.database;
 
 import com.wotf.game.classes.Session;
@@ -90,7 +85,7 @@ public class SessionContext extends EntityContext<Session> {
     public boolean insert(Session session) {
         String query = "INSERT INTO session (HostID, RoomName, MaxPlayersSession) VALUES (?, ?, ?)";
         List<Object> parameters = new ArrayList<>();
-        parameters.add(session.getHost().getID());
+        parameters.add(session.getHost().getId());
         parameters.add((session.getRoomName() != null) ? session.getRoomName() : "Roomname is not entered");
         parameters.add(session.getGameSettings().getMaxPlayersSession());
 
@@ -122,7 +117,7 @@ public class SessionContext extends EntityContext<Session> {
     public boolean delete(Session session) {
         String query = "DELETE FROM session WHERE HostID = ?";
         List<Object> parameters = new ArrayList<>();
-        parameters.add(session.getHost().getID());
+        parameters.add(session.getHost().getId());
         return DBCon.executeUpdate(query, parameters) >= 1;
     }
 

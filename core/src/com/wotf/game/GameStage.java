@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.wotf.game;
 
 import com.badlogic.gdx.Gdx;
@@ -36,7 +31,6 @@ import java.util.List;
 
 /**
  * Extension of Stage that contains a game session
- *
  */
 public class GameStage extends Stage {
 
@@ -93,7 +87,7 @@ public class GameStage extends Stage {
         networkingUtil = new NetworkUtil( game.getHost(), this );
         
         // Initialize the game by host, after that send it to all connected clients
-        if (game.getPlayingPlayer().getID() == game.getHost().getID()) {
+        if (game.getPlayingPlayer().getId()== game.getHost().getId()) {
             
             // Send all the random spawn locations in one message
             int unitCount = 0;
@@ -253,6 +247,7 @@ public class GameStage extends Stage {
                 cam.translate(new Vector2(50f, 0));
                 focusedActor = null;
                 break;
+                
             // Camera controls (zoom)
             case Keys.PLUS:
                 cam.zoom -= 0.05f;
@@ -266,7 +261,7 @@ public class GameStage extends Stage {
         }
         
         // Only allow these controls for the current playing player
-        if (game.getPlayingPlayer().getID() == game.getActiveTeam().getPlayer().getID()) {
+        if (game.getPlayingPlayer().getId()== game.getActiveTeam().getPlayer().getId()) {
             switch (keyCode) {
                 // Unit selection
                 case Keys.TAB:
@@ -339,7 +334,7 @@ public class GameStage extends Stage {
         Vector3 rel = getCamera().unproject(new Vector3(screenX, screenY, 0));
         
         // Check if the playing player is allowed to do actions
-        if (game.getPlayingPlayer().getID() == game.getActiveTeam().getPlayer().getID()) {
+        if (game.getPlayingPlayer().getId()== game.getActiveTeam().getPlayer().getId()) {
             
             // Check if turn state is playing
             if (game.getTurnLogic().getState() == TurnState.PLAYING) {
@@ -371,7 +366,7 @@ public class GameStage extends Stage {
 
         Texture backgroundTexture = game.getMap().getBackgroundTexture();
         Texture terrainTexture = game.getMap().getLandscapeTexture();
-
+        
         // draws background and foreground
         batch.draw(backgroundTexture, 0, 0, 0, 0,
                 backgroundTexture.getWidth(), backgroundTexture.getHeight(),
@@ -392,8 +387,7 @@ public class GameStage extends Stage {
 
             if (effect.isComplete()) {
                 effect.free();
-                particles.remove(i);
-                
+                particles.remove(i);                
                 //effect.reset();
             }
         }
@@ -445,6 +439,7 @@ public class GameStage extends Stage {
      * @param damage Amount of damage the explosion does should it collide with
      * a Unit
      */
+
     public void explode(int x, int y, int radius, int damage, boolean cluster) {
         // calls radius destruction method in game map
         // which will update the boolean[][] and the terrain texture
@@ -511,7 +506,6 @@ public class GameStage extends Stage {
                 }
             }
         }
-
         // if any units have taken damage, we want to update their health and team healthbars
         if (!collidedUnits.isEmpty()) {
             

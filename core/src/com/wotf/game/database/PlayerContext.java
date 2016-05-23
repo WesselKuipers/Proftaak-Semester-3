@@ -103,7 +103,7 @@ public class PlayerContext extends EntityContext<Player> {
         String query = "UPDATE session SET IngameName = ? WHERE ID = ?";
         List<Object> parameters = new ArrayList<>();
         parameters.add(player.getName());
-        parameters.add(player.getID());
+        parameters.add(player.getId());
 
         return DBCon.executeUpdate(query, parameters) >= 1;
     }
@@ -117,7 +117,7 @@ public class PlayerContext extends EntityContext<Player> {
     public boolean delete(Player player) {
        String query = "DELETE FROM player WHERE ID = ?";
         List<Object> parameters = new ArrayList<>();
-        parameters.add(player.getID());
+        parameters.add(player.getId());
 
         return DBCon.executeUpdate(query, parameters) >= 1;
     }
@@ -127,7 +127,7 @@ public class PlayerContext extends EntityContext<Player> {
         Player player = null;
         while (record.next()) {
             player = new Player(record.getString("IPAddress"), record.getString("IngameName"));
-            player.setID(record.getInt("ID"));
+            player.setId(record.getInt("ID"));
         }
         return player;
     }

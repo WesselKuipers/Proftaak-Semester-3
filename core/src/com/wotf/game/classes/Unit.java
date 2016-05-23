@@ -1,7 +1,6 @@
 package com.wotf.game.classes;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
@@ -9,13 +8,10 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import com.wotf.game.classes.Items.Item;
 import com.wotf.game.GameStage;
-import com.wotf.game.GuiStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 import java.io.Serializable;
 
@@ -122,7 +118,6 @@ public class Unit extends Group implements Serializable {
         Unit.this.clearChildren();
         destroyWeapon();
         weapon = i;
-        //i.initActor();
         ((GameStage) this.getStage()).addActor(weapon);
     }
 
@@ -264,6 +259,7 @@ public class Unit extends Group implements Serializable {
         } else {
             font.setColor(team.getColor());
         }
+        
         //make weapons move with the unit
         Array<Actor> children = this.getChildren();
         if (children.size > 0) {
@@ -275,7 +271,7 @@ public class Unit extends Group implements Serializable {
         if (isOutOfBounds()) {
             health = 0;
 
-            // if it's currently this unit's turn, manually call the endTurn() method
+            // If it's currently this unit's turn, manually call the endTurn() method
             if (((GameStage) this.getStage()).getGame().getActiveTeam().getActiveUnit().equals(this)) {
                 ((GameStage) this.getStage()).getGame().endTurn();
             }
@@ -397,8 +393,8 @@ public class Unit extends Group implements Serializable {
      * @param force Force towards direction.
      */
     private void setVelocity(float force) {
-        final double DEG2RAD = Math.PI / 180;
-        double ang = angle * DEG2RAD;
+        final double deg2Rad = Math.PI / 180;
+        double ang = angle * deg2Rad;
 
         velocity = new Vector2(
                 (float) (force * Math.cos(ang)),

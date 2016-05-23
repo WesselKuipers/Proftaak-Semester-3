@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.wotf.gui.view;
 
 import com.badlogic.gdx.Gdx;
@@ -125,35 +120,22 @@ public class Username implements Screen {
     }
 
     /**
-     * Called when the {@link Application} is paused, usually when it's not
-     * active or visible on screen. An Application is also paused before it is
-     * destroyed.
-     */
-    @Override
-    public void pause() {
-    }
-
-    /**
-     * Called when the {@link Application} is resumed from a paused state,
-     * usually when it regains focus.
-     */
-    @Override
-    public void resume() {
-    }
-
-    /**
-     * Called when this screen is no longer the current screen for a
-     * {@link Game}.
-     */
-    @Override
-    public void hide() {
-    }
-
-    /**
      * Called when this screen should release all resources.
      */
     @Override
     public void dispose() {
+    }
+
+    @Override
+    public void pause() {
+    }
+
+    @Override
+    public void resume() {
+    }
+
+    @Override
+    public void hide() {
     }
 
 }

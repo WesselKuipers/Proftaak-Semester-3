@@ -1,22 +1,28 @@
 package com.wotf.game.database;
 
+import com.badlogic.gdx.Gdx;
 import com.sun.rowset.CachedRowSetImpl;
+import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import javax.sql.rowset.CachedRowSet;
 
 /**
- * Created by Wessel on 1-2-2016.
+ * Helper class for making database calls
  */
 public class DBCon {
 
     private static Connection connection;
 
+    private static String ConnectionPath;
+    private static String Username;
+    private static String Password;
     // TODO: 6-3-2016 Refactor this so that the username and password are loaded from a file instead of being hard-coded
-    private static final String ConnectionPath = "jdbc:mysql://192.168.2.132:3306/school"; // example oracle string: "jdbc:oracle:thin:@localhost:1521:XE";
-    private static final String Username = "connect";
-    private static final String Password = "admin";
+//    private static final String ConnectionPath = "jdbc:mysql://192.168.2.132:3306/school"; // example oracle string: "jdbc:oracle:thin:@localhost:1521:XE";
+//    private static final String Username = "connect";
+//    private static final String Password = "admin";
 
     private static final String NumericDefault = "0";
 
@@ -24,6 +30,10 @@ public class DBCon {
      * @return a JDBC Connection object based
      */
     public static Connection getConnection() {
+        if (ConnectionPath == null) {
+            loadProperties();
+        }
+        
         try {
             connection = DriverManager.getConnection(ConnectionPath, Username, Password);
         } catch (SQLException e) {
@@ -32,6 +42,22 @@ public class DBCon {
         }
 
         return connection;
+    }
+
+    /**
+     * Loads the login info required to make a connection to the database
+     */
+    private static void loadProperties() {
+        Properties prop = new Properties();
+        try {
+            prop.load(Gdx.files.internal("dbc.properties").read());
+            
+            ConnectionPath = prop.getProperty("ConnectionPath");
+            Username = prop.getProperty("Username");
+            Password = prop.getProperty("Password");
+        } catch (IOException ex) {
+            Gdx.app.error("Database", "Couldn't load dbc.properties");
+        }
     }
 
     /**

@@ -24,7 +24,6 @@ public class Game {
     private final GamePhysics gamePhysics;
     private final GameSettings gameSettings;
     private final TurnLogic turnLogic;
-    
     private boolean turnState;
     /**
      * Constructor of Game, assign params to properties. Add new game physics
@@ -77,6 +76,8 @@ public class Game {
 
     /**
      *
+<<<<<<< HEAD
+=======
      * @return the player that is currently playing the game
      */
     public Player getPlayingPlayer() {
@@ -85,6 +86,7 @@ public class Game {
 
     /**
      *
+>>>>>>> refs/remotes/origin/master
      * @return the player that is host
      */
     public Player getHost() {
@@ -139,7 +141,7 @@ public class Game {
      * Function to send the current beginTurn
      */
     public void beginTurn() {
-        if (playingPlayer.getID() == host.getID()) {
+        if (playingPlayer.getId()== host.getId()) {
             GameStage gameStage = (GameStage) teams.get(0).getUnit(0).getStage();
             
             map.calculateWind();
@@ -211,7 +213,6 @@ public class Game {
             GameStage gameStage = (GameStage) team.getActiveUnit().getStage();
             gameStage.setKeyboardFocus(team.getActiveUnit());
             gameStage.setCameraFocusToActor(team.getActiveUnit(), true);
-
 //            // select first weapon
 //            Item i = WEAPONS_ARMORY.get(0);
 //            team.getActiveUnit().selectWeapon(i);

@@ -47,7 +47,7 @@ public class SessionPlayerContext {
     public boolean insert(Player player, Session session) {
         String query = "INSERT INTO session_participant (PlayerID, SessionID) VALUES (?, ?)";
         List<Object> parameters = new ArrayList<>();
-        parameters.add(player.getID());
+        parameters.add(player.getId());
         parameters.add(session.getID());
 
         return DBCon.executeUpdate(query, parameters) >= 1;
@@ -62,7 +62,7 @@ public class SessionPlayerContext {
         String query = "DELETE FROM session_participant WHERE SessionID = ? AND PlayerID = ?";
         List<Object> parameters = new ArrayList<>();
         parameters.add(session.getID());
-        parameters.add(player.getID());
+        parameters.add(player.getId());
 
         return DBCon.executeUpdate(query, parameters) >= 1;
     }
