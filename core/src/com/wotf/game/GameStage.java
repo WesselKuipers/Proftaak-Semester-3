@@ -452,18 +452,20 @@ public class GameStage extends Stage {
 
         unitCollisionExplosion(x, radius, y, damage);
 
-        // adds effect to the list of effects to draw
-        //PooledEffect effect = explosionEffectPool.obtain();
-        //effect.setPosition(x, y);
-        //effect.scaleEffect(radius/100);
-        //effect.start();
-        //particles.add(effect);
-        //if (cluster) {
-           // fireCluster(x, y);
-        //}
-        game.getActiveTeam().getActiveUnit().getWeapon().getBullet().remove();
+        Gdx.app.postRunnable(() -> {
+            // adds effect to the list of effects to draw
+            PooledEffect effect = explosionEffectPool.obtain();
+            effect.setPosition(x, y);
+            effect.scaleEffect(radius/100);
+            effect.start();
+            particles.add(effect);
+            if (cluster) {
+               fireCluster(x, y);
+            }
+        });
+        //game.getActiveTeam().getActiveUnit().getWeapon().getBullet().remove();
         // End the turn after unit has fired
-        game.endTurn();
+        //game.endTurn();
     }
 
     private void fireCluster(int x, int y) {

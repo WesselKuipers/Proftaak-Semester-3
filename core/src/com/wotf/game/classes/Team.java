@@ -250,7 +250,7 @@ public class Team implements Serializable{
     }
 
     /**
-     * select an item that is foudn inside the teamlist
+     * select an item that is found inside the teamlist
      *
      * @param item item that needs to be selected
      * @return the selected item
@@ -260,7 +260,7 @@ public class Team implements Serializable{
     }
 
     /**
-     * Check if the item excists inside the team's item list
+     * Check if the item exists inside the team's item list
      *
      * @param item item to check for
      * @return return the item that is found inside the team

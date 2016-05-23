@@ -11,6 +11,10 @@ package com.wotf.game.classes;
  */
 public class TurnLogic {
 
+    public void setTurn() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     /**
      * Enum State of the game
      */

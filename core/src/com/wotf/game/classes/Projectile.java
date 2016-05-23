@@ -205,8 +205,9 @@ public class Projectile extends Actor {
 
         // if projectile is out of bounds, remove it from the stage
         if (isProjectileOutOfBounds(gameMap)) {
-            this.remove();
+            isFired = true;
             ((GameStage) getStage()).getGame().endTurn();
+            this.remove();
             return;
         }
 
@@ -246,13 +247,14 @@ public class Projectile extends Actor {
         }
     }
     
-    public void terrainCollisionReceive() {
+    public void terrainCollisionReceive(int posX, int posY) {
         // Projectile collided with terrain
-        System.out.println("Bullet collided at " + this.getX() + " " + this.getY());
-
+        System.out.println("Bullet collided at " + posX + " " + posY);
         ((GameStage) getStage()).setParticle(p);
-        ((GameStage) getStage()).explode((int) getX(), (int) getY(), blastRadius, damage, isCluster);
+        ((GameStage) getStage()).explode(posX, posY, blastRadius, damage, isCluster);
+        ((GameStage) getStage()).getGame().endTurn();
         this.remove();
+        isFired = false;
     }
 
     /**
