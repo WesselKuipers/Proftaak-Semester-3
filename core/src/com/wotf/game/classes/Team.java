@@ -205,8 +205,9 @@ public class Team implements Serializable {
     public void beginTurn() {
         if (activeUnit == null) {
             activeUnit = units.get(0);
+        } else {
+            setNextActiveUnit();
         }
-        setNextActiveUnit();
     }
 
     /**
@@ -245,15 +246,19 @@ public class Team implements Serializable {
      * Set the next active unit in the team
      */
     public void setNextActiveUnit() {
-        int activeUnitIndex = units.indexOf(activeUnit);
+        if (!units.isEmpty()) {
+            int activeUnitIndex = units.indexOf(activeUnit);
 
-        // Change the active unit index if its not at the end of the list
-        if (activeUnitIndex < (units.size() - 1)) {
-            activeUnitIndex++;
+            // Change the active unit index if its not at the end of the list
+            if (activeUnitIndex < (units.size() - 1)) {
+                activeUnitIndex++;
+            } else {
+                activeUnitIndex = 0;
+            }
+            activeUnit = units.get(activeUnitIndex);
         } else {
-            activeUnitIndex = 0;
+            activeUnit = null;
         }
-        activeUnit = units.get(activeUnitIndex);
     }
 
     /**

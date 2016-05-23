@@ -61,6 +61,7 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
      *
      */
     public Session(Player host, String roomName, boolean any) throws RemoteException {
+        this();
         this.gameSettings = new GameSettings(true);
         this.host = host;
         this.players = new ArrayList<>();

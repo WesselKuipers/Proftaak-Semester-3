@@ -6,6 +6,7 @@
 package com.wotf.game.classes;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;

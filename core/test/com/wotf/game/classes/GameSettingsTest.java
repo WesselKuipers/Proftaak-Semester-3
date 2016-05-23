@@ -182,4 +182,13 @@ public class GameSettingsTest {
         // Test if the sudden death is false now.
         assertEquals(false, dsettings.isSuddenDeath());
     }
+    
+    @Test
+    public void testgetandsetPhysics(){
+        // Set the physics to false and check if it is false now.
+        // It starts at true.
+        dsettings.setPhysics(false);
+        // Test if it is False now.
+        assertEquals(false, dsettings.getPhysics());
+    }
 }

@@ -163,6 +163,14 @@ public class TeamTest {
         // Test if the list size is 0 now.
         //assertEquals(1, team.getUnits().size());
     }
+    
+    @Test
+    public void testremoveAllUnits(){
+        // Removes all the units from a team. It starts with 2.
+        team.removeAllUnits();
+        // The size should be 0 now.
+        assertEquals(0, team.getUnits().size());
+    }
 
     @Test
     public void testNextActiveUnit() {
@@ -175,6 +183,10 @@ public class TeamTest {
         // This means if I do it 2 times.
         team.setNextActiveUnit();
         assertEquals("AlphaUnit2", team.getActiveUnit().getName());
+        // Now remove all units and see if it will be the old unit.
+        team.removeAllUnits();
+        team.setNextActiveUnit();
+        assertNull(team.getActiveUnit());
     }
 
     @Test
@@ -189,5 +201,20 @@ public class TeamTest {
         // End the turn and see if the unit with 0 hp is removed.
         team.endTurn(true);
         assertEquals(2, team.getUnits().size());
+    }
+    
+    @Test
+    public void testbeginTurn(){
+        Team team2 = new Team("Kolor", Color.GRAY, true);
+        team2.addUnit("UInit1", 22, new Vector2(20,20), true);
+        team2.addUnit("UInit2", 44, new Vector2(30,20), true);
+        // Begin the turn
+        team2.beginTurn();
+        // Now the unit with index 0 is set. AlphaUnit is the first one added. And first one served.
+        assertEquals("UInit1", team2.getActiveUnit().getName());
+        // Now switch turn.
+        team2.beginTurn();
+        // Now the unit index 1 is set. If it goes right. This is UInit2.
+        assertEquals("UInit2", team2.getActiveUnit().getName());
     }
 }
