@@ -43,6 +43,8 @@ public class Projectile extends Actor {
     private int blastRadius;
     private int damage;
 
+    private boolean isFired;
+    
     /**
      * 
      * Projectile constructor to initialize visual appearence of the bullet.
@@ -62,6 +64,8 @@ public class Projectile extends Actor {
         this.setBounds(getX(), getY(), sprite.getWidth(), sprite.getHeight());
         this.setWidth(sprite.getWidth());
         this.setHeight(sprite.getHeight());
+        
+        this.isFired = false;
     }
 
     /**
@@ -227,7 +231,8 @@ public class Projectile extends Actor {
     private void terrainCollision() {
         // Terrain and unit collision
         if (((GameStage) getStage()).getGame().getPlayingPlayer().getID() == ((GameStage) getStage()).getGame().getActiveTeam().getPlayer().getID() && 
-            ((GameStage) getStage()).getGame().getMap().isPixelSolid((int) getX(), (int) getY())) {
+            ((GameStage) getStage()).getGame().getMap().isPixelSolid((int) getX(), (int) getY()) &&
+                isFired == false) {
 
             NetworkMessage syncCollisionMsg = new NetworkMessage(Command.SYNCCOLLISION);
             
@@ -237,6 +242,7 @@ public class Projectile extends Actor {
             //send message to host
             ((GameStage) getStage()).getNetworkingUtil().sendToHost( syncCollisionMsg );
             
+            isFired = true;
         }
     }
     
