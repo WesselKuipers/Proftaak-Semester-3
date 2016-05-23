@@ -412,19 +412,20 @@ public class NetworkUtil {
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
     }
-      /**
-       * test if the given string is a integer
-       * @param value string to be tested
-       * @return boolean if it is safe to parse the content as an integer
-       */
-     public static boolean tryParseInt(String value) {  
-     try {  
-         Integer.parseInt(value);  
-         return true;  
-      } catch (NumberFormatException e) {  
-         return false;  
-      }  
-}
+     
+    /**
+     * test if the given string is a integer
+     * @param value string to be tested
+     * @return boolean if it is safe to parse the content as an integer
+     */
+    public static boolean tryParseInt(String value) {  
+        try {  
+            Integer.parseInt(value);  
+            return true;  
+         } catch (NumberFormatException e) {  
+            return false;  
+         }  
+    }
 
     private void syncCollision(NetworkMessage nMsg) {
         try {

@@ -453,14 +453,17 @@ public class GameStage extends Stage {
         unitCollisionExplosion(x, radius, y, damage);
 
         // adds effect to the list of effects to draw
-        PooledEffect effect = explosionEffectPool.obtain();
-        effect.setPosition(x, y);
+        //PooledEffect effect = explosionEffectPool.obtain();
+        //effect.setPosition(x, y);
         //effect.scaleEffect(radius/100);
-        effect.start();
-        particles.add(effect);
-        if (cluster) {
-            fireCluster(x, y);
-        }
+        //effect.start();
+        //particles.add(effect);
+        //if (cluster) {
+           // fireCluster(x, y);
+        //}
+        
+        // End the turn after unit has fired
+        game.endTurn();
     }
 
     private void fireCluster(int x, int y) {
@@ -591,9 +594,6 @@ public class GameStage extends Stage {
 
         // make camera follow bullet
         focusedActor = (Actor)( game.getActiveTeam().getActiveUnit().getWeapon().getBullet() );
-        
-        // End the turn after unit has fired
-        game.endTurn();
     }
 
     /**
