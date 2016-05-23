@@ -204,6 +204,9 @@ public class NetworkUtil {
                 break;
             case SWITCHUNIT:
                 switchUnit ( nMsg );
+                break;
+            case SYNCCOLLISION:
+                syncCollision ( nMsg );
             default: 
                 System.out.println("Command was not processed");
                 break;
@@ -422,4 +425,21 @@ public class NetworkUtil {
          return false;  
       }  
 }
+
+    private void syncCollision(NetworkMessage nMsg) {
+        try {
+            String posXStr = nMsg.getParameter("posX");
+            String posYStr = nMsg.getParameter("posY");
+            
+            int posX = Integer.parseInt(posXStr);
+            int posY = Integer.parseInt(posYStr);
+            
+            scene.explode(posX, posY, 50, 30, false);
+            scene.getGame().getActiveTeam().getActiveUnit().getWeapon().getBullet().remove();
+        }
+        catch( InvalidParameterException ipe ) {
+            //TODO: what do we do when message went wrong ? ask host aggain ?
+            Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
+        }
+    }
 }
