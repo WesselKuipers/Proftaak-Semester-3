@@ -40,7 +40,6 @@ public class NetworkUtil {
     private final GameStage scene;
     private Socket socket;
     private final List<Vector2> unitPositions = new ArrayList<>();
-    private boolean[][] terrain;
     
     /**
      * Object holds data to connect to the host.
@@ -230,7 +229,7 @@ public class NetworkUtil {
                 }
             }
         } catch (SocketException e) {
-            e.printStackTrace();
+            Gdx.app.log("networkingUtil", e.getMessage());
         }
         
         // Print the contents of our array to a string.  Yeah, should have used StringBuilder
@@ -246,33 +245,33 @@ public class NetworkUtil {
      * Fire function which retrieves the mousePos parameter from the network message and call in scene fire function.
      * @param nMsg Network message which holds the data for the fire method.
      */
-    public void fire( NetworkMessage nMsg ) {
+    public void fire(NetworkMessage nMsg) {
         try {
             String mousePosXStr = nMsg.getParameter("mousePosX");
             String mousePosYStr = nMsg.getParameter("mousePosY");
             
-            float mousePosX = Float.parseFloat(mousePosXStr );
-            float mousePosY = Float.parseFloat( mousePosYStr );
+            float mousePosX = Float.parseFloat(mousePosXStr);
+            float mousePosY = Float.parseFloat(mousePosYStr);
             
-            scene.fire( mousePosX, mousePosY );
+            scene.fire(mousePosX, mousePosY);
         }
-        catch( InvalidParameterException ipe ) {
+        catch(InvalidParameterException ipe) {
             //TODO: what do we do when message went wrong ? ask host aggain ?
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
     }
     
-    public void initGame( NetworkMessage nMsg ) {
+    public void initGame(NetworkMessage nMsg) {
         try {
             scene.spawnUnits(unitPositions);
             scene.getGame().beginTurn();
         }
-        catch( InvalidParameterException ipe ) {
+        catch(InvalidParameterException ipe) {
             //TODO: what do we do when message went wrong ? ask host aggain ?
         }
     }
     
-    public void beginTurn( NetworkMessage nMsg ) {
+    public void beginTurn(NetworkMessage nMsg) {
         try {
             // host has already ran this action when sending this message, so we want to apply it only on the connected clients 
             if (scene.getGame().getPlayingPlayer().getID() != host.getID()) {
@@ -280,12 +279,12 @@ public class NetworkUtil {
                 String windXStr = nMsg.getParameter("windX");
                 String windYStr = nMsg.getParameter("windY");
 
-                float windX = Float.parseFloat( windXStr );
-                float windY = Float.parseFloat( windYStr );
+                float windX = Float.parseFloat(windXStr);
+                float windY = Float.parseFloat(windYStr);
                 
-                System.out.println("Wind received: "+windX + ", "+windY);
+                System.out.println("Wind received: " + windX + ", " + windY);
 
-                Vector2 windForce = new Vector2( windX, windY );
+                Vector2 windForce = new Vector2(windX, windY);
                 
                 scene.getGame().beginTurnReceive(windForce);
             }
@@ -296,7 +295,7 @@ public class NetworkUtil {
         }
     }
     
-    public void addTerrainX( NetworkMessage nMsg ) {
+    public void addTerrainX(NetworkMessage nMsg) {
         try {
             boolean[][] terrain = scene.getGame().getMap().getTerrain();
             int yVal = 0;
@@ -380,11 +379,11 @@ public class NetworkUtil {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    private void switchUnit( NetworkMessage nMsg ) {
+    private void switchUnit(NetworkMessage nMsg) {
         try {
             scene.getGame().getActiveTeam().setNextActiveUnit();
         }
-        catch( InvalidParameterException ipe ) {
+        catch(InvalidParameterException ipe) {
             //TODO: what do we do when message went wrong ? ask host aggain ?
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
@@ -394,32 +393,34 @@ public class NetworkUtil {
      * method used by networking that makes sure the active unit selects the right weapon
      * @param nMsg string from the network device that contains the needed information. 
      */
-     private void selectWeapon( NetworkMessage nMsg ) {
+     private void selectWeapon(NetworkMessage nMsg) {
         try {
             int weapon = 0;
-             String weaponIndex = nMsg.getParameter("WeaponIndex");
-             if (tryParseInt(weaponIndex)) {  
+            String weaponIndex = nMsg.getParameter("WeaponIndex");
+            if (tryParseInt(weaponIndex)) {  
                 weapon = Integer.parseInt(weaponIndex);  
-               }             
-             
+            }             
+
             scene.getGame().getActiveTeam().getActiveUnit().selecting_weapon(weapon);
         }
-        catch( InvalidParameterException ipe ) {
+        catch(InvalidParameterException ipe) {
             //TODO: what do we do when message went wrong ? ask host aggain ?
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
     }
-      /**
-       * test if the given string is a integer
-       * @param value string to be tested
-       * @return boolean if it is safe to parse the content as an integer
-       */
-     public static boolean tryParseInt(String value) {  
-     try {  
-         Integer.parseInt(value);  
-         return true;  
-      } catch (NumberFormatException e) {  
-         return false;  
-      }  
-}
+    
+    /**
+     * test if the given string is a integer
+     * @param value string to be tested
+     * @return boolean if it is safe to parse the content as an integer
+     */
+    public static boolean tryParseInt(String value) {  
+        try {  
+            Integer.parseInt(value);  
+            return true;  
+        }
+        catch (NumberFormatException e) {  
+            return false;  
+        }  
+    }
 }

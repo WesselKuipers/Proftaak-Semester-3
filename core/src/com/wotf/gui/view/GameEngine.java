@@ -80,34 +80,7 @@ public class GameEngine implements Screen {
      */
     @Override
     public void show() {
-        // Creates default players list and object
-        /*List<Player> players = new ArrayList<>();
-        //players.add(new Player("145.93.92.128", "PlayerHost"));
-        players.add(new Player("127.0.0.1", "PlayerHost"));
-        players.add(new Player("127.0.0.1", "PlayerClient"));
-        
-        Player playingPlayer = players.get(0);*/
-
         map.setWaterLevel(30);
-        
-        /* Debug map:
-        // Creates a new terrain mask and assigns a flat rectangle as terrain
-        boolean[][] terrain = new boolean[map.getWidth()][map.getHeight()];
-        for (int x = 100; x < (map.getWidth() - 100); x++) {
-            for (int y = 0; y < 80; y++) {
-                terrain[x][y] = true;
-            }
-        }
-        
-        // Creates a platform on the debug map
-        for(int x = (map.getWidth() / 2); x < (map.getWidth() / 2 + 50); x++) {
-            for(int y = 80; y < 120; y++) {
-                terrain[x][y] = true;
-            }
-        }
-
-        map.setTerrain(terrain);
-        */
         
         // Initializes a viewport and a camera object
         ScreenViewport viewport = new ScreenViewport(new OrthographicCamera(1280, 720));
@@ -122,6 +95,7 @@ public class GameEngine implements Screen {
                 Thread.sleep(5000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                Thread.currentThread().interrupt();
             }
         }
         

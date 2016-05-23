@@ -21,8 +21,8 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
     private GameSettings gameSettings;
     private Player host;
     private List<Player> players;
-    private Registry registry;
-    private RemotePublisher publisher;
+    private transient Registry registry;
+    private transient RemotePublisher publisher;
     private String roomName;
     private int ID;
 
