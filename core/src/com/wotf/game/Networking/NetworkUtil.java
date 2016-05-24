@@ -367,7 +367,6 @@ public class NetworkUtil {
         catch(InvalidParameterException ipe) {
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
-        
     }
 
     /**

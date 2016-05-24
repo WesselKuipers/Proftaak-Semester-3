@@ -43,7 +43,7 @@ public class Projectile extends Actor {
     private int blastRadius;
     private int damage;
 
-    private boolean isFired;
+    private boolean isExploded;
     
     /**
      * 
@@ -65,7 +65,7 @@ public class Projectile extends Actor {
         this.setWidth(sprite.getWidth());
         this.setHeight(sprite.getHeight());
         
-        this.isFired = false;
+        this.isExploded = false;
     }
 
     /**
@@ -205,9 +205,9 @@ public class Projectile extends Actor {
 
         // if projectile is out of bounds, remove it from the stage
         if (isProjectileOutOfBounds(gameMap)) {
-            isFired = true;
             ((GameStage) getStage()).getGame().endTurn();
             this.remove();
+            isExploded = false;
             return;
         }
 
@@ -233,7 +233,7 @@ public class Projectile extends Actor {
         // Terrain and unit collision
         if (((GameStage) getStage()).getGame().getPlayingPlayer().getID() == ((GameStage) getStage()).getGame().getActiveTeam().getPlayer().getID() && 
             ((GameStage) getStage()).getGame().getMap().isPixelSolid((int) getX(), (int) getY()) &&
-                isFired == false) {
+                isExploded == false) {
 
             NetworkMessage syncCollisionMsg = new NetworkMessage(Command.SYNCCOLLISION);
             
@@ -243,7 +243,7 @@ public class Projectile extends Actor {
             //send message to host
             ((GameStage) getStage()).getNetworkingUtil().sendToHost( syncCollisionMsg );
             
-            isFired = true;
+            isExploded = true;
         }
     }
     
@@ -254,7 +254,7 @@ public class Projectile extends Actor {
         ((GameStage) getStage()).explode(posX, posY, blastRadius, damage, isCluster);
         ((GameStage) getStage()).getGame().endTurn();
         this.remove();
-        isFired = false;
+        isExploded = false;
     }
 
     /**
