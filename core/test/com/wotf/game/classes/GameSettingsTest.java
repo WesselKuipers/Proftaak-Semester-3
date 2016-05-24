@@ -5,6 +5,8 @@
  */
 package com.wotf.game.classes;
 
+import com.badlogic.gdx.graphics.Color;
+import java.rmi.RemoteException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -29,9 +31,48 @@ public class GameSettingsTest {
     }
 
     @Test
+    public void testgetandsetMapIndex() {
+        // Set the map index.
+        dsettings.setMapIndex(3);
+
+        // Test if the value of return is 3 now.
+        assertEquals(3, dsettings.getMapIndex());
+    }
+
+    @Test
+    public void testgetandsetMapName() {
+        // Set the map name.
+        dsettings.setMapName("Wesselmap");
+
+        // Test if the value of return is "Wesselmap" now.
+        assertEquals("Wesselmap", dsettings.getMapName());
+    }
+
+    @Test
     public void testgetMaxTurns() {
         // The default max turns are set to 30 check if this is true.
         assertEquals(30, dsettings.getMaxTurns());
+    }
+
+    @Test
+    public void testaddTeam() {
+        // Add the teams with 2 different methods. And check if the size will be 2 after.
+        Team team = new Team("Betaar", Color.GREEN, true);
+        dsettings.addTeam(team);
+
+        assertEquals(1, dsettings.getTeams().size());
+    }
+
+    @Test
+    public void testremoveTeam() {
+        // Add a team to the gamesettings.
+        Team team = new Team("Betaar", Color.GREEN, true);
+        
+        dsettings.addTeam(team);
+        // Remove the team again to check this method.
+        dsettings.removeTeam(team);
+        // The size should be 0 again now. 
+        assertEquals(0, dsettings.getTeams().size());
     }
 
     @Test
@@ -42,6 +83,15 @@ public class GameSettingsTest {
 
         // Test if the maxTurns is 50 now.
         assertEquals(50, dsettings.getMaxTurns());
+    }
+
+    @Test
+    public void testgetandsetMaxplayersSession() throws RemoteException {
+        // Set the map index.
+        dsettings.setMaxPlayersSession(2);
+
+        // Test if the value of return is 2 now.
+        assertEquals(2, dsettings.getMaxPlayersSession());
     }
 
     @Test
@@ -57,7 +107,16 @@ public class GameSettingsTest {
         dsettings.setMaxTime(2200);
 
         // Test if the maxTurns is 50 now.
-        assertEquals(2200, dsettings.getMaxTime());
+        assertEquals(2200 * 60, dsettings.getMaxTime());
+    }
+
+    @Test
+    public void testgetandsetMaxUnitCount() {
+        // Sets the value to 2.
+        dsettings.setMaxUnitCount(2);
+
+        // Gets the value which should be 2 now.
+        assertEquals(2, dsettings.getMaxUnitCount());
     }
 
     @Test
@@ -122,5 +181,14 @@ public class GameSettingsTest {
 
         // Test if the sudden death is false now.
         assertEquals(false, dsettings.isSuddenDeath());
+    }
+    
+    @Test
+    public void testgetandsetPhysics(){
+        // Set the physics to false and check if it is false now.
+        // It starts at true.
+        dsettings.setPhysics(false);
+        // Test if it is False now.
+        assertEquals(false, dsettings.getPhysics());
     }
 }

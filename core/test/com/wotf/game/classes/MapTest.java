@@ -70,9 +70,25 @@ public class MapTest {
 
     @Test
     public void testgetTerrain() {
-        // Get the initialized terrain of this map.
+        // Create a boolean array and set random x y as width and height
+        int x = 20;
+        int y = 20;
+        boolean[][] terrain = new boolean[x][y];
+        // Set the terrain.
+        map.setTerrain(terrain);
+        // Test if the terrain length equals the set terrain length.
+        assertEquals(terrain.length, map.getTerrain().length);
     }
 
+    @Test
+    public void testsetandgetWind(){
+        //  Sets the windforce as a vector 2.
+        Vector2 vec = new Vector2(20,20);
+        map.setWind(vec);
+        // Test if the wind is the same as the set wind of the map.
+        assertEquals(vec, map.getWind());
+    }
+    
     @Test
     public void testgetLandscapeTexture() {
         // The map has a width of 1920
