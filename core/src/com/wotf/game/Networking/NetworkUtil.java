@@ -81,6 +81,14 @@ public class NetworkUtil {
             this.socket = Gdx.net.newClientSocket(Net.Protocol.TCP, host.getIp(), _PORT, socketHints);
             messageListener(false);
         }
+        
+        Runtime.getRuntime().addShutdownHook(new Thread(){
+            @Override
+            public void run(){
+                socket.dispose();
+                Gdx.app.log("networkingUtil", "Server was shut down");
+            }
+        });
     }
     
     /**
