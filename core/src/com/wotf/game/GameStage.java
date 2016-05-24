@@ -270,9 +270,10 @@ public class GameStage extends Stage {
             switch (keyCode) {
                 // Unit selection
                 case Keys.TAB:
-                    game.getActiveTeam().setNextActiveUnit();
-                    NetworkMessage switchUnitMsg = new NetworkMessage( Command.SWITCHUNIT );
-                    networkingUtil.sendToHost( switchUnitMsg );
+                    if (game.getTurnLogic().getState() == TurnState.PLAYING) {
+                        NetworkMessage switchUnitMsg = new NetworkMessage(Command.SWITCHUNIT);
+                        networkingUtil.sendToHost(switchUnitMsg);
+                    }
                     break;
                 // Debug key for killing current unit
                 case Keys.G:
@@ -283,17 +284,17 @@ public class GameStage extends Stage {
                     showDebug = !showDebug;
                     break;
                 case Keys.RIGHT:
-                    if(game.getActiveTeam().getActiveUnit() != null) {
-                        NetworkMessage moveMsg = new NetworkMessage( Command.MOVE );
+                    if (game.getActiveTeam().getActiveUnit() != null) {
+                        NetworkMessage moveMsg = new NetworkMessage(Command.MOVE);
                         moveMsg.addParameter("direction", "right");
-                        networkingUtil.sendToHost( moveMsg );
+                        networkingUtil.sendToHost(moveMsg);
                     }    
                     break;
                 case Keys.LEFT:
-                    if(game.getActiveTeam().getActiveUnit() != null) {
-                        NetworkMessage moveMsg = new NetworkMessage( Command.MOVE );
+                    if (game.getActiveTeam().getActiveUnit() != null) {
+                        NetworkMessage moveMsg = new NetworkMessage(Command.MOVE);
                         moveMsg.addParameter("direction", "left");
-                        networkingUtil.sendToHost( moveMsg );
+                        networkingUtil.sendToHost(moveMsg);
                     }
                     break;
                 case Keys.NUM_0:
@@ -310,11 +311,7 @@ public class GameStage extends Stage {
                     break;
                 case Keys.NUM_4:
                     sendSelectWeapon(4);
-                    break;
-                case Keys.NUM_5:
-                    sendSelectWeapon(5);
-                    break;
-                    
+                    break;    
             }
         }
 
@@ -329,9 +326,9 @@ public class GameStage extends Stage {
      * @param weaponIndex index of the weapon
      */
     private void sendSelectWeapon(int weaponIndex) {
-        NetworkMessage selectWeaponMsg = new NetworkMessage( Command.SELECTWEAPON );
+        NetworkMessage selectWeaponMsg = new NetworkMessage(Command.SELECTWEAPON);
         selectWeaponMsg.addParameter("weaponIndex", Integer.toString(weaponIndex));
-        networkingUtil.sendToHost( selectWeaponMsg );
+        networkingUtil.sendToHost(selectWeaponMsg);
     }
 
     /**

@@ -40,7 +40,6 @@ public class NetworkUtil {
     private final GameStage scene;
     private Socket socket;
     private final List<Vector2> unitPositions;
-    private boolean[][] terrain;
     
     /**
      * Object holds data to connect to the host.
@@ -52,8 +51,7 @@ public class NetworkUtil {
         this.scene = gameStage;
         this.unitPositions = new ArrayList<>();
         
-        initNetworkListener( this.host );
-        
+        initNetworkListener(this.host);
     }
     
     /**
@@ -82,6 +80,7 @@ public class NetworkUtil {
             messageListener(false);
         }
         
+        // Run another thread to check if there was a shutdown client side. if so dispose the socket, to prevent connection conflicts.
         Runtime.getRuntime().addShutdownHook(new Thread(){
             @Override
             public void run(){
@@ -265,7 +264,6 @@ public class NetworkUtil {
             scene.fire(mousePosX, mousePosY);
         }
         catch(InvalidParameterException ipe) {
-            //TODO: what do we do when message went wrong ? ask host aggain ?
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
     }
@@ -384,6 +382,7 @@ public class NetworkUtil {
     private void switchUnit(NetworkMessage nMsg) {
         try {
             scene.getGame().getActiveTeam().setNextActiveUnit();
+            scene.getGame().setActiveUnit(scene.getGame().getActiveTeam());
         }
         catch(InvalidParameterException ipe) {
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);

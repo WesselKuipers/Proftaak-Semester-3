@@ -206,17 +206,12 @@ public class Game {
      * Set the controls to the active unit
      * @param team the current active team
      */
-    private void setActiveUnit(Team team) {
+    public void setActiveUnit(Team team) {
         if (team.getActiveUnit().getHealth() > 0) {
             GameStage gameStage = (GameStage) team.getActiveUnit().getStage();
             gameStage.setKeyboardFocus(team.getActiveUnit());
             gameStage.setCameraFocusToActor(team.getActiveUnit(), true);
-
-//            // select first weapon
-//            Item i = WEAPONS_ARMORY.get(0);
-//            team.getActiveUnit().selectWeapon(i);
-            
-             team.getActiveUnit().selecting_weapon(0);
+            team.getActiveUnit().selecting_weapon(0);
         } else {
             endTurn();
         }
