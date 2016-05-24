@@ -388,32 +388,15 @@ public class NetworkUtil {
      */
      private void selectWeapon(NetworkMessage nMsg) {
         try {
-            int weapon = 0;
-             String weaponIndex = nMsg.getParameter("WeaponIndex");
-             if (tryParseInt(weaponIndex)) {  
-                weapon = Integer.parseInt(weaponIndex);  
-               }             
-             
-            scene.getGame().getActiveTeam().getActiveUnit().selecting_weapon(weapon);
+            String weaponIndexStr = nMsg.getParameter("weaponIndex");
+                     
+            int weaponIndex = Integer.parseInt(weaponIndexStr);  
+            
+            scene.getGame().getActiveTeam().getActiveUnit().selecting_weapon(weaponIndex);
         }
         catch(InvalidParameterException ipe) {
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
-    }
-     
-    /**
-     * test if the given string is a integer
-     * @param value string to be tested
-     * @return boolean if it is safe to parse the content as an integer
-     */
-    private static boolean tryParseInt(String value) {  
-        try {  
-            Integer.parseInt(value);  
-            return true;  
-        } 
-        catch (NumberFormatException e) {  
-            return false;  
-        }  
     }
 
     /**

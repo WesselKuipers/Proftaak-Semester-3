@@ -297,22 +297,22 @@ public class GameStage extends Stage {
                     }
                     break;
                 case Keys.NUM_0:
-                    game.getActiveTeam().getActiveUnit().selecting_weapon(0);
+                    sendSelectWeapon(0);
                     break;
                 case Keys.NUM_1:
-                    game.getActiveTeam().getActiveUnit().selecting_weapon(1);
+                    sendSelectWeapon(1);
                     break;
                 case Keys.NUM_2:
-                    game.getActiveTeam().getActiveUnit().selecting_weapon(2);
+                    sendSelectWeapon(2);
                     break;
                 case Keys.NUM_3:
-                    game.getActiveTeam().getActiveUnit().selecting_weapon(3);
+                    sendSelectWeapon(3);
                     break;
                 case Keys.NUM_4:
-                    game.getActiveTeam().getActiveUnit().selecting_weapon(4);
+                    sendSelectWeapon(4);
                     break;
                 case Keys.NUM_5:
-                    game.getActiveTeam().getActiveUnit().selecting_weapon(5);
+                    sendSelectWeapon(5);
                     break;
                     
             }
@@ -322,6 +322,16 @@ public class GameStage extends Stage {
         cam.update();
 
         return super.keyDown(keyCode);
+    }
+    
+    /**
+     * Function to send the change of a weapon selection to network.
+     * @param weaponIndex index of the weapon
+     */
+    private void sendSelectWeapon(int weaponIndex) {
+        NetworkMessage selectWeaponMsg = new NetworkMessage( Command.SELECTWEAPON );
+        selectWeaponMsg.addParameter("weaponIndex", Integer.toString(weaponIndex));
+        networkingUtil.sendToHost( selectWeaponMsg );
     }
 
     /**
@@ -452,17 +462,17 @@ public class GameStage extends Stage {
 
         unitCollisionExplosion(x, radius, y, damage);
 
-        Gdx.app.postRunnable(() -> {
-            // adds effect to the list of effects to draw
-            PooledEffect effect = explosionEffectPool.obtain();
-            effect.setPosition(x, y);
-            effect.scaleEffect(radius/100);
-            effect.start();
-            particles.add(effect);
-            if (cluster) {
-               fireCluster(x, y);
-            }
-        });
+//        Gdx.app.postRunnable(() -> {
+//            // adds effect to the list of effects to draw
+//            PooledEffect effect = explosionEffectPool.obtain();
+//            effect.setPosition(x, y);
+//            effect.scaleEffect(radius/100);
+//            effect.start();
+//            particles.add(effect);
+//            if (cluster) {
+//               fireCluster(x, y);
+//            }
+//        });
         //game.getActiveTeam().getActiveUnit().getWeapon().getBullet().remove();
         // End the turn after unit has fired
         //game.endTurn();

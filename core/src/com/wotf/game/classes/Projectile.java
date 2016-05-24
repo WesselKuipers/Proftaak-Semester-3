@@ -250,7 +250,7 @@ public class Projectile extends Actor {
     public void terrainCollisionReceive(int posX, int posY) {
         // Projectile collided with terrain
         System.out.println("Bullet collided at " + posX + " " + posY);
-        ((GameStage) getStage()).setParticle(p);
+        //((GameStage) getStage()).setParticle(p);
         ((GameStage) getStage()).explode(posX, posY, blastRadius, damage, isCluster);
         ((GameStage) getStage()).getGame().endTurn();
         this.remove();
