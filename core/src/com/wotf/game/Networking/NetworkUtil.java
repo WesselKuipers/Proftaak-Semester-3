@@ -138,7 +138,7 @@ public class NetworkUtil {
             }
             
             // debug 
-            System.out.println("Command: " + nMsg.getCommand().toString() + " was send to host.");
+            Gdx.app.log("networkingUtil", "Command: " + nMsg.getCommand().toString() + " was send to host.");
         } catch (IOException ex) {
             Gdx.app.log("networkingUtil", "Error occured while sending message to host", ex);
         }
