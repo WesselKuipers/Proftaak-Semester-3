@@ -34,10 +34,10 @@ public class Game {
      * @param map
      * @param players
      */
-    public Game(GameSettings gameSettings, Map map, List<Player> players, Player playingPlayer) {
+    public Game(GameSettings gameSettings, Map map, List<Player> players, Player playingPlayer, Player host) {
         this.gameSettings = gameSettings;
         this.players = players;
-        this.host = this.players.get(0);
+        this.host = host;
         this.playingPlayer = playingPlayer;
         this.teams = this.gameSettings.getTeams();
         this.turnLogic = new TurnLogic(this.teams.size());
