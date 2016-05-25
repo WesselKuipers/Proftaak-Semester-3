@@ -9,7 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
-import com.wotf.game.classes.Items.Bazooka1;
 import com.wotf.game.classes.Items.Item;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -168,7 +167,7 @@ public class UnitTest {
         Vector2 afterjump = new Vector2(120, 80);
         // MoveRight is set to True by default.
         // This means the nextX will be the position of X + 20 when the unit lands.
-        unit.jump();
+        //unit.jump();
         // The earlier created spawn was on the position 100, 80. So with the +20 of the jump it should be 120.
         assertEquals(afterjump, unit.getPosition());
     }

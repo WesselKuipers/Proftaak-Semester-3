@@ -14,7 +14,8 @@ import java.util.List;
 
 /**
  * Session contains the data structure containing the list of teams, players and
- * gameSettings
+ * gameSettings. Also the initalizitation of a registry of a sessionhost happens
+ * in this class.
  */
 public class Session extends UnicastRemoteObject implements ISessionSettings {
 
@@ -24,17 +25,24 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
     private transient Registry registry;
     private transient RemotePublisher publisher;
     private String roomName;
-    private int ID;
+    private int id;
 
-    public Session() throws RemoteException {
+    /**
+     * Private empty constructor for initializing UnicastRemoteObject.
+     *
+     * @throws RemoteException
+     */
+    private Session() throws RemoteException {
     }
 
     ;
-
+    
     /**
      * Initializes a session using the information of the hosting player
      *
-     * @param host Player indicating which player is the host
+     * @param host the player who hosts the game
+     * @param roomName the name of the room which will be displayed in the lobby
+     * @throws RemoteException
      */
     public Session(Player host, String roomName) throws RemoteException {
         this();
@@ -48,33 +56,66 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
         publisher.registerProperty("startgameprop");
     }
 
+    /**
+     * Constructor without any graphics Made for the unit testing.
+     *
+     */
+    public Session(Player host, String roomName, boolean any) throws RemoteException {
+        this();
+        this.gameSettings = new GameSettings(true);
+        this.host = host;
+        this.players = new ArrayList<>();
+        this.roomName = roomName;
+    }
+
+    /**
+     * Create the new registry for the session on a specific IP and port.
+     *
+     * @throws RemoteException
+     */
     public void createNewRegistry() throws RemoteException {
         registry = LocateRegistry.createRegistry(5555);
         registry.rebind("SessionSettings", this);
     }
 
+    /**
+     * Unexport the unicastobject this removes the session/registry
+     *
+     * @throws NoSuchObjectException
+     */
     public void removeRegistry() throws NoSuchObjectException {
         UnicastRemoteObject.unexportObject(registry, true);
     }
 
+    /**
+     * Cancels the session for all the clients. Push message to all the
+     * listeners. Set the variable to 1. Each SessionOnlinePlayer will continue
+     * to check if this variable is changed.
+     *
+     * @throws RemoteException
+     */
     public void cancelSessionForClients() throws RemoteException {
         publisher.inform("cancelgameprop", 0, 1);
     }
 
     /**
-     * Constructor without any graphics Made for the unit testing.
+     * Will be used for each player that connects to a host. A player needs to
+     * know the initial GameSettings to see the correct map/settings.
+     *
+     * @return initial GameSettings
      */
-    public Session(Player host, boolean any) throws RemoteException {
-        this.gameSettings = new GameSettings(true);
-        this.host = host;
-        this.players = new ArrayList<>();
-    }
-
     @Override
     public GameSettings getGameSettings() {
         return gameSettings;
     }
 
+    /**
+     * Set the GameSettings for this session. Also updates the old GameSettings
+     * to the new GameSettings to the clients.
+     *
+     * @param settings the new gamesettings
+     * @throws RemoteException
+     */
     public void setGameSettings(GameSettings settings) throws RemoteException {
         GameSettings oldsettings = this.gameSettings;
         this.gameSettings = settings;
@@ -114,43 +155,88 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
         players.remove(p);
         // TODO: logic for kicking players
     }
-    
-    public void setPlayerList(ArrayList<Player> playerList){
+
+    /**
+     * Sets the list of players for a Session.
+     *
+     * @param playerList
+     */
+    public void setPlayerList(ArrayList<Player> playerList) {
         this.players = playerList;
     }
 
+    /**
+     * Get the name of the room.
+     *
+     * @return roomName which will be displayed in the lobby
+     */
     public String getRoomName() {
         return roomName;
     }
 
-    public int getID() {
-        return ID;
-    }
-
-    public void setID(int ID) {
-        this.ID = ID;
+    /**
+     * Get the id of the session. This sessionid will be the id saved in the DB
+     *
+     * @return id as DB id
+     */
+    public int getId() {
+        return id;
     }
 
     /**
-     * Initializes the game screen
+     * Set the id which is the same as in the db.
+     *
+     * @param id as DB id
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    /**
+     * Starts the game for all the clients. Push message to all the listeners.
+     * Set the variable to 1. Each SessionOnlinePlayer will continue to check if
+     * this variable is changed.
      */
     public void startGame() throws RemoteException {
         publisher.inform("startgameprop", 0, 1);
     }
 
+    /**
+     * Subscribe to a RemotePublisher. From now on each update gives a
+     * propertychange to the client.
+     *
+     * @param listener
+     * @param property
+     * @throws RemoteException
+     */
     @Override
     public void subscribeRemoteListener(IRemotePropertyListener listener, String property) throws RemoteException {
         publisher.subscribeRemoteListener(listener, property);
     }
 
+    /**
+     * Unsubscribe from a RemotePublisher. From now on there won't be any
+     * updates from the remotepublisher to the client.
+     *
+     * @param listener
+     * @param property
+     * @throws RemoteException
+     */
     @Override
     public void unsubscribeRemoteListener(IRemotePropertyListener listener, String property) throws RemoteException {
         publisher.unsubscribeRemoteListener(listener, property);
     }
 
+    /**
+     *
+     * @return String which shows the hostname+roomname and if the session is
+     * full or not.
+     */
     @Override
     public String toString() {
-        if(this.host == null || this.gameSettings == null) return "Remove session from DB";
+        if (this.host == null || this.gameSettings == null) {
+            return "Remove session from DB";
+        }
         return host.getName() + " " + this.roomName + "     " + this.getPlayers().size() + "/" + this.gameSettings.getMaxPlayersSession();
     }
 

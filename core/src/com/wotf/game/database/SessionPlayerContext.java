@@ -28,7 +28,7 @@ public class SessionPlayerContext {
 
         String query = "SELECT * FROM session_participant WHERE SessionID = ? ORDER BY PlayerID";
         ArrayList<Object> parameters = new ArrayList<>();
-        parameters.add(session.getID());
+        parameters.add(session.getId());
 
         ResultSet res = DBCon.executeResultSet(query, parameters);
         ArrayList<Player> players = new ArrayList<>();
@@ -48,7 +48,7 @@ public class SessionPlayerContext {
         String query = "INSERT INTO session_participant (PlayerID, SessionID) VALUES (?, ?)";
         List<Object> parameters = new ArrayList<>();
         parameters.add(player.getID());
-        parameters.add(session.getID());
+        parameters.add(session.getId());
 
         return DBCon.executeUpdate(query, parameters) >= 1;
     }
@@ -61,7 +61,7 @@ public class SessionPlayerContext {
     public boolean deletePlayerFromSession(Player player, Session session) {
         String query = "DELETE FROM session_participant WHERE SessionID = ? AND PlayerID = ?";
         List<Object> parameters = new ArrayList<>();
-        parameters.add(session.getID());
+        parameters.add(session.getId());
         parameters.add(player.getID());
 
         return DBCon.executeUpdate(query, parameters) >= 1;
@@ -75,7 +75,7 @@ public class SessionPlayerContext {
     public boolean deleteSessionAndPlayers(Session session) {
         String query = "DELETE FROM session_participant WHERE SessionID = ?";
         List<Object> parameters = new ArrayList<>();
-        parameters.add(session.getID());
+        parameters.add(session.getId());
 
         return DBCon.executeUpdate(query, parameters) >= 1;
     }

@@ -15,7 +15,7 @@ import org.junit.Test;
  */
 public class BazookaTest {
 
-    private Bazooka1 bazooka;
+    //private Bazooka1 bazooka;
 
     /*@Before
     public void initItem() {
