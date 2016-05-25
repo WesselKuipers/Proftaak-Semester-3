@@ -434,10 +434,7 @@ public class NetworkUtil {
      */
     private void endTurn(NetworkMessage nMsg) {
         try {
-            // host has already ran this action when sending this message, so we want to apply it only on the connected clients 
-            if (scene.getGame().getPlayingPlayer().getID() != host.getID()) {
-                scene.getGame().endTurnReceive();
-            }
+            scene.getGame().endTurnReceive();
         }
         catch(InvalidParameterException ipe) {
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);

@@ -141,7 +141,6 @@ public class GameStage extends Stage {
     
     /**
      * 
-     * @param unitAmount
      * @return a list with random spawn locations 
      */
     public List<Vector2> getRandomSpawnLocations() {

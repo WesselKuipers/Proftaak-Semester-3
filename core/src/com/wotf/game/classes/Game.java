@@ -142,21 +142,6 @@ public class Game {
             GameStage gameStage = (GameStage) teams.get(0).getUnit(0).getStage();
             
             map.calculateWind();
-  
-            // Sync units position and health
-            int unitCount = 0;
-            NetworkMessage syncUnitsMsg = new NetworkMessage ( Command.SYNCUNITS );
-
-            for (Team team : teams) {
-                for (Unit unit : team.getUnits()) {
-                    syncUnitsMsg.addParameter("u" + unitCount + "x", Float.toString(unit.getPosition().x));
-                    syncUnitsMsg.addParameter("u" + unitCount + "y", Float.toString(unit.getPosition().y));
-                    syncUnitsMsg.addParameter("u" + unitCount + "hp", Integer.toString(unit.getHealth()));
-                    unitCount++;
-                }
-            }
-            
-            gameStage.getNetworkingUtil().sendToHost( syncUnitsMsg );
         
             NetworkMessage beginTurnMsg = new NetworkMessage( Command.BEGINTURN );
 
@@ -204,17 +189,32 @@ public class Game {
         }
     }
     
+    /**
+     * Function to send message to host to let host end the turn for all clients
+     */
     public void endTurn() {
-        if (playingPlayer.getID() == host.getID()) {
+        // We only want to run this function by the playing player
+        if (playingPlayer.getID() == getActiveTeam().getPlayer().getID()) {
             GameStage gameStage = (GameStage) teams.get(0).getUnit(0).getStage();
-            
-            NetworkMessage endTurnMsg = new NetworkMessage( Command.ENDTURN );
 
-            // send message to host and after that, all clients        
+            // Sync units position and health and send a message
+            int unitCount = 0;
+            NetworkMessage syncUnitsMsg = new NetworkMessage (Command.SYNCUNITS);
+
+            for (Team team : teams) {
+                for (Unit unit : team.getUnits()) {
+                    syncUnitsMsg.addParameter("u" + unitCount + "x", Float.toString(unit.getPosition().x));
+                    syncUnitsMsg.addParameter("u" + unitCount + "y", Float.toString(unit.getPosition().y));
+                    syncUnitsMsg.addParameter("u" + unitCount + "hp", Integer.toString(unit.getHealth()));
+                    unitCount++;
+                }
+            }
+
+            gameStage.getNetworkingUtil().sendToHost(syncUnitsMsg);
+
+            // Send end turn message
+            NetworkMessage endTurnMsg = new NetworkMessage( Command.ENDTURN );     
             gameStage.getNetworkingUtil().sendToHost( endTurnMsg );
-
-            // run action for host too
-            endTurnReceive();
         }
     }
 
