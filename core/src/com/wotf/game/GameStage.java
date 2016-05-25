@@ -153,13 +153,10 @@ public class GameStage extends Stage {
         for (int i = unitAmount; i >= 0; i--) {
             // Generates a random X position and attempts to find the highest collision-free position
             // and spawns the unit at that position, will continue looping until a position has been found
-            boolean spawned = false;
-            int posX = 0;
-            int posY = 0;
-
-            while (!spawned) {
-                posX = MathUtils.random(0 + (int) unitWidth, (int) game.getMap().getWidth() - (int) unitWidth);
-                posY = -1;
+            
+            while (true) {
+                int posX = MathUtils.random(0 + (int) unitWidth, (int) game.getMap().getWidth() - (int) unitWidth);
+                int posY = -1;
 
                 // loops through terrain[x ± half its width][y] to check for collision free locations
                 for (int x = posX; x < posX + unitWidth; x++) {
@@ -174,7 +171,6 @@ public class GameStage extends Stage {
 
                 // if a position has been found, we can exit the loop
                 if (posY != -1) {
-                    spawned = true;
                     spawnLocations.add(new Vector2(posX, posY + 1));
                     break;
                 }
@@ -297,22 +293,22 @@ public class GameStage extends Stage {
                     }
                     break;
                 case Keys.NUM_0:
-                    game.getActiveTeam().getActiveUnit().selecting_weapon(0);
+                    game.getActiveTeam().getActiveUnit().selectWeaponIndex(0);
                     break;
                 case Keys.NUM_1:
-                    game.getActiveTeam().getActiveUnit().selecting_weapon(1);
+                    game.getActiveTeam().getActiveUnit().selectWeaponIndex(1);
                     break;
                 case Keys.NUM_2:
-                    game.getActiveTeam().getActiveUnit().selecting_weapon(2);
+                    game.getActiveTeam().getActiveUnit().selectWeaponIndex(2);
                     break;
                 case Keys.NUM_3:
-                    game.getActiveTeam().getActiveUnit().selecting_weapon(3);
+                    game.getActiveTeam().getActiveUnit().selectWeaponIndex(3);
                     break;
                 case Keys.NUM_4:
-                    game.getActiveTeam().getActiveUnit().selecting_weapon(4);
+                    game.getActiveTeam().getActiveUnit().selectWeaponIndex(4);
                     break;
                 case Keys.NUM_5:
-                    game.getActiveTeam().getActiveUnit().selecting_weapon(5);
+                    game.getActiveTeam().getActiveUnit().selectWeaponIndex(5);
                     break;
                     
             }
@@ -495,7 +491,7 @@ public class GameStage extends Stage {
         for (int xPos = x - radius; xPos <= x + radius; xPos++) {
             for (int yPos = y - radius; yPos <= y + radius; yPos++) {
                 // scan square area around radius to determine which pixels are within the radius
-                if (Math.pow(xPos - x, 2) + Math.pow(yPos - y, 2) < radius * radius) {
+                if (Math.pow((double) xPos - x, 2.0d) + Math.pow((double) yPos - y, 2.0d) < radius * radius) {
                     // Iterate through every team and unit
                     // and add it to the list of collided Units if its bounding box contains explosion Xs and Ys
                     for (Team t : game.getTeams()) {

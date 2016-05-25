@@ -1,5 +1,5 @@
-projectKey=groep_s31a_source_code_WotF
+projectKey=wotf
 serverUrl=http://localhost:9000
-dashboardUrl=http://localhost:9000/dashboard/index/groep_s31a_source_code_WotF
-ceTaskId=AVSXiqnjHlCrJgQdihuz
-ceTaskUrl=http://localhost:9000/api/ce/task?id=AVSXiqnjHlCrJgQdihuz
+dashboardUrl=http://localhost:9000/dashboard/index/wotf
+ceTaskId=AVTc6SgRNvy9ZYM1PJ4R
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AVTc6SgRNvy9ZYM1PJ4R

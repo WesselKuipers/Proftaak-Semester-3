@@ -9,7 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -76,7 +75,10 @@ public final class GuiStage extends Stage {
         initializeWeaponSelection();
     }
     
-    public void initializeTurnTimers() {
+    /**
+     * Iniializes the turn and match time displays on the GUI
+     */
+    private void initializeTurnTimers() {
         // container for the total played time
         Texture totalTimeContainerTexture = new Texture(Gdx.files.internal("GUI/totalTimeContainer.png"));
         
@@ -115,7 +117,7 @@ public final class GuiStage extends Stage {
     /**
      * Initializes the wind indicator on the GUI
      */
-    public void initializeWindIndicator() {
+    private void initializeWindIndicator() {
         // sets up textures for the wind container
         windContainer = new Image(new Texture(Gdx.files.internal("GUI/windContainer.png")));
         windContainer.setPosition((int) (this.getWidth() / 2 - windContainer.getWidth() / 2), this.getHeight() - 30);
@@ -132,7 +134,10 @@ public final class GuiStage extends Stage {
         this.addActor(windContainer);
     }
     
-    public void initializeTeamHealthBars() {
+    /**
+     * Initializes the healthbars for each team on the GUI
+     */
+    private void initializeTeamHealthBars() {
         healthBars = new HashMap<>();
         healthBarLabels = new HashMap<>();
         
@@ -169,15 +174,18 @@ public final class GuiStage extends Stage {
         }
     }
     
-    public void initializeWeaponSelection() {
-       //weapon hotbar setup
+    /**
+     * Initializes the weapon hotbar
+     */
+    private void initializeWeaponSelection() {
+       // weapon hotbar setup
         Texture weaponHotbarTexture = new Texture(Gdx.files.internal("GUI/itemBar.png"));
     
         weaponHotbar = new Image(weaponHotbarTexture);
         weaponHotbar.setTouchable(Touchable.disabled);
         weaponHotbar.setPosition(this.getWidth() - weaponHotbar.getWidth()-1, this.getHeight() - weaponHotbar.getHeight()-1);
         
-        //weapon selector setup
+        // weapon selector setup
         Texture weaponSelectorTexture = new Texture(Gdx.files.internal("GUI/selectedItem.png"));
     
         weaponSelector = new Image(weaponSelectorTexture);
@@ -185,33 +193,40 @@ public final class GuiStage extends Stage {
         weaponSelector.setPosition(this.getWidth()-weaponHotbar.getWidth()-1,this.getHeight() - weaponSelector.getHeight());
         
         //add item icons to hotbar
-         int weaponNR = 0;
-       for(Item i : WEAPONS_ARMORY){
-           Texture ProjectileTexture = i.getProjectileTexture();
-           Image ProjectileImage = new Image(ProjectileTexture);
-           ProjectileImage.setSize(25, 25);
-           ProjectileImage.setPosition((this.getWidth()-weaponHotbar.getWidth()-1)+(40*weaponNR)+11, this.getHeight() - weaponHotbar.getHeight()-1+5);
-           weaponNR++;
+        int weaponNr = 0;
+        for (Item i : WEAPONS_ARMORY) {
+            Texture ProjectileTexture = i.getProjectileTexture();
+            Image projectileImage = new Image(ProjectileTexture);
+            
+            projectileImage.setSize(25, 25);
+            projectileImage.setPosition((this.getWidth() - weaponHotbar.getWidth() - 1) + (40 * weaponNr) + 11, this.getHeight() - weaponHotbar.getHeight() - 1 + 5);
+            weaponNr++;
                       
-           this.addActor(ProjectileImage);
-       }
+            this.addActor(projectileImage);
+        }
         
-        //adding actors
+        // adding actors
         this.addActor(weaponHotbar);
         this.addActor(weaponSelector);
         
     }
 
+    /**
+     * Updates the GUI
+     * Handles the time displays, game over state and the weapon hotbar
+     */
     public void update() {
         // update the turn and total time
         updateTime();
         
-        //weapon selector update mechanism
+        // weapon selector update mechanism
         int indexWeapon = 0;
-        if(game.getTurnState()){
+        
+        if (game.getTurnState()) {
             indexWeapon = WEAPONS_ARMORY.indexOf(game.getActiveTeam().getActiveUnit().getWeapon());
         }
-        UpdateSelectedWeaponHotbar(indexWeapon);
+        
+        updateSelectedWeaponHotbar(indexWeapon);
         
         Label healthBarLabel = healthBarLabels.get(game.getActiveTeam());
         
@@ -245,14 +260,18 @@ public final class GuiStage extends Stage {
         rightWindRegion.scroll(-0.05f, 0);
     }
     
-    public void UpdateSelectedWeaponHotbar(int weaponNR){
-       weaponSelector.setPosition((this.getWidth()-weaponHotbar.getWidth()-1)+(40*weaponNR),this.getHeight() - weaponSelector.getHeight());
+    /**
+     * Selects a weapon in the weapon hotbar
+     * @param weaponNr Index of weapon to select
+     */
+    public void updateSelectedWeaponHotbar(int weaponNr){
+       weaponSelector.setPosition((this.getWidth() - weaponHotbar.getWidth() - 1) + (40 * weaponNr), this.getHeight() - weaponSelector.getHeight());
     }
     
     /**
      * Sets the remaining time of this turn and the total time on the GUI
      */
-    public void updateTime() {
+    private void updateTime() {
         int totalTime = (int) game.getTurnLogic().getTotalTime();
         int elapsedTime = (int) game.getTurnLogic().getElapsedTime();
         
@@ -265,7 +284,7 @@ public final class GuiStage extends Stage {
     /**
      * Shows the game over message on the GUI stage
      */
-    public void showGameOverMessage() {
+    private void showGameOverMessage() {
         Label gameOverLabel = new Label("Game over", skin);
         gameOverLabel.setPosition(this.getWidth() / 2, this.getHeight() / 2);
         

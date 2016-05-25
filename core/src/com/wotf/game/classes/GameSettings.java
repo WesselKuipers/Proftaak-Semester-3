@@ -5,10 +5,7 @@
  */
 package com.wotf.game.classes;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.wotf.game.classes.Items.*;
 import com.wotf.game.classes.Items.Item;
 import java.io.Serializable;
@@ -25,7 +22,8 @@ public class GameSettings implements Serializable {
     /**
      * List of weapons in the game
      */
-    public static List<Item> WEAPONS_ARMORY;
+    public static final List<Item> WEAPONS_ARMORY = new ArrayList<>();;
+    
     /**
      * List of teams in the game
      */
@@ -47,8 +45,7 @@ public class GameSettings implements Serializable {
      * Main constructor for GameSettings Sets all variables to the default rules
      */
     public GameSettings() {
-        if (WEAPONS_ARMORY == null) {
-            WEAPONS_ARMORY = new ArrayList<>();
+        if (WEAPONS_ARMORY.isEmpty()) {
             fillWeapons();
         }
 

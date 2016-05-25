@@ -132,11 +132,11 @@ public class SessionContext extends EntityContext<Session> {
         while (record.next()) {
             try {
                 session = new Session(new PlayerContext().getById(record.getInt("HostID")), record.getString("RoomName"));
-                session.getGameSettings().setMaxPlayersSession(record.getInt("MaxPlayersSession"));
+                session.getGameSettings().setMaxPlayersSession(record.getInt("MaxPlayersSession"));session.setID(record.getInt("ID"));
+                session.setId(record.getInt("ID"));
             } catch (RemoteException ex) {
                 Logger.getLogger(SessionContext.class.getName()).log(Level.SEVERE, null, ex);
             }
-            session.setId(record.getInt("ID"));
         }
         return session;
     }
