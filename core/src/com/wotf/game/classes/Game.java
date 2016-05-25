@@ -21,11 +21,11 @@ public class Game {
     private final List<Team> teams;
     private final Map map;
 
-    private final GamePhysics gamePhysics;
     private final GameSettings gameSettings;
     private final TurnLogic turnLogic;
     
     private boolean turnState;
+    
     /**
      * Constructor of Game, assign params to properties. Add new game physics
      * and add a turn logic based on amount of teams
@@ -40,7 +40,6 @@ public class Game {
         this.host = this.players.get(0);
         this.playingPlayer = playingPlayer;
         this.teams = this.gameSettings.getTeams();
-        this.gamePhysics = new GamePhysics();
         this.turnLogic = new TurnLogic(this.teams.size());
         this.map = map;
     }
@@ -211,7 +210,7 @@ public class Game {
             GameStage gameStage = (GameStage) team.getActiveUnit().getStage();
             gameStage.setKeyboardFocus(team.getActiveUnit());
             gameStage.setCameraFocusToActor(team.getActiveUnit(), true);
-            team.getActiveUnit().selecting_weapon(0);
+             team.getActiveUnit().selectWeaponIndex(0);
         } else {
             endTurn();
         }

@@ -116,7 +116,7 @@ public class Map {
         for (int xPos = x - radius; xPos <= x + radius; xPos++) {
             for (int yPos = y - radius; yPos <= y + radius; yPos++) {
                 // scan square area around radius to determine which pixels to destroy
-                if (Math.pow(xPos - x, 2) + Math.pow(yPos - y, 2) < radius * radius) {
+                if (Math.pow((double) xPos - x, 2.0d) + Math.pow((double) yPos - y, 2.0d) < radius * radius) {
 
                     // Check if the position is in bounds of the array, if not, skip this iteration
                     if (!(xPos >= 0 && yPos >= 0 && xPos < terrain.length && yPos < terrain[0].length)) {

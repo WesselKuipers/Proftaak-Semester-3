@@ -36,7 +36,7 @@ import java.util.List;
 public class NetworkUtil {
     
     private final Player host;
-    private final int _PORT = 9021;
+    private final int port = 9021;
     private final GameStage scene;
     private Socket socket;
     private final List<Vector2> unitPositions;
@@ -68,7 +68,7 @@ public class NetworkUtil {
             serverSocketHint.acceptTimeout = 0;
 
             // Create the socket server using TCP protocol and listening on 9021
-            ServerSocket serverSocket = Gdx.net.newServerSocket(Net.Protocol.TCP, _PORT, serverSocketHint);
+            ServerSocket serverSocket = Gdx.net.newServerSocket(Net.Protocol.TCP, port, serverSocketHint);
 
             // Accept any incoming connections
             this.socket = serverSocket.accept(null);
@@ -76,7 +76,7 @@ public class NetworkUtil {
             messageListener(true);
         } else {
             SocketHints socketHints = new SocketHints();
-            this.socket = Gdx.net.newClientSocket(Net.Protocol.TCP, host.getIp(), _PORT, socketHints);
+            this.socket = Gdx.net.newClientSocket(Net.Protocol.TCP, host.getIp(), port, socketHints);
             messageListener(false);
         }
         
@@ -237,7 +237,7 @@ public class NetworkUtil {
                 }
             }
         } catch (SocketException e) {
-            e.printStackTrace();
+            Gdx.app.log("networkingUtil", e.getMessage());
         }
         
         // Print the contents of our array to a string.  Yeah, should have used StringBuilder
@@ -310,7 +310,7 @@ public class NetworkUtil {
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
     }
-    
+
     /**
      * On first time of call on this function, it should retrieve the randomly generated spawn locations and put it in the unitPositions array.
      * After the first call all unit positions will be sent after each turn, to sync the unit positions.
@@ -399,7 +399,7 @@ public class NetworkUtil {
                      
             int weaponIndex = Integer.parseInt(weaponIndexStr);  
             
-            scene.getGame().getActiveTeam().getActiveUnit().selecting_weapon(weaponIndex);
+            scene.getGame().getActiveTeam().getActiveUnit().selectWeaponIndex(weaponIndex);
         }
         catch(InvalidParameterException ipe) {
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
