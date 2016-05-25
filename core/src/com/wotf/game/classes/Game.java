@@ -142,18 +142,6 @@ public class Game {
             GameStage gameStage = (GameStage) teams.get(0).getUnit(0).getStage();
             
             map.calculateWind();
-          
-            // add terrain solid booleans to parameters
-       /*        boolean[][] terrain = map.getTerrain();
-           for (int x = 0; x < terrain.length; x++) {
-                NetworkMessage terrainMsg = new NetworkMessage( Command.TERRAIN );
-                terrainMsg.addParameter("x", Integer.toString(x));
-                for (int y = 0; y < terrain[0].length; y++) {
-                    terrainMsg.addParameter("y"+y, Integer.toString(y));
-                    terrainMsg.addParameter("val"+y, Boolean.toString(terrain[x][y]));
-                }
-                gameStage.getNetworkingUtil().sendToHost( terrainMsg );
-            }*/
   
             // Sync units position and health
             int unitCount = 0;
@@ -215,6 +203,20 @@ public class Game {
             endTurn();
         }
     }
+    
+    public void endTurn() {
+        if (playingPlayer.getID() == host.getID()) {
+            GameStage gameStage = (GameStage) teams.get(0).getUnit(0).getStage();
+            
+            NetworkMessage endTurnMsg = new NetworkMessage( Command.ENDTURN );
+
+            // send message to host and after that, all clients        
+            gameStage.getNetworkingUtil().sendToHost( endTurnMsg );
+
+            // run action for host too
+            endTurnReceive();
+        }
+    }
 
     /**
      * Method to end a turn in the game. First call the endTurn method of the
@@ -222,7 +224,7 @@ public class Game {
      * the active index of the team to keyboard and camera focus. Last check
      * whether team and its units are still alive.
      */
-    public void endTurn() {
+    public void endTurnReceive() {
         turnState = false;
         Team activeTeam = getActiveTeam();
         activeTeam.endTurn();

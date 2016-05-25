@@ -16,6 +16,7 @@ public enum Command {
     FIRE, 
     MOVE,
     BEGINTURN,
+    ENDTURN,
     INITGAME,
     SYNCUNITS,
     SWITCHUNIT,
