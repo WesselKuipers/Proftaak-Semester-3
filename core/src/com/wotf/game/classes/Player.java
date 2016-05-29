@@ -49,8 +49,8 @@ public class Player implements Serializable{
         return id;
     }
 
-    public void setId(int ID) {
-        this.id = ID;
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override
