@@ -7,7 +7,7 @@ import java.io.Serializable;
  */
 public class Player implements Serializable{
 
-    private int ID;
+    private int id;
     private final String ip;
     private String name;
 
@@ -45,12 +45,12 @@ public class Player implements Serializable{
         this.name = name;
     }
 
-    public int getID() {
-        return ID;
+    public int getId() {
+        return id;
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    public void setId(int ID) {
+        this.id = ID;
     }
 
     @Override

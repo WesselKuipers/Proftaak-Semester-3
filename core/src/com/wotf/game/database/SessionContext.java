@@ -90,7 +90,7 @@ public class SessionContext extends EntityContext<Session> {
     public boolean insert(Session session) {
         String query = "INSERT INTO session (HostID, RoomName, MaxPlayersSession) VALUES (?, ?, ?)";
         List<Object> parameters = new ArrayList<>();
-        parameters.add(session.getHost().getID());
+        parameters.add(session.getHost().getId());
         parameters.add((session.getRoomName() != null) ? session.getRoomName() : "Roomname is not entered");
         parameters.add(session.getGameSettings().getMaxPlayersSession());
 
@@ -122,7 +122,7 @@ public class SessionContext extends EntityContext<Session> {
     public boolean delete(Session session) {
         String query = "DELETE FROM session WHERE HostID = ?";
         List<Object> parameters = new ArrayList<>();
-        parameters.add(session.getHost().getID());
+        parameters.add(session.getHost().getId());
         return DBCon.executeUpdate(query, parameters) >= 1;
     }
 
@@ -132,7 +132,7 @@ public class SessionContext extends EntityContext<Session> {
         while (record.next()) {
             try {
                 session = new Session(new PlayerContext().getById(record.getInt("HostID")), record.getString("RoomName"));
-                session.getGameSettings().setMaxPlayersSession(record.getInt("MaxPlayersSession"));session.setID(record.getInt("ID"));
+                session.getGameSettings().setMaxPlayersSession(record.getInt("MaxPlayersSession"));
                 session.setId(record.getInt("ID"));
             } catch (RemoteException ex) {
                 Logger.getLogger(SessionContext.class.getName()).log(Level.SEVERE, null, ex);

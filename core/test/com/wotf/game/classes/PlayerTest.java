@@ -51,9 +51,9 @@ public class PlayerTest {
     @Test
     public void testgetandsetId(){
         // Sets the id.
-        player.setID(2);
+        player.setId(2);
         
         // Check if it is 2 now.
-        assertEquals(2, player.getID());
+        assertEquals(2, player.getId());
     }
 }

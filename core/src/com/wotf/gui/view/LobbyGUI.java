@@ -188,7 +188,7 @@ public class LobbyGUI implements Screen {
                 try {
                     // The currently selected session.
                     Session selhost = (Session) sessions.getSelected();
-                    selhost = sc.getByHostId(selhost.getHost().getID());
+                    selhost = sc.getByHostId(selhost.getHost().getId());
                     // Check if there aren't more players than allowed, if not, continue the if statement.
                     if (part.getPlayersFromSession(selhost).size() < sc.getById(selhost.getId()).getGameSettings().getMaxPlayersSession()) {
                         game.setScreen(new SessionOnlinePlayer(game, selhost, player));
