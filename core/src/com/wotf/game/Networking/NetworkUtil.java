@@ -61,7 +61,7 @@ public class NetworkUtil {
      * @param hostIP Ip Address of the host.
      */
     private void initNetworkListener(Player host) {
-        if (scene.getGame().getPlayingPlayer().getID() == host.getID() ) {
+        if (scene.getGame().getPlayingPlayer().getId() == host.getId() ) {
             ServerSocketHints serverSocketHint = new ServerSocketHints();
 
             // This prevents the host from dropping out, when in production set it to an appropiate value
@@ -110,7 +110,7 @@ public class NetworkUtil {
                         if (isHost) {
                             for (Player player : scene.getGame().getPlayers()) {
                                 // Dont send the message to host else it will do the action twice!
-                                if (player.getID() != host.getID()) {
+                                if (player.getId() != host.getId()) {
                                     sendToClient(message, player.getIp());
                                 }
                             }
@@ -133,7 +133,7 @@ public class NetworkUtil {
             socket.getOutputStream().write((nMsg.toString() + System.lineSeparator()).getBytes());
             
             // If its the host that is sending the message, you have to run the action for the host too
-            if (scene.getGame().getPlayingPlayer().getID() == host.getID()) {
+            if (scene.getGame().getPlayingPlayer().getId() == host.getId()) {
                 receiveMessage(nMsg.toString());
             }
             
@@ -293,7 +293,7 @@ public class NetworkUtil {
     private void beginTurn(NetworkMessage nMsg) {
         try {
             // host has already ran this action when sending this message, so we want to apply it only on the connected clients 
-            if (scene.getGame().getPlayingPlayer().getID() != host.getID()) {
+            if (scene.getGame().getPlayingPlayer().getId() != host.getId()) {
                 // set the wind force
                 String windXStr = nMsg.getParameter("windX");
                 String windYStr = nMsg.getParameter("windY");

@@ -26,6 +26,9 @@ public class WotFGame extends Game {
         game.setScreen(new MainMenu(game));
     }
 
+    /**
+     * Called when application gets closed
+     */
     @Override
     public void dispose() {
         game.getScreen().dispose();

@@ -231,7 +231,7 @@ public class Projectile extends Actor {
      */
     private void terrainCollision() {
         // Terrain and unit collision
-        if (((GameStage) getStage()).getGame().getPlayingPlayer().getID() == ((GameStage) getStage()).getGame().getActiveTeam().getPlayer().getID() && 
+        if (((GameStage) getStage()).getGame().getPlayingPlayer().getId()== ((GameStage) getStage()).getGame().getActiveTeam().getPlayer().getId()&& 
             ((GameStage) getStage()).getGame().getMap().isPixelSolid((int) getX(), (int) getY()) &&
                 isExploded == false) {
 

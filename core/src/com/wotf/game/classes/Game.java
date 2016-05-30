@@ -33,6 +33,7 @@ public class Game {
      * @param gameSettings
      * @param map
      * @param players
+     * @param playingPlayer
      */
     public Game(GameSettings gameSettings, Map map, List<Player> players, Player playingPlayer) {
         this.gameSettings = gameSettings;
@@ -138,7 +139,7 @@ public class Game {
      * Function to send the current beginTurn
      */
     public void beginTurn() {
-        if (playingPlayer.getID() == host.getID()) {
+        if (playingPlayer.getId() == host.getId()) {
             GameStage gameStage = (GameStage) teams.get(0).getUnit(0).getStage();
             
             map.calculateWind();

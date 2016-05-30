@@ -93,7 +93,7 @@ public class GameStage extends Stage {
         networkingUtil = new NetworkUtil( game.getHost(), this );
         
         // Initialize the game by host, after that send it to all connected clients
-        if (game.getPlayingPlayer().getID() == game.getHost().getID()) {
+        if (game.getPlayingPlayer().getId() == game.getHost().getId()) {
             
             // Send all the random spawn locations in one message
             int unitCount = 0;
@@ -262,7 +262,7 @@ public class GameStage extends Stage {
         }
         
         // Only allow these controls for the current playing player
-        if (game.getPlayingPlayer().getID() == game.getActiveTeam().getPlayer().getID()) {
+        if (game.getPlayingPlayer().getId() == game.getActiveTeam().getPlayer().getId()) {
             switch (keyCode) {
                 // Unit selection
                 case Keys.TAB:
@@ -342,7 +342,7 @@ public class GameStage extends Stage {
         Vector3 rel = getCamera().unproject(new Vector3(screenX, screenY, 0));
         
         // Check if the playing player is allowed to do actions
-        if (game.getPlayingPlayer().getID() == game.getActiveTeam().getPlayer().getID()) {
+        if (game.getPlayingPlayer().getId() == game.getActiveTeam().getPlayer().getId()) {
             
             // Check if turn state is playing
             if (game.getTurnLogic().getState() == TurnState.PLAYING) {
