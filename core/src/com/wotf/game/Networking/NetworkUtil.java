@@ -196,6 +196,9 @@ public class NetworkUtil {
             case BEGINTURN:
                 beginTurn(nMsg);
                 break;
+            case ENDTURN:
+                endTurn(nMsg);
+                break;
             case INITGAME:
                 initGame(nMsg);
                 break;
@@ -419,6 +422,19 @@ public class NetworkUtil {
             int posY = Integer.parseInt(posYStr);
             
             scene.getGame().getActiveTeam().getActiveUnit().getWeapon().getBullet().terrainCollisionReceive(posX, posY);
+        }
+        catch(InvalidParameterException ipe) {
+            Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
+        }
+    }
+
+    /**
+     * Function to end a turn. When host has ended a turn receive it for all clients.
+     * @param nMsg Network message which holds the data for the endTurn method.
+     */
+    private void endTurn(NetworkMessage nMsg) {
+        try {
+            scene.getGame().endTurnReceive();
         }
         catch(InvalidParameterException ipe) {
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);

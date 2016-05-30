@@ -35,10 +35,10 @@ public class Game {
      * @param players
      * @param playingPlayer
      */
-    public Game(GameSettings gameSettings, Map map, List<Player> players, Player playingPlayer) {
+    public Game(GameSettings gameSettings, Map map, List<Player> players, Player playingPlayer, Player host) {
         this.gameSettings = gameSettings;
         this.players = players;
-        this.host = this.players.get(0);
+        this.host = host;
         this.playingPlayer = playingPlayer;
         this.teams = this.gameSettings.getTeams();
         this.turnLogic = new TurnLogic(this.teams.size());
@@ -143,33 +143,6 @@ public class Game {
             GameStage gameStage = (GameStage) teams.get(0).getUnit(0).getStage();
             
             map.calculateWind();
-          
-            // add terrain solid booleans to parameters
-       /*        boolean[][] terrain = map.getTerrain();
-           for (int x = 0; x < terrain.length; x++) {
-                NetworkMessage terrainMsg = new NetworkMessage( Command.TERRAIN );
-                terrainMsg.addParameter("x", Integer.toString(x));
-                for (int y = 0; y < terrain[0].length; y++) {
-                    terrainMsg.addParameter("y"+y, Integer.toString(y));
-                    terrainMsg.addParameter("val"+y, Boolean.toString(terrain[x][y]));
-                }
-                gameStage.getNetworkingUtil().sendToHost( terrainMsg );
-            }*/
-  
-            // Sync units position and health
-            int unitCount = 0;
-            NetworkMessage syncUnitsMsg = new NetworkMessage ( Command.SYNCUNITS );
-
-            for (Team team : teams) {
-                for (Unit unit : team.getUnits()) {
-                    syncUnitsMsg.addParameter("u" + unitCount + "x", Float.toString(unit.getPosition().x));
-                    syncUnitsMsg.addParameter("u" + unitCount + "y", Float.toString(unit.getPosition().y));
-                    syncUnitsMsg.addParameter("u" + unitCount + "hp", Integer.toString(unit.getHealth()));
-                    unitCount++;
-                }
-            }
-            
-            gameStage.getNetworkingUtil().sendToHost( syncUnitsMsg );
         
             NetworkMessage beginTurnMsg = new NetworkMessage( Command.BEGINTURN );
 
@@ -216,6 +189,35 @@ public class Game {
             endTurn();
         }
     }
+    
+    /**
+     * Function to send message to host to let host end the turn for all clients
+     */
+    public void endTurn() {
+        // We only want to run this function by the playing player
+        if (playingPlayer.getID() == getActiveTeam().getPlayer().getID()) {
+            GameStage gameStage = (GameStage) teams.get(0).getUnit(0).getStage();
+
+            // Sync units position and health and send a message
+            int unitCount = 0;
+            NetworkMessage syncUnitsMsg = new NetworkMessage (Command.SYNCUNITS);
+
+            for (Team team : teams) {
+                for (Unit unit : team.getUnits()) {
+                    syncUnitsMsg.addParameter("u" + unitCount + "x", Float.toString(unit.getPosition().x));
+                    syncUnitsMsg.addParameter("u" + unitCount + "y", Float.toString(unit.getPosition().y));
+                    syncUnitsMsg.addParameter("u" + unitCount + "hp", Integer.toString(unit.getHealth()));
+                    unitCount++;
+                }
+            }
+
+            gameStage.getNetworkingUtil().sendToHost(syncUnitsMsg);
+
+            // Send end turn message
+            NetworkMessage endTurnMsg = new NetworkMessage( Command.ENDTURN );     
+            gameStage.getNetworkingUtil().sendToHost( endTurnMsg );
+        }
+    }
 
     /**
      * Method to end a turn in the game. First call the endTurn method of the
@@ -223,7 +225,7 @@ public class Game {
      * the active index of the team to keyboard and camera focus. Last check
      * whether team and its units are still alive.
      */
-    public void endTurn() {
+    public void endTurnReceive() {
         turnState = false;
         Team activeTeam = getActiveTeam();
         activeTeam.endTurn();
