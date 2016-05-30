@@ -33,6 +33,7 @@ public class Game {
      * @param gameSettings
      * @param map
      * @param players
+     * @param playingPlayer
      */
     public Game(GameSettings gameSettings, Map map, List<Player> players, Player playingPlayer) {
         this.gameSettings = gameSettings;

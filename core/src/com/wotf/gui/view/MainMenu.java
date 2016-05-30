@@ -14,14 +14,12 @@ import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.wotf.game.WotFGame;
-import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Screen that shows the main menu
@@ -77,15 +75,19 @@ public class MainMenu implements Screen {
         // Pak het JSON bestand uit de assets folder. Hier staan alle skins in.
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
+        Image banner = new Image(new Texture(Gdx.files.internal("banner.png")));
+        banner.setPosition(Gdx.graphics.getWidth() / 2 - banner.getWidth() / 2, 335);
+        stage.addActor(banner);
+        
         Label wotflabel = new Label("War of the Figures", skin);
-        wotflabel.setPosition(Gdx.graphics.getWidth() / 2 - wotflabel.getWidth() / 2, 740);
+        wotflabel.setPosition(Gdx.graphics.getWidth() / 2 - wotflabel.getWidth() / 2, 480);
         stage.addActor(wotflabel);
 
         TextButton local = new TextButton("Local", skin); // Use the initialized skin
         local.setColor(Color.BLACK);
         local.setWidth(300);
         local.setHeight(60);
-        local.setPosition(Gdx.graphics.getWidth() / 2 - local.getWidth() / 2, 500);
+        local.setPosition(Gdx.graphics.getWidth() / 2 - local.getWidth() / 2, 240);
         local.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -98,7 +100,7 @@ public class MainMenu implements Screen {
         online.setColor(Color.BLACK);
         online.setWidth(300);
         online.setHeight(60);
-        online.setPosition(Gdx.graphics.getWidth() / 2 - online.getWidth() / 2, 430);
+        online.setPosition(Gdx.graphics.getWidth() / 2 - online.getWidth() / 2, 170);
         online.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -111,14 +113,14 @@ public class MainMenu implements Screen {
         about.setColor(Color.BLACK);
         about.setWidth(300);
         about.setHeight(60);
-        about.setPosition(Gdx.graphics.getWidth() / 2 - about.getWidth() / 2, 360);
+        about.setPosition(Gdx.graphics.getWidth() / 2 - about.getWidth() / 2, 100);
         stage.addActor(about);
 
         TextButton exit = new TextButton("Exit", skin); // Use the initialized skin
         exit.setColor(Color.BLACK);
         exit.setWidth(300);
         exit.setHeight(60);
-        exit.setPosition(Gdx.graphics.getWidth() / 2 - exit.getWidth() / 2, 290);
+        exit.setPosition(Gdx.graphics.getWidth() / 2 - exit.getWidth() / 2, 30);
         exit.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
