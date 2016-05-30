@@ -13,6 +13,8 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.wotf.game.GameStage;
+import com.wotf.game.Networking.Command;
+import com.wotf.game.Networking.NetworkMessage;
 
 /**
  *
@@ -41,6 +43,8 @@ public class Projectile extends Actor {
     private int blastRadius;
     private int damage;
 
+    private boolean isExploded;
+    
     /**
      * 
      * Projectile constructor to initialize visual appearence of the bullet.
@@ -60,6 +64,8 @@ public class Projectile extends Actor {
         this.setBounds(getX(), getY(), sprite.getWidth(), sprite.getHeight());
         this.setWidth(sprite.getWidth());
         this.setHeight(sprite.getHeight());
+        
+        this.isExploded = false;
     }
 
     /**
@@ -199,7 +205,9 @@ public class Projectile extends Actor {
 
         // if projectile is out of bounds, remove it from the stage
         if (isProjectileOutOfBounds(gameMap)) {
+            ((GameStage) getStage()).getGame().endTurn();
             this.remove();
+            isExploded = false;
             return;
         }
 
@@ -223,16 +231,30 @@ public class Projectile extends Actor {
      */
     private void terrainCollision() {
         // Terrain and unit collision
-        if (((GameStage) getStage()).getGame().getMap()
-                .isPixelSolid((int) getX(), (int) getY())) {
+        if (((GameStage) getStage()).getGame().getPlayingPlayer().getId()== ((GameStage) getStage()).getGame().getActiveTeam().getPlayer().getId()&& 
+            ((GameStage) getStage()).getGame().getMap().isPixelSolid((int) getX(), (int) getY()) &&
+                isExploded == false) {
 
-            // Projectile collided with terrain
-            System.out.println("Bullet collided at " + this.getX() + " " + this.getY());
+            NetworkMessage syncCollisionMsg = new NetworkMessage(Command.SYNCCOLLISION);
             
-            ((GameStage) getStage()).setParticle(p);
-            ((GameStage) getStage()).explode((int) getX(), (int) getY(), blastRadius, damage, isCluster);
-            this.remove();
+            syncCollisionMsg.addParameter( "posX", Integer.toString( (int) getX() ));
+            syncCollisionMsg.addParameter( "posY", Integer.toString( (int) getY() ));
+                    
+            //send message to host
+            ((GameStage) getStage()).getNetworkingUtil().sendToHost( syncCollisionMsg );
+            
+            isExploded = true;
         }
+    }
+    
+    public void terrainCollisionReceive(int posX, int posY) {
+        // Projectile collided with terrain
+        System.out.println("Bullet collided at " + posX + " " + posY);
+        //((GameStage) getStage()).setParticle(p);
+        ((GameStage) getStage()).explode(posX, posY, blastRadius, damage, isCluster);
+        ((GameStage) getStage()).getGame().endTurn();
+        this.remove();
+        isExploded = false;
     }
 
     /**

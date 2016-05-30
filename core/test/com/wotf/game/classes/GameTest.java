@@ -49,7 +49,7 @@ public class GameTest {
         // Finally initialize the Game class.
         // The map is null because the map can't be initialized from the test classes.
         // It looks like a Pixmap can't be made while in the tests.
-        game = new Game(gamesetting, null, players, playerrens);
+        game = new Game(gamesetting, null, players, playerrens, playerrens);
     }
 
     @Test
