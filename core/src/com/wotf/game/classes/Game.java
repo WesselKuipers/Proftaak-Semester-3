@@ -195,7 +195,7 @@ public class Game {
      */
     public void endTurn() {
         // We only want to run this function by the playing player
-        if (playingPlayer.getID() == getActiveTeam().getPlayer().getID()) {
+        if (playingPlayer.getId() == getActiveTeam().getPlayer().getId()) {
             GameStage gameStage = (GameStage) teams.get(0).getUnit(0).getStage();
 
             // Sync units position and health and send a message
