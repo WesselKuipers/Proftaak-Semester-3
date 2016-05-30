@@ -79,9 +79,9 @@ public class MainMenu implements Screen {
         banner.setPosition(Gdx.graphics.getWidth() / 2 - banner.getWidth() / 2, 335);
         stage.addActor(banner);
         
-        Label wotflabel = new Label("War of the Figures", skin);
-        wotflabel.setPosition(Gdx.graphics.getWidth() / 2 - wotflabel.getWidth() / 2, 480);
-        stage.addActor(wotflabel);
+        //Label wotflabel = new Label("War of the Figures", skin);
+        //wotflabel.setPosition(Gdx.graphics.getWidth() / 2 - wotflabel.getWidth() / 2, 480);
+        //stage.addActor(wotflabel);
 
         TextButton local = new TextButton("Local", skin); // Use the initialized skin
         local.setColor(Color.BLACK);
