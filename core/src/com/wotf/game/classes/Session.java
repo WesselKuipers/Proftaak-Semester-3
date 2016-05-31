@@ -196,9 +196,14 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
      * Starts the game for all the clients. Push message to all the listeners.
      * Set the variable to 1. Each SessionOnlinePlayer will continue to check if
      * this variable is changed.
+     * @throws java.rmi.RemoteException
      */
     public void startGame() throws RemoteException {
         publisher.inform("startgameprop", 0, 1);
+    }
+    
+    public void sendChatMessage(String message) throws RemoteException {
+        publisher.inform("chatmessageprop", null, message);
     }
 
     /**

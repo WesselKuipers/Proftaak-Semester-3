@@ -345,6 +345,6 @@ public class Team implements Serializable {
      */
     @Override
     public String toString() {
-        return getName() + " - " + getColorname();
+        return getName();
     }
 }

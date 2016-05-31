@@ -761,6 +761,10 @@ public class SessionOnlinePlayer implements Screen {
         playerList = getPlayersOfSession(session);
         session.setPlayerList(playerList);
     }
+    
+    public void chatMessage(String message){
+        //TODO message handling
+    }
 
     /**
      * Create units for a single team based on how many units there should be created.
