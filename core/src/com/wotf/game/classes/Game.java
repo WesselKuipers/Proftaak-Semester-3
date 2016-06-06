@@ -200,7 +200,7 @@ public class Game {
 
             // Sync units position and health and send a message
             int unitCount = 0;
-            NetworkMessage syncUnitsMsg = new NetworkMessage (Command.SYNCUNITS);
+            NetworkMessage syncUnitsMsg = new NetworkMessage(Command.SYNCUNITS);
 
             for (Team team : teams) {
                 for (Unit unit : team.getUnits()) {
@@ -214,8 +214,10 @@ public class Game {
             gameStage.getNetworkingUtil().sendToHost(syncUnitsMsg);
 
             // Send end turn message
-            NetworkMessage endTurnMsg = new NetworkMessage( Command.ENDTURN );     
-            gameStage.getNetworkingUtil().sendToHost( endTurnMsg );
+            NetworkMessage endTurnMsg = new NetworkMessage(Command.ENDTURN);
+            gameStage.getNetworkingUtil().sendToHost(endTurnMsg);
+            
+            endTurnReceive();
         }
     }
 

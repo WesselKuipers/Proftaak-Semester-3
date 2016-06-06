@@ -35,7 +35,6 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
     private Session() throws RemoteException {
     }
 
-    ;
     
     /**
      * Initializes a session using the information of the hosting player
@@ -54,6 +53,21 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
         publisher.registerProperty("sessionsettingsprop");
         publisher.registerProperty("cancelgameprop");
         publisher.registerProperty("startgameprop");
+    }
+    
+        /**
+     * Initializes a session using the information for local Session
+     *
+     * @param host the player who hosts the game
+     * @param roomName the name of the room which will be displayed in the lobby
+     * @param gameSettings gameSettings of Session
+     * @throws RemoteException
+     */
+    public Session(Player host, String roomName, GameSettings gameSettings) throws RemoteException {
+        this.gameSettings = gameSettings;
+        this.host = host;
+        this.players = new ArrayList<>();
+        this.roomName = roomName;
     }
 
     /**

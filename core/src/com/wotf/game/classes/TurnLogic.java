@@ -15,7 +15,7 @@ public class TurnLogic {
      * Enum State of the game
      */
     public enum TurnState {
-        PLAYING, WITHDRAW, GAMEOVER
+        PLAYING, WITHDRAW, GAMEOVER, SHOOTING
     };
     
     public TurnState currentState;
