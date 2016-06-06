@@ -32,7 +32,11 @@ import com.badlogic.gdx.utils.Array;
 import com.wotf.game.WotFGame;
 import com.wotf.game.classes.GameSettings;
 import com.wotf.game.classes.Map;
+import com.wotf.game.classes.Player;
+import com.wotf.game.classes.Session;
 import com.wotf.game.classes.Team;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -328,10 +332,35 @@ public class SessionLocal implements Screen {
 
                 // Selected TurnTime to an integer.
                 gameSettings.setTurnTime(Integer.parseInt(turntimebox.getSelected().toString()));
-
+                
+                gameSettings.setIsLocal(true);
                 // Create the map
                 Map map = new Map(chooseMap.getSelected().toString());
-                game.setScreen(new GameEngine(game, gameSettings, map));
+                String localhost = null;
+                
+                try {
+                    localhost =  InetAddress.getLocalHost().getHostAddress();
+                } catch (UnknownHostException ex) {
+                    Logger.getLogger(SessionLocal.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                Player playerLocal = new Player(localhost, "Local");
+                Player playerLocal1 = new Player(localhost, "Local2");
+                
+                playerLocal1.setId(1);
+                playerLocal.setId(0);
+                Session sessionLocal = null;
+                
+                try {
+                    // Create session
+                    sessionLocal = new Session(playerLocal, "localHost", gameSettings);
+                    sessionLocal.addPlayer(playerLocal);
+                    sessionLocal.addPlayer(playerLocal1);
+                } catch (RemoteException ex) {
+                    Logger.getLogger(SessionLocal.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                game.setScreen(new GameEngine(game, gameSettings, map, sessionLocal, playerLocal));
             }
         });
 

@@ -83,6 +83,7 @@ public class SessionOnlineHost implements Screen {
         playerList = new ArrayList<>();
         addPlayerToDB();
         playerList = getPlayersOfSession(session);
+        gameSettings.setIsLocal(false);
     }
 
     /**
