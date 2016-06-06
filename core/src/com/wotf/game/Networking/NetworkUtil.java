@@ -70,7 +70,9 @@ public class NetworkUtil {
                 initClientNetworkListener();
             }
         } else {
-            initHostNetworkListener();
+            new Thread(() -> {
+                initHostNetworkListener();
+            }).start();
             initClientNetworkListener();
         }
 
