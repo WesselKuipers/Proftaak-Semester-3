@@ -86,6 +86,7 @@ public class SessionOnlineHost implements Screen {
         playerList = new ArrayList<>();
         addPlayerToDB();
         playerList = getPlayersOfSession(session);
+        gameSettings.setIsLocal(false);
         messages = new ArrayList<>();
     }
 
@@ -829,7 +830,7 @@ public class SessionOnlineHost implements Screen {
             }
         });
     }
-    
+
     /**
      * Method that adds a message to the GUI
      * @param message Message to add

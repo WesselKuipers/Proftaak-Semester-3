@@ -28,7 +28,7 @@ public class Clusterbomb extends Item {
                new Sprite(new Texture(Gdx.files.internal("clusterbomb.png"))),
                new Sprite(new Texture(Gdx.files.internal("clusterbomb.png"))),
                "effects/grenade_explosion.p");       
-        super.getBullet().isCluster = true;        
+        (super.getBullet()).isCluster = true;        
     }
 
     /**

@@ -47,14 +47,14 @@ public abstract class Item extends Actor implements Serializable {
         this.name = nm;
         this.power = pw;
         this.radius = rad;
-        this.damage = damage;;
-        this.bullet = bullet;
+        this.damage = damage;
         this.bullet_sprite = bulletSprite;
         this.weapon_sprite = weaponSprite;
 
         this.p = new ParticleEffect();
         p.load(Gdx.files.internal(particleEffect), Gdx.files.internal("effects"));
 
+        this.bullet = new Projectile(bullet_sprite, p);
         InitItemChildSuper(weapon_sprite);
     }
 

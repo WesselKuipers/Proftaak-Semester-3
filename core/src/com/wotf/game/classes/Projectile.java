@@ -231,7 +231,7 @@ public class Projectile extends Actor {
      */
     private void terrainCollision() {
         // Terrain and unit collision
-        if (((GameStage) getStage()).getGame().getPlayingPlayer().getId()== ((GameStage) getStage()).getGame().getActiveTeam().getPlayer().getId()&& 
+        if (((GameStage) getStage()).getGame().getPlayingPlayer().getId()== ((GameStage) getStage()).getGame().getActiveTeam().getPlayer().getId() && 
             ((GameStage) getStage()).getGame().getMap().isPixelSolid((int) getX(), (int) getY()) &&
                 isExploded == false) {
 
@@ -244,6 +244,8 @@ public class Projectile extends Actor {
             ((GameStage) getStage()).getNetworkingUtil().sendToHost( syncCollisionMsg );
             
             isExploded = true;
+            
+            terrainCollisionReceive((int) getX(), (int) getY());
         }
     }
     

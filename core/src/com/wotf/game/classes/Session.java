@@ -37,7 +37,6 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
     private Session() throws RemoteException {
     }
 
-    ;
     
     /**
      * Initializes a session using the information of the hosting player
@@ -59,6 +58,21 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
         publisher.registerProperty("startgameprop");
         publisher.registerProperty("chatmessageprop");
     }
+    
+        /**
+     * Initializes a session using the information for local Session
+     *
+     * @param host the player who hosts the game
+     * @param roomName the name of the room which will be displayed in the lobby
+     * @param gameSettings gameSettings of Session
+     * @throws RemoteException
+     */
+    public Session(Player host, String roomName, GameSettings gameSettings) throws RemoteException {
+        this.gameSettings = gameSettings;
+        this.host = host;
+        this.players = new ArrayList<>();
+        this.roomName = roomName;
+    }
 
     /**
      * Constructor without any graphics Made for the unit testing.
@@ -71,7 +85,7 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
         this.players = new ArrayList<>();
         this.roomName = roomName;
     }
-    
+
     /**
      * Sets the host GUI in Session
      * This normally only gets called from SessionOnlineHost
@@ -214,7 +228,7 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
     public void startGame() throws RemoteException {
         publisher.inform("startgameprop", 0, 1);
     }
-    
+
     /**
      * Sends a message to all other players
      * @param message Message to send
