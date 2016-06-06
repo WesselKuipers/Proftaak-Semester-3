@@ -65,6 +65,8 @@ public class SessionOnlineHost implements Screen {
     private Timer timer;
     private SelectBox maxplayerbox;
     private SelectBox unitbox;
+    private ArrayList<String> messages;
+    private List chatBox;
 
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting Other
@@ -83,6 +85,7 @@ public class SessionOnlineHost implements Screen {
         playerList = new ArrayList<>();
         addPlayerToDB();
         playerList = getPlayersOfSession(session);
+        messages = new ArrayList<>();
     }
 
     /**
@@ -146,6 +149,7 @@ public class SessionOnlineHost implements Screen {
         skin = new Skin(Gdx.files.internal("uiskin.json"));
         teams = new List(skin);
         players = new List(skin);
+        chatBox = new List(skin);
 
         // Alle teams en labels hiervoor.
         Table teamstable = new Table();
@@ -158,6 +162,31 @@ public class SessionOnlineHost implements Screen {
         teamselecttable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 100, 100, 160, 160)));
         playerstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 125, 125, 160, 160)));
 
+        Table chatBoxTable = new Table();
+        chatBoxTable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 130, 130, 160, 160)));
+        chatBox.setItems(messages.toArray());
+        chatBoxTable.add(chatBox);
+        chatBoxTable.setWidth(500);
+        chatBoxTable.setHeight(300);
+        chatBoxTable.setPosition(500, 50);
+        stage.addActor(chatBoxTable);
+        
+        chatMessage("Host said: HEY");
+        chatMessage("Host said: NOTHING SAID");
+        
+        TextButton sendMessage = new TextButton("Verstuur", skin);
+        sendMessage.setColor(Color.BLACK);
+        sendMessage.setWidth(200);
+        sendMessage.setHeight(60);
+        sendMessage.setPosition(1010, 120);
+        stage.addActor(sendMessage);
+        sendMessage.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                    
+            }
+        });
+        
         setHostLabel();
 
         setPlayerList(playerstable);
@@ -704,9 +733,9 @@ public class SessionOnlineHost implements Screen {
     private void startGame(SelectBox chooseMap) {
         TextButton start = new TextButton("Start", skin); // Use the initialized skin
         start.setColor(Color.BLACK);
-        start.setWidth(300);
+        start.setWidth(200);
         start.setHeight(60);
-        start.setPosition(590, 180);
+        start.setPosition(1010, 190);
         stage.addActor(start);
         start.addListener(new ClickListener() {
             @Override
@@ -764,9 +793,9 @@ public class SessionOnlineHost implements Screen {
     private void exitGame() {
         TextButton exit = new TextButton("Exit", skin); // Use the initialized skin
         exit.setColor(Color.BLACK);
-        exit.setWidth(300);
+        exit.setWidth(200);
         exit.setHeight(60);
-        exit.setPosition(590, 110);
+        exit.setPosition(1010, 50);
         stage.addActor(exit);
         exit.addListener(new ClickListener() {
             @Override
@@ -794,6 +823,10 @@ public class SessionOnlineHost implements Screen {
                 }
             }
         });
+    }
+    public void chatMessage(String message){
+        messages.add(message);
+        chatBox.setItems(messages.toArray());
     }
 
     /**

@@ -54,6 +54,7 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
         publisher.registerProperty("sessionsettingsprop");
         publisher.registerProperty("cancelgameprop");
         publisher.registerProperty("startgameprop");
+        publisher.registerProperty("chatmessageprop");
     }
 
     /**

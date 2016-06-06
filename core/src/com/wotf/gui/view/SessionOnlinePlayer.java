@@ -74,6 +74,8 @@ public class SessionOnlinePlayer implements Screen {
     private int startGame;
     private boolean updateUnit;
     private boolean refreshUnit;
+    private ArrayList<String> messages;
+    private List chatBox;
 
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting
@@ -109,6 +111,8 @@ public class SessionOnlinePlayer implements Screen {
         playerList = getPlayersOfSession(session);
         updateUnit = false;
         refreshUnit = false;
+        messages = new ArrayList<>();
+        chatBox = new List(skin);
     }
 
     /**
@@ -194,6 +198,31 @@ public class SessionOnlinePlayer implements Screen {
         mapstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 220, 220, 160, 160)));
         teamselecttable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 100, 100, 160, 160)));
         playerstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 125, 125, 160, 160)));
+        
+        Table chatBoxTable = new Table();
+        chatBoxTable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 130, 130, 160, 160)));
+        chatBox.setItems(messages.toArray());
+        chatBoxTable.add(chatBox);
+        chatBoxTable.setWidth(500);
+        chatBoxTable.setHeight(300);
+        chatBoxTable.setPosition(500, 50);
+        stage.addActor(chatBoxTable);
+        
+        chatMessage("Host said: HEY");
+        chatMessage("Host said: NOTHING SAID");
+        
+        TextButton sendMessage = new TextButton("Verstuur", skin);
+        sendMessage.setColor(Color.BLACK);
+        sendMessage.setWidth(200);
+        sendMessage.setHeight(60);
+        sendMessage.setPosition(1010, 120);
+        stage.addActor(sendMessage);
+        sendMessage.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                    
+            }
+        });
 
         setPlayerList(playerstable);
 
@@ -504,9 +533,9 @@ public class SessionOnlinePlayer implements Screen {
     private void exitGame() {
         TextButton exit = new TextButton("Exit", skin); // Use the initialized skin
         exit.setColor(Color.BLACK);
-        exit.setWidth(300);
+        exit.setWidth(200);
         exit.setHeight(60);
-        exit.setPosition(590, 110);
+        exit.setPosition(1010, 50);
         stage.addActor(exit);
         exit.addListener(new ClickListener() {
             @Override
@@ -763,7 +792,8 @@ public class SessionOnlinePlayer implements Screen {
     }
     
     public void chatMessage(String message){
-        //TODO message handling
+        messages.add(message);
+        chatBox.setItems(messages.toArray());
     }
 
     /**
