@@ -15,6 +15,7 @@ import com.badlogic.gdx.net.SocketHints;
 import com.wotf.game.GameStage;
 import com.wotf.game.classes.Player;
 import com.wotf.game.classes.Team;
+import com.wotf.game.classes.TurnLogic;
 import com.wotf.game.classes.Unit;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -290,6 +291,8 @@ public class NetworkUtil {
             float mousePosY = Float.parseFloat(mousePosYStr);
 
             scene.fire(mousePosX, mousePosY);
+            
+            scene.getGame().getTurnLogic().setState(TurnLogic.TurnState.SHOOTING);
         } catch (InvalidParameterException ipe) {
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
