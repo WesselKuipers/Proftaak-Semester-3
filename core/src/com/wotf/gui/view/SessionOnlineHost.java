@@ -63,7 +63,7 @@ public class SessionOnlineHost implements Screen {
     private Session session;
     private Player player;
     private Timer timer;
-    private SelectBox maxplayerbox;
+    private SelectBox maxPlayerBox;
     private SelectBox unitbox;
     private ArrayList<String> messages;
     private List chatBox;
@@ -80,6 +80,7 @@ public class SessionOnlineHost implements Screen {
         this.game = game;
         this.session = session;
         this.player = player;
+        session.setHostGui(this);
         gameSettings = new GameSettings();
         teamList = new ArrayList<>();
         playerList = new ArrayList<>();
@@ -171,9 +172,6 @@ public class SessionOnlineHost implements Screen {
         chatBoxTable.setPosition(500, 50);
         stage.addActor(chatBoxTable);
         
-        chatMessage("Host said: HEY");
-        chatMessage("Host said: NOTHING SAID");
-        
         TextButton sendMessage = new TextButton("Verstuur", skin);
         sendMessage.setColor(Color.BLACK);
         sendMessage.setWidth(200);
@@ -183,7 +181,14 @@ public class SessionOnlineHost implements Screen {
         sendMessage.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                    
+                //chatMessage("Testbericht");
+                String message = SessionOnlineHost.this.player.getName() + ": " + "testbericht";
+
+                try {
+                    SessionOnlineHost.this.session.sendChatMessage(message);
+                } catch (RemoteException ex) {
+                    Gdx.app.log("SessionOnlineHost", ex.getMessage());
+                }
             }
         });
         
@@ -517,16 +522,16 @@ public class SessionOnlineHost implements Screen {
         maxplayervals[1] = "3";
         maxplayervals[2] = "4";
         maxplayervals[3] = "5";
-        maxplayerbox = new SelectBox(skin);
-        maxplayerbox.setItems(maxplayervals);
-        maxplayerbox.setSelected(Integer.toString(session.getGameSettings().getMaxPlayersSession()));
-        maxplayerbox.addListener(new ChangeListener() {
+        maxPlayerBox = new SelectBox(skin);
+        maxPlayerBox.setItems(maxplayervals);
+        maxPlayerBox.setSelected(Integer.toString(session.getGameSettings().getMaxPlayersSession()));
+        maxPlayerBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeListener.ChangeEvent event, Actor actor) {
                 try {
                     SessionContext sc = new SessionContext();
                     // Send a new property because this is sending a session object instead of a gamesettings object
-                    gameSettings.setMaxPlayersSession(Integer.valueOf(maxplayerbox.getSelected().toString()));
+                    gameSettings.setMaxPlayersSession(Integer.valueOf(maxPlayerBox.getSelected().toString()));
                     session.setGameSettings(gameSettings);
                     // Update this session's max players value.
                     // Otherwise people will be able to connect to the session while over the max players value.
@@ -536,7 +541,7 @@ public class SessionOnlineHost implements Screen {
                 }
             }
         });
-        settingstable.add(maxplayerbox).width(180);
+        settingstable.add(maxPlayerBox).width(180);
         settingstable.row();
     }
 
@@ -824,6 +829,11 @@ public class SessionOnlineHost implements Screen {
             }
         });
     }
+    
+    /**
+     * Method that adds a message to the GUI
+     * @param message Message to add
+     */
     public void chatMessage(String message){
         messages.add(message);
         chatBox.setItems(messages.toArray());

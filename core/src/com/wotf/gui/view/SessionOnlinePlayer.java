@@ -220,7 +220,10 @@ public class SessionOnlinePlayer implements Screen {
         sendMessage.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                    
+                //chatMessage("Testbericht");
+                String message = SessionOnlinePlayer.this.player.getName() + ": " + "testbericht";
+                System.out.println("Sending message: " + message);
+                SessionOnlinePlayer.this.manager.sendMessage(message);
             }
         });
 
@@ -782,7 +785,6 @@ public class SessionOnlinePlayer implements Screen {
      * Change variable startGame to 1 if this method is called. 
      * This will be checked in the render. For a change from 0 to 1.
      * Updates the playerlist before launch.
-     * 
      */
     public void startGame() {
         startGame = 1;
@@ -791,7 +793,11 @@ public class SessionOnlinePlayer implements Screen {
         session.setPlayerList(playerList);
     }
     
-    public void chatMessage(String message){
+    /**
+     * Method that adds a message to the GUI
+     * @param message Message to add
+     */
+    public void chatMessage(String message) {
         messages.add(message);
         chatBox.setItems(messages.toArray());
     }
