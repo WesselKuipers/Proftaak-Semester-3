@@ -1,5 +1,6 @@
 package com.wotf.game.desktop;
 
+import com.badlogic.gdx.Files;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.wotf.game.WotFGame;
@@ -18,6 +19,8 @@ public class DesktopLauncher {
             // Sets the default width and height of the window to 720p
             config.width = 1280;
             config.height = 720;
+            config.title = "War of the Figures";
+            config.addIcon("icon.png", Files.FileType.Internal);
             LwjglApplication lwjglApplication = new LwjglApplication(new WotFGame(), config);
     }
 }
