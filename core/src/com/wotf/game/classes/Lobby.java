@@ -49,7 +49,6 @@ public class Lobby {
      * @return A list of sessions currently found in the database
      */
     public List<Session> getSessions() {
-        // TODO: Database calls?
         return Collections.unmodifiableList(sessions);
     }
 
@@ -71,7 +70,6 @@ public class Lobby {
      * @param s Session to register
      */
     public void addSession(Session s) {
-        // TODO: Database calls
         sessions.add(s);
     }
 
@@ -80,23 +78,11 @@ public class Lobby {
      * @param s Session to remove
      */
     public void removeSession(Session s) {
-        // TODO: Database calls
         sessions.remove(s);
     }
     
     public void removeAllSessions() {
-        // TODO: Database calls
         sessions.clear();
-    }
-
-    /**
-     * Attempts to join the given session
-     * if successfully joined, the game will transition to the corresponding Session screen
-     * @param s Session to join
-     */
-    public void joinSession(Session s) {
-        // logic for joining sessions
-        // TODO: Database calls
     }
 
 }

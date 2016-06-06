@@ -81,11 +81,11 @@ public class GameSettings implements Serializable {
      * TODO!
      */
     private void fillWeapons() {
-        WEAPONS_ARMORY.add(new Bazooka("Bazooka"));
-        WEAPONS_ARMORY.add(new Nuke("Nuke"));
-        WEAPONS_ARMORY.add(new Grenade("Grenade"));
-        WEAPONS_ARMORY.add(new Clusterbomb("Clusterbomb"));
-        WEAPONS_ARMORY.add(new AirStrike("Airstrike"));
+        WEAPONS_ARMORY.add(new Bazooka());
+        WEAPONS_ARMORY.add(new Nuke());
+        WEAPONS_ARMORY.add(new Grenade());
+        WEAPONS_ARMORY.add(new Clusterbomb());
+        WEAPONS_ARMORY.add(new AirStrike());
     }
  
     /**

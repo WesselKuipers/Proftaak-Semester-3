@@ -5,11 +5,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.wotf.game.GameStage;
 import com.wotf.game.GuiStage;
@@ -18,7 +14,6 @@ import com.wotf.game.classes.GameSettings;
 import com.wotf.game.classes.Map;
 import com.wotf.game.classes.Player;
 import com.wotf.game.classes.Team;
-import java.util.ArrayList;
 import java.util.List;
 import com.wotf.game.WotFGame;
 import com.wotf.game.classes.Session;
@@ -95,7 +90,7 @@ public class GameEngine implements Screen {
         viewport.setWorldSize(map.getWidth(), map.getHeight());
         viewport.getCamera().position.set(viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2, 0);
         viewport.apply();
-        
+
         if(!isLocal){
             // WARNING: THIS IS A TEMPORARY FIX. This makes the client sleep so it can receive all gamesettings sent by the host, else it will crash.
             // TODO: Make the client wait until the settings are loaded from the host by the client?
