@@ -57,6 +57,8 @@ public class SessionLocal implements Screen {
     private final GameSettings gameSettings;
     private Image map1;
     private SelectBox unitbox;
+    private Session sessionLocal;
+    private Player defaultPlayer;
 
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting
@@ -67,6 +69,8 @@ public class SessionLocal implements Screen {
         this.game = game;
         gameSettings = new GameSettings();
         teamList = new ArrayList<>();
+        defaultPlayer = new Player(getLocalhost(), "defaultPlayer");
+        defaultPlayer.setId(0);
     }
 
     /**
@@ -121,6 +125,7 @@ public class SessionLocal implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Team teamalpha = new Team("Alpha", Color.BLUE);
+                teamalpha.setPlayer(defaultPlayer);
                 teamalpha.setColorname(teamalpha.getColor().toString());
 
                 int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
@@ -139,6 +144,7 @@ public class SessionLocal implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Team teambeta = new Team("Beta", Color.CORAL);
+                teambeta.setPlayer(defaultPlayer);
                 teambeta.setColorname(teambeta.getColor().toString());
 
                 int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
@@ -156,6 +162,7 @@ public class SessionLocal implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Team teamgamma = new Team("Gamma", Color.GREEN);
+                teamgamma.setPlayer(defaultPlayer);
                 teamgamma.setColorname(teamgamma.getColor().toString());
 
                 int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
@@ -332,35 +339,19 @@ public class SessionLocal implements Screen {
 
                 // Selected TurnTime to an integer.
                 gameSettings.setTurnTime(Integer.parseInt(turntimebox.getSelected().toString()));
-                
+
                 gameSettings.setIsLocal(true);
                 // Create the map
                 Map map = new Map(chooseMap.getSelected().toString());
-                String localhost = null;
-                
+
                 try {
-                    localhost =  InetAddress.getLocalHost().getHostAddress();
-                } catch (UnknownHostException ex) {
-                    Logger.getLogger(SessionLocal.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
-                Player playerLocal = new Player(localhost, "Local");
-                Player playerLocal1 = new Player(localhost, "Local2");
-                
-                playerLocal1.setId(1);
-                playerLocal.setId(0);
-                Session sessionLocal = null;
-                
-                try {
-                    // Create session
-                    sessionLocal = new Session(playerLocal, "localHost", gameSettings);
-                    sessionLocal.addPlayer(playerLocal);
-                    sessionLocal.addPlayer(playerLocal1);
+                    sessionLocal = new Session(defaultPlayer, "localHost", gameSettings);
+                    sessionLocal.addPlayer(defaultPlayer);
                 } catch (RemoteException ex) {
-                    Logger.getLogger(SessionLocal.class.getName()).log(Level.SEVERE, null, ex);
+                    // TODO: Logging
                 }
-                
-                game.setScreen(new GameEngine(game, gameSettings, map, sessionLocal, playerLocal));
+
+                game.setScreen(new GameEngine(game, gameSettings, map, sessionLocal, defaultPlayer));
             }
         });
 
@@ -462,4 +453,12 @@ public class SessionLocal implements Screen {
     public void dispose() {
     }
 
+    private String getLocalhost() {
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(SessionLocal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
 }

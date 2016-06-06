@@ -105,7 +105,7 @@ public class NetworkUtil {
     private void initClientNetworkListener() {
         SocketHints socketHints = new SocketHints();
         this.socket = Gdx.net.newClientSocket(Net.Protocol.TCP, host.getIp(), port, socketHints);
-        if(!scene.getGame().getGameSettings().getIsLocal())
+        //if(!scene.getGame().getGameSettings().getIsLocal())
             messageListener(false);
     }
 
