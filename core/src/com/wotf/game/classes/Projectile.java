@@ -205,7 +205,9 @@ public class Projectile extends Actor {
 
         // if projectile is out of bounds, remove it from the stage
         if (isProjectileOutOfBounds(gameMap)) {
-            ((GameStage) getStage()).getGame().endTurn();
+           if (((GameStage) getStage()).getGame().getPlayingPlayer().getId() == ((GameStage) getStage()).getGame().getActiveTeam().getPlayer().getId()) {
+                ((GameStage) getStage()).getGame().endTurn();
+            }
             this.remove();
             isExploded = false;
             return;
@@ -231,7 +233,7 @@ public class Projectile extends Actor {
      */
     private void terrainCollision() {
         // Terrain and unit collision
-        if (((GameStage) getStage()).getGame().getPlayingPlayer().getId()== ((GameStage) getStage()).getGame().getActiveTeam().getPlayer().getId()&& 
+        if (((GameStage) getStage()).getGame().getPlayingPlayer().getId()== ((GameStage) getStage()).getGame().getActiveTeam().getPlayer().getId() && 
             ((GameStage) getStage()).getGame().getMap().isPixelSolid((int) getX(), (int) getY()) &&
                 isExploded == false) {
 
