@@ -39,25 +39,28 @@ public class NetworkUtil {
     private final int port = 9021;
     private final GameStage scene;
     private Socket socket;
-    private final List<Vector2> unitPositions = new ArrayList<>();
+    private final List<Vector2> unitPositions;
     
     /**
      * Object holds data to connect to the host.
      * @param host the host of the game.
      * @param gameStage stage to interact with the actors and all classes being used by the game
      */
-    public NetworkUtil( Player host, GameStage gameStage ){
+    public NetworkUtil(Player host, GameStage gameStage){
         this.host = host;
         this.scene = gameStage;
+        this.unitPositions = new ArrayList<>();
         
-        initNetworkListener( this.host );
+        initNetworkListener(this.host);
     }
     
     /**
-     * Add network listener to this client.
+     * Network listener which will setup the socket connection.
+     * If it's the host that is entering this method, create a socket connection. Host will wait until it receives an client request for connection
+     * If it's the client that is entering this method, try to connect to the host's socket connection
      * @param hostIP Ip Address of the host.
      */
-    private void initNetworkListener( Player host ) {
+    private void initNetworkListener(Player host) {
         if (scene.getGame().getPlayingPlayer().getId() == host.getId() ) {
             ServerSocketHints serverSocketHint = new ServerSocketHints();
 
@@ -76,12 +79,23 @@ public class NetworkUtil {
             this.socket = Gdx.net.newClientSocket(Net.Protocol.TCP, host.getIp(), port, socketHints);
             messageListener(false);
         }
+        
+        // Run another thread to check if there was a shutdown client side. if so dispose the socket, to prevent connection conflicts.
+        Runtime.getRuntime().addShutdownHook(new Thread(){
+            @Override
+            public void run(){
+                socket.dispose();
+                Gdx.app.log("networkingUtil", "Server was shut down");
+            }
+        });
     }
     
     /**
-     * Used to check if host is receiving messages from any client
+     * messageListener used for retrieving messages sent, either by host or any client, after its received, we are going to run the receiveMessage method.
+     * @param isHost this boolean is used to either start a message listener for host or client. 
+     * If it's the host, we want to send the message to all clients by using the sendToClient method for all connected clients. 
      */
-    private void messageListener(Boolean isHost) {
+    private void messageListener(boolean isHost) {
         new Thread(() -> {
             String message;
             // Keep checking if client receives messages
@@ -111,7 +125,7 @@ public class NetworkUtil {
     }
     
     /**
-     * Send message to host.
+     * Send message to host and receive the message for the host itself too, else it will only be executed on the client sides.
      * @param nMsg
      */
     public void sendToHost( NetworkMessage nMsg ) {
@@ -124,14 +138,14 @@ public class NetworkUtil {
             }
             
             // debug 
-            System.out.println("Command: " + nMsg.getCommand().toString() + " was send to host.");
+            Gdx.app.log("networkingUtil", "Command: " + nMsg.getCommand().toString() + " was send to host.");
         } catch (IOException ex) {
             Gdx.app.log("networkingUtil", "Error occured while sending message to host", ex);
         }
     } 
     
     /**
-     * Send message to client.
+     * Send message to client by using the output stream write method.
      * @param message
      * @param clientIP
      */
@@ -150,11 +164,6 @@ public class NetworkUtil {
      * @param message Message to send.
      */
     public void receiveMessage( String message ) {
-        //debug
-        //System.out.println("Received message: " + message);
-        
-        //check if host get this message if so make host send it to all clients.
-        
         //split message up into networkMessages by splitting by end of line (;).        
         String[] splitMessages = message.split(";");
         
@@ -162,7 +171,7 @@ public class NetworkUtil {
             NetworkMessage nMsg = new NetworkMessage( msg );
             
             //debug
-            System.out.println("Command: " + nMsg.getCommand().toString() + " was received and triggered.");
+            Gdx.app.log("networkingUtil", "Command: " + nMsg.getCommand().toString() + " was received and triggered.");
             
             commandLogic(nMsg);
         }
@@ -177,34 +186,36 @@ public class NetworkUtil {
         // to retreive a parameter do nMsg.getParameter( parameterName).
         // will return null if specified parameter could not be found (message was created incorrect)
         
-        switch ( nMsg.getCommand() ) {
+        switch (nMsg.getCommand()) {
             case FIRE:
-                fire( nMsg );
+                fire(nMsg);
                 break;
             case MOVE:
-                move ( nMsg );
+                move(nMsg);
                 break;
             case BEGINTURN:
-                beginTurn( nMsg );
+                beginTurn(nMsg);
+                break;
             case ENDTURN:
-                //endTurn ( nMsg );
+                endTurn(nMsg);
                 break;
             case INITGAME:
-                initGame( nMsg );
+                initGame(nMsg);
                 break;
             case SYNCUNITS:
-                syncUnits( nMsg );
-                break;
-            case TERRAIN:
-                addTerrainX ( nMsg );
+                syncUnits(nMsg);
                 break;
             case SELECTWEAPON:
-                selectWeapon ( nMsg );
+                selectWeapon(nMsg);
                 break;
             case SWITCHUNIT:
-                switchUnit ( nMsg );
+                switchUnit(nMsg);
+                break;
+            case SYNCCOLLISION:
+                syncCollision(nMsg);
+                break;
             default: 
-                System.out.println("Command was not processed");
+                Gdx.app.log("networkingUtil", "Command was not processed");
                 break;
         }
     }
@@ -245,7 +256,7 @@ public class NetworkUtil {
      * Fire function which retrieves the mousePos parameter from the network message and call in scene fire function.
      * @param nMsg Network message which holds the data for the fire method.
      */
-    public void fire(NetworkMessage nMsg) {
+    private void fire(NetworkMessage nMsg) {
         try {
             String mousePosXStr = nMsg.getParameter("mousePosX");
             String mousePosYStr = nMsg.getParameter("mousePosY");
@@ -256,22 +267,33 @@ public class NetworkUtil {
             scene.fire(mousePosX, mousePosY);
         }
         catch(InvalidParameterException ipe) {
-            //TODO: what do we do when message went wrong ? ask host aggain ?
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
     }
     
-    public void initGame(NetworkMessage nMsg) {
+    /**
+     * Function which is received by all connected clients to initialize the game the first time.
+     * Units are being spawned based on the random locations sent by the host
+     * First turn is started
+     * @param nMsg Network message which holds the data for the initGame method.
+     */
+    private void initGame(NetworkMessage nMsg) {
         try {
             scene.spawnUnits(unitPositions);
             scene.getGame().beginTurn();
         }
         catch(InvalidParameterException ipe) {
-            //TODO: what do we do when message went wrong ? ask host aggain ?
+            Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
     }
     
-    public void beginTurn(NetworkMessage nMsg) {
+    /**
+     * Function which is retrieved by all clients to beginTurn on the game.
+     * We want to send the wind parameters to all connected clients,
+     * EXCEPT the host because he has generated the wind and is already on the correct wind vector.
+     * @param nMsg Network message which holds the data for the beginTurn method. 
+     */
+    private void beginTurn(NetworkMessage nMsg) {
         try {
             // host has already ran this action when sending this message, so we want to apply it only on the connected clients 
             if (scene.getGame().getPlayingPlayer().getId() != host.getId()) {
@@ -281,46 +303,24 @@ public class NetworkUtil {
 
                 float windX = Float.parseFloat(windXStr);
                 float windY = Float.parseFloat(windYStr);
-                
-                System.out.println("Wind received: " + windX + ", " + windY);
 
                 Vector2 windForce = new Vector2(windX, windY);
                 
                 scene.getGame().beginTurnReceive(windForce);
             }
         }
-        catch( InvalidParameterException ipe ) {
-            //TODO: what do we do when message went wrong ? ask host aggain ?
-            Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
-        }
-    }
-    
-    public void addTerrainX(NetworkMessage nMsg) {
-        try {
-            boolean[][] terrain = scene.getGame().getMap().getTerrain();
-            int yVal = 0;
-            boolean val = false;
-            
-            String xStr = nMsg.getParameter("x");
-            for (int y = 0; y < terrain[0].length; y++) {
-                String yStr = nMsg.getParameter("y" + y);
-                String valStr = nMsg.getParameter("val" + y);
-                
-                yVal = Integer.parseInt(yStr);
-                val = Boolean.parseBoolean(valStr);
-            }
-            
-            int x = Integer.parseInt(xStr);
-            
-            terrain[x][yVal] = val;
-        }
         catch(InvalidParameterException ipe) {
-            //TODO: what do we do when message went wrong ? ask host aggain ?
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
     }
-    
-    public void syncUnits( NetworkMessage nMsg ) {
+
+    /**
+     * On first time of call on this function, it should retrieve the randomly generated spawn locations and put it in the unitPositions array.
+     * After the first call all unit positions will be sent after each turn, to sync the unit positions.
+     * The health of the units is also being synchronized by this function.
+     * @param nMsg Network message which holds the data for the syncUnits method.
+     */
+    private void syncUnits( NetworkMessage nMsg ) {
         try {   
             List<Team> teams = scene.getGame().getTeams();
             int unitCount = 0;
@@ -331,13 +331,13 @@ public class NetworkUtil {
                     String unitXStr = nMsg.getParameter("u" + unitCount + "x");
                     String unitYStr = nMsg.getParameter("u" + unitCount + "y");
 
-                    float unitX = Float.parseFloat( unitXStr );
-                    float unitY = Float.parseFloat( unitYStr );
+                    float unitX = Float.parseFloat(unitXStr);
+                    float unitY = Float.parseFloat(unitYStr);
 
-                    Vector2 unitPosition = new Vector2( unitX, unitY );
+                    Vector2 unitPosition = new Vector2(unitX, unitY);
 
                     // When no positions are yet added, add them to the array, else we are going to sync the current positions and the unit health
-                    if (unitPositions == null || unitPositions.size() != unitAmount) {
+                    if (unitPositions.size() != unitAmount) {
                         unitPositions.add(unitPosition);
                     } else {
                         unit.setPosition(unitPosition);
@@ -352,39 +352,42 @@ public class NetworkUtil {
                 }
             }
         }
-        catch( InvalidParameterException ipe ) {
-            //TODO: what do we do when message went wrong ? ask host aggain ?
+        catch(InvalidParameterException ipe) {
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
     }
     
-    public void move( NetworkMessage nMsg ) {
+    /**
+     * Function which will retrieve the direction and trigger a move by the active unit.
+     * @param nMsg Network message which holds the data for the move method.
+     */
+    private void move(NetworkMessage nMsg) {
         try {
+            // Retrieve direction
             String direction = nMsg.getParameter("direction");
             
+            // Either move left or right depending on the parameter direction, above.
             if ("right".equals(direction)) {
                 scene.getGame().getActiveTeam().getActiveUnit().jump(true);
             } else {
                 scene.getGame().getActiveTeam().getActiveUnit().jump(false);
             }
         }
-        catch( InvalidParameterException ipe ) {
-            //TODO: what do we do when message went wrong ? ask host aggain ?
+        catch(InvalidParameterException ipe) {
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
-        
     }
 
-    private void endTurn(NetworkMessage nMsg) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
+    /**
+     * Function to receive a switch between active unit
+     * @param nMsg Network message which holds the data for the switchUnit method.
+     */
     private void switchUnit(NetworkMessage nMsg) {
         try {
             scene.getGame().getActiveTeam().setNextActiveUnit();
+            scene.getGame().setActiveUnit(scene.getGame().getActiveTeam());
         }
         catch(InvalidParameterException ipe) {
-            //TODO: what do we do when message went wrong ? ask host aggain ?
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
     }
@@ -395,32 +398,46 @@ public class NetworkUtil {
      */
      private void selectWeapon(NetworkMessage nMsg) {
         try {
-            int weapon = 0;
-            String weaponIndex = nMsg.getParameter("WeaponIndex");
-            if (tryParseInt(weaponIndex)) {  
-                weapon = Integer.parseInt(weaponIndex);  
-            }             
-
-            scene.getGame().getActiveTeam().getActiveUnit().selectWeaponIndex(weapon);
+            String weaponIndexStr = nMsg.getParameter("weaponIndex");
+                     
+            int weaponIndex = Integer.parseInt(weaponIndexStr);  
+            
+            scene.getGame().getActiveTeam().getActiveUnit().selectWeaponIndex(weaponIndex);
         }
         catch(InvalidParameterException ipe) {
-            //TODO: what do we do when message went wrong ? ask host aggain ?
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
     }
-    
+
     /**
-     * test if the given string is a integer
-     * @param value string to be tested
-     * @return boolean if it is safe to parse the content as an integer
+     * Function to synchronize the collision that was shot by the active player. 
+     * @param nMsg Network message which holds the data for the syncCollision method.
      */
-    public static boolean tryParseInt(String value) {  
-        try {  
-            Integer.parseInt(value);  
-            return true;  
+    private void syncCollision(NetworkMessage nMsg) {
+        try {
+            String posXStr = nMsg.getParameter("posX");
+            String posYStr = nMsg.getParameter("posY");
+            
+            int posX = Integer.parseInt(posXStr);
+            int posY = Integer.parseInt(posYStr);
+            
+            scene.getGame().getActiveTeam().getActiveUnit().getWeapon().getBullet().terrainCollisionReceive(posX, posY);
         }
-        catch (NumberFormatException e) {  
-            return false;  
-        }  
+        catch(InvalidParameterException ipe) {
+            Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
+        }
+    }
+
+    /**
+     * Function to end a turn. When host has ended a turn receive it for all clients.
+     * @param nMsg Network message which holds the data for the endTurn method.
+     */
+    private void endTurn(NetworkMessage nMsg) {
+        try {
+            scene.getGame().endTurnReceive();
+        }
+        catch(InvalidParameterException ipe) {
+            Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
+        }
     }
 }

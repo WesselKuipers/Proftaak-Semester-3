@@ -7,7 +7,6 @@ import com.wotf.game.WotFGame;
 
 /**
  * Main entry point of the desktop application
- * @author Remco
  */
 public class DesktopLauncher {
     /**

@@ -100,7 +100,7 @@ public class GameEngine implements Screen {
         }
         
         // Initializes game object using game settings
-        Game gameclass = new Game(gameSettings, map, session.getPlayers(), playingPlayer);
+        Game gameclass = new Game(gameSettings, map, session.getPlayers(), playingPlayer, session.getHost());
 
         stageGUI = new GuiStage(gameclass);
         

@@ -141,7 +141,6 @@ public class GameStage extends Stage {
     
     /**
      * 
-     * @param unitAmount
      * @return a list with random spawn locations 
      */
     public List<Vector2> getRandomSpawnLocations() {
@@ -266,9 +265,10 @@ public class GameStage extends Stage {
             switch (keyCode) {
                 // Unit selection
                 case Keys.TAB:
-                    game.getActiveTeam().setNextActiveUnit();
-                    NetworkMessage switchUnitMsg = new NetworkMessage( Command.SWITCHUNIT );
-                    networkingUtil.sendToHost( switchUnitMsg );
+                    if (game.getTurnLogic().getState() == TurnState.PLAYING) {
+                        NetworkMessage switchUnitMsg = new NetworkMessage(Command.SWITCHUNIT);
+                        networkingUtil.sendToHost(switchUnitMsg);
+                    }
                     break;
                 // Debug key for killing current unit
                 case Keys.G:
@@ -279,38 +279,34 @@ public class GameStage extends Stage {
                     showDebug = !showDebug;
                     break;
                 case Keys.RIGHT:
-                    if(game.getActiveTeam().getActiveUnit() != null) {
-                        NetworkMessage moveMsg = new NetworkMessage( Command.MOVE );
+                    if (game.getActiveTeam().getActiveUnit() != null) {
+                        NetworkMessage moveMsg = new NetworkMessage(Command.MOVE);
                         moveMsg.addParameter("direction", "right");
-                        networkingUtil.sendToHost( moveMsg );
+                        networkingUtil.sendToHost(moveMsg);
                     }    
                     break;
                 case Keys.LEFT:
-                    if(game.getActiveTeam().getActiveUnit() != null) {
-                        NetworkMessage moveMsg = new NetworkMessage( Command.MOVE );
+                    if (game.getActiveTeam().getActiveUnit() != null) {
+                        NetworkMessage moveMsg = new NetworkMessage(Command.MOVE);
                         moveMsg.addParameter("direction", "left");
-                        networkingUtil.sendToHost( moveMsg );
+                        networkingUtil.sendToHost(moveMsg);
                     }
                     break;
                 case Keys.NUM_0:
-                    game.getActiveTeam().getActiveUnit().selectWeaponIndex(0);
+                    sendSelectWeapon(0);
                     break;
                 case Keys.NUM_1:
-                    game.getActiveTeam().getActiveUnit().selectWeaponIndex(1);
+                    sendSelectWeapon(1);
                     break;
                 case Keys.NUM_2:
-                    game.getActiveTeam().getActiveUnit().selectWeaponIndex(2);
+                    sendSelectWeapon(2);
                     break;
                 case Keys.NUM_3:
-                    game.getActiveTeam().getActiveUnit().selectWeaponIndex(3);
+                    sendSelectWeapon(3);
                     break;
                 case Keys.NUM_4:
-                    game.getActiveTeam().getActiveUnit().selectWeaponIndex(4);
-                    break;
-                case Keys.NUM_5:
-                    game.getActiveTeam().getActiveUnit().selectWeaponIndex(5);
-                    break;
-                    
+                    sendSelectWeapon(4);
+                    break;    
             }
         }
 
@@ -318,6 +314,16 @@ public class GameStage extends Stage {
         cam.update();
 
         return super.keyDown(keyCode);
+    }
+    
+    /**
+     * Function to send the change of a weapon selection to network.
+     * @param weaponIndex index of the weapon
+     */
+    private void sendSelectWeapon(int weaponIndex) {
+        NetworkMessage selectWeaponMsg = new NetworkMessage(Command.SELECTWEAPON);
+        selectWeaponMsg.addParameter("weaponIndex", Integer.toString(weaponIndex));
+        networkingUtil.sendToHost(selectWeaponMsg);
     }
 
     /**
@@ -448,15 +454,20 @@ public class GameStage extends Stage {
 
         unitCollisionExplosion(x, radius, y, damage);
 
-        // adds effect to the list of effects to draw
-        PooledEffect effect = explosionEffectPool.obtain();
-        effect.setPosition(x, y);
-        //effect.scaleEffect(radius/100);
-        effect.start();
-        particles.add(effect);
-        if (cluster) {
-            fireCluster(x, y);
-        }
+//        Gdx.app.postRunnable(() -> {
+//            // adds effect to the list of effects to draw
+//            PooledEffect effect = explosionEffectPool.obtain();
+//            effect.setPosition(x, y);
+//            effect.scaleEffect(radius/100);
+//            effect.start();
+//            particles.add(effect);
+//            if (cluster) {
+//               fireCluster(x, y);
+//            }
+//        });
+        //game.getActiveTeam().getActiveUnit().getWeapon().getBullet().remove();
+        // End the turn after unit has fired
+        //game.endTurn();
     }
 
     private void fireCluster(int x, int y) {
@@ -587,9 +598,6 @@ public class GameStage extends Stage {
 
         // make camera follow bullet
         focusedActor = (Actor)( game.getActiveTeam().getActiveUnit().getWeapon().getBullet() );
-        
-        // End the turn after unit has fired
-        game.endTurn();
     }
 
     /**

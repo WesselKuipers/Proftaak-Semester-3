@@ -10,7 +10,7 @@ package com.wotf.game.classes;
  * @author rensphilipsen
  */
 public class TurnLogic {
-
+    
     /**
      * Enum State of the game
      */

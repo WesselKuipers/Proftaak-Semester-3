@@ -19,9 +19,9 @@ public enum Command {
     ENDTURN,
     INITGAME,
     SYNCUNITS,
-    TERRAIN, 
     SWITCHUNIT,
-    SELECTWEAPON;
+    SELECTWEAPON,
+    SYNCCOLLISION;
     
     /**
      * Helper method which converts a string into command enum.
