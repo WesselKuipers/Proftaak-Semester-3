@@ -205,9 +205,7 @@ public class Projectile extends Actor {
 
         // if projectile is out of bounds, remove it from the stage
         if (isProjectileOutOfBounds(gameMap)) {
-           if (((GameStage) getStage()).getGame().getPlayingPlayer().getId() == ((GameStage) getStage()).getGame().getActiveTeam().getPlayer().getId()) {
-                ((GameStage) getStage()).getGame().endTurn();
-            }
+            ((GameStage) getStage()).getGame().endTurn();
             this.remove();
             isExploded = false;
             return;
