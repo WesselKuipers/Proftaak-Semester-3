@@ -443,13 +443,15 @@ public class NetworkUtil {
      */
     private void syncCollision(NetworkMessage nMsg) {
         try {
-            String posXStr = nMsg.getParameter("posX");
-            String posYStr = nMsg.getParameter("posY");
+            if (scene.getGame().getPlayingPlayer().getId() != scene.getGame().getActiveTeam().getPlayer().getId()) {
+                String posXStr = nMsg.getParameter("posX");
+                String posYStr = nMsg.getParameter("posY");
 
-            int posX = Integer.parseInt(posXStr);
-            int posY = Integer.parseInt(posYStr);
+                int posX = Integer.parseInt(posXStr);
+                int posY = Integer.parseInt(posYStr);
 
-            scene.getGame().getActiveTeam().getActiveUnit().getWeapon().getBullet().terrainCollisionReceive(posX, posY);
+                scene.getGame().getActiveTeam().getActiveUnit().getWeapon().getBullet().terrainCollisionReceive(posX, posY);
+            }
         } catch (InvalidParameterException ipe) {
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }

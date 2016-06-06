@@ -244,6 +244,8 @@ public class Projectile extends Actor {
             ((GameStage) getStage()).getNetworkingUtil().sendToHost( syncCollisionMsg );
             
             isExploded = true;
+            
+            terrainCollisionReceive((int) getX(), (int) getY());
         }
     }
     
