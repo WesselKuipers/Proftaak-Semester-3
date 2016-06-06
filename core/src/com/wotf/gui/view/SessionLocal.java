@@ -349,7 +349,11 @@ public class SessionLocal implements Screen {
         });
 
     }
-
+    
+    /**
+     * Make new units for each team.
+     * @param selectedunitcount
+     */
     public void refreshUnitsForTeam(int selectedunitcount) {
         // For each team in the list remove all the units first and remove it from the gamesettings.
         for (Team teamv : teamList) {
@@ -362,7 +366,13 @@ public class SessionLocal implements Screen {
             gameSettings.addTeam(teamv);
         }
     }
-
+    
+    /**
+     * Create units for a single team based on how many units there should be created.
+     * 
+     * @param selectedunitcount amount of units to create
+     * @param team selected
+     */
     public void addUnitsSingleTeam(int selectedunitcount, Team team) {
         // The new units to the team. The name of the unit is the teamname + the number of the variable 'i'.
         for (int i = 0; i < selectedunitcount; i++) {
