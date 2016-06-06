@@ -1,5 +1,6 @@
 package com.wotf.game.classes.Items;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -12,10 +13,22 @@ import java.io.Serializable;
 /**
  * Abstract class that describes all necessary fields for an Item
  */
-public abstract class Item extends Actor implements Serializable{
+public abstract class Item extends Actor implements Serializable {
+
+    private final float power;
+    private final int radius;
+    private final int damage;
+
+    public ParticleEffect p;
+    public String particleName;
+
+    private Sprite bullet_sprite;
+    private Sprite weapon_sprite;
+
+    private Projectile bullet;
 
     private String name;
-    
+
     /**
      * Main constructor of Item used to initialize all necessary fields
      *
@@ -25,36 +38,57 @@ public abstract class Item extends Actor implements Serializable{
      * @param damage Damage the item inflicts
      * @param weaponSprite Sprite of the weapon of the item
      * @param bulletSprite Sprite of the bullet/projectile of the item
+     * @param pe particle effect that is started with the event trigger
+     * 'explosion'
+     * @param bullet projectile that will be fired as bullet and triggers event
+     * on impact/activation
      */
-    public Item(String nm ) {
+    public Item(String nm, float pw, int rad, int damage, Sprite weaponSprite, Sprite bulletSprite, String particleEffect) {
         this.name = nm;
+        this.power = pw;
+        this.radius = rad;
+        this.damage = damage;;
+        this.bullet = bullet;
+        this.bullet_sprite = bulletSprite;
+        this.weapon_sprite = weaponSprite;
+
+        this.p = new ParticleEffect();
+        p.load(Gdx.files.internal(particleEffect), Gdx.files.internal("effects"));
+
+        InitItemChildSuper(weapon_sprite);
     }
 
-    public void InitItemChildSuper(Sprite weapon_Sprite) {
-        this.setBounds(getX(), getY(), weapon_Sprite.getWidth(), weapon_Sprite.getHeight());
-        this.setWidth(weapon_Sprite.getWidth());
-        this.setHeight(weapon_Sprite.getHeight());
+    public void InitItemChildSuper(Sprite weaponSprite) {
+        this.setBounds(getX(), getY(), weaponSprite.getWidth(), weaponSprite.getHeight());
+        this.setWidth(weaponSprite.getWidth());
+        this.setHeight(weaponSprite.getHeight());
     }
 
     /**
      * @return sprite image of the projectile/bullet
      */
-     public abstract Texture getProjectileTexture();
-         
+    public abstract Texture getProjectileTexture();
+
     /**
      * @return sprite image of the projectile/bullet
      */
-     public abstract Sprite getProjectileSprite();
-     
+    public Sprite getProjectileSprite() {
+        return this.bullet_sprite;
+    }
+
     /**
      * @return stprite image of the weapon
      */
-    public abstract Sprite getWeaponSprite();
-    
+    public Sprite getWeaponSprite() {
+        return this.weapon_sprite;
+    }
+
     /**
-     * @return particle affect
+     * @return particle effect
      */
-      public abstract ParticleEffect getParticle();
+    public ParticleEffect getParticle(){
+        return this.p;
+    }
 
     /**
      * @return the name of the item
@@ -63,34 +97,34 @@ public abstract class Item extends Actor implements Serializable{
     public String getName() {
         return name;
     }
-
-    /**
-     * @param name sets the name of the item
-     */
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
+    
     /**
      * @return gets the power of the item
      */
-    public abstract float getPower();
+    public float getPower(){
+        return this.power;
+    }
 
     /**
      * @return gets the initial blastradius
      */
-    public abstract int getBlastRadius();
+    public int getBlastRadius(){
+        return this.radius;
+    }
 
     /**
      * @return gets the bullet
      */
-    public abstract Projectile getBullet();
+    public Projectile getBullet(){
+        return this.bullet;
+    }
 
     /**
      * @return gets the damage that this item can do
      */
-    public abstract int getDamage();
+    public int getDamage(){
+        return this.damage;
+    }
 
     /**
      * initiate this object as an actor
