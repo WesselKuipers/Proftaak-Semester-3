@@ -16,15 +16,19 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.wotf.game.WotFGame;
 import com.wotf.game.classes.GameSettings;
 import com.wotf.game.classes.Player;
@@ -74,15 +78,14 @@ public class SessionOnlinePlayer implements Screen {
     private int startGame;
     private boolean updateUnit;
     private boolean refreshUnit;
-    private ArrayList<String> messages;
-    private List chatBox;
+    private Table outerTable;
+    private ScrollPane scroll;
 
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting
      * Connects to the parameter session in the SessionManager class.
-     * Initializes global tables.
-     * Makes a list of Textures where all internal maps are saved
-     * Update the playerlist of the current session
+     * Initializes global tables. Makes a list of Textures where all internal
+     * maps are saved Update the playerlist of the current session
      *
      * @param game current
      * @param session from host
@@ -111,15 +114,13 @@ public class SessionOnlinePlayer implements Screen {
         playerList = getPlayersOfSession(session);
         updateUnit = false;
         refreshUnit = false;
-        messages = new ArrayList<>();
-        chatBox = new List(skin);
     }
 
     /**
      * Get all the players for a given session.
-     * 
+     *
      * @param session
-     * @return 
+     * @return
      */
     public ArrayList<Player> getPlayersOfSession(Session session) {
         try {
@@ -133,7 +134,7 @@ public class SessionOnlinePlayer implements Screen {
 
     /**
      * Adds a single player to the session to the DB.
-     * 
+     *
      */
     public void addPlayerToDB() {
         SessionPlayerContext sp = new SessionPlayerContext();
@@ -142,7 +143,7 @@ public class SessionOnlinePlayer implements Screen {
 
     /**
      * Sets a list of the maps which are located in the internal /maps folder.
-     * 
+     *
      */
     public void setMapsList() {
         mapslist = new ArrayList<>();
@@ -177,9 +178,10 @@ public class SessionOnlinePlayer implements Screen {
     }
 
     /**
-     * The screen for the client(player). This screen is based on what the SessionManager receives from the host.
-     * The selectboxes etc. are updated when the host changes a value/selectbox.
-     * 
+     * The screen for the client(player). This screen is based on what the
+     * SessionManager receives from the host. The selectboxes etc. are updated
+     * when the host changes a value/selectbox.
+     *
      */
     @Override
     public void show() {
@@ -198,19 +200,27 @@ public class SessionOnlinePlayer implements Screen {
         mapstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 220, 220, 160, 160)));
         teamselecttable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 100, 100, 160, 160)));
         playerstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 125, 125, 160, 160)));
-        
-        Table chatBoxTable = new Table();
-        chatBoxTable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 130, 130, 160, 160)));
-        chatBox.setItems(messages.toArray());
-        chatBoxTable.add(chatBox);
-        chatBoxTable.setWidth(500);
-        chatBoxTable.setHeight(300);
-        chatBoxTable.setPosition(500, 50);
-        stage.addActor(chatBoxTable);
-        
-        chatMessage("Host said: HEY");
-        chatMessage("Host said: NOTHING SAID");
-        
+
+        outerTable = new Table();
+        outerTable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 130, 130, 160, 160)));
+
+        scroll = new ScrollPane(outerTable);
+        outerTable.setSkin(skin);
+        scroll.setSize(500, 300);
+        scroll.setPosition(500, 50);
+        scroll.setScrollingDisabled(true, false);
+        scroll.setForceScroll(false, true);
+        scroll.setFlickScroll(true);
+        scroll.setOverscroll(false, false);
+        stage.addActor(scroll);
+
+        TextField chatMessageField = new TextField("", skin);
+        chatMessageField.setWidth(500);
+        chatMessageField.setHeight(40);
+        chatMessageField.setPosition(500, 5);
+        stage.setKeyboardFocus(chatMessageField);
+        stage.addActor(chatMessageField);
+
         TextButton sendMessage = new TextButton("Verstuur", skin);
         sendMessage.setColor(Color.BLACK);
         sendMessage.setWidth(200);
@@ -220,10 +230,18 @@ public class SessionOnlinePlayer implements Screen {
         sendMessage.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                //chatMessage("Testbericht");
-                String message = SessionOnlinePlayer.this.player.getName() + ": " + "testbericht";
-                System.out.println("Sending message: " + message);
+                if (chatMessageField.getText().equals("")) {
+                    // Username is empty, show dialog asking for the user to enter a username
+                    Dialog noUsernameDialog = new Dialog("ERROR", skin);
+                    noUsernameDialog.text("Message may not be empty.\nPlease enter a message.");
+                    noUsernameDialog.button("Ok");
+                    noUsernameDialog.show(stage);
+                    return;
+                }
+                
+                String message = SessionOnlinePlayer.this.player.getName() + ": " + chatMessageField.getText();
                 SessionOnlinePlayer.this.manager.sendMessage(message);
+                chatMessageField.setText("");
             }
         });
 
@@ -679,9 +697,9 @@ public class SessionOnlinePlayer implements Screen {
     }
 
     /**
-     * The player should not be removed from the db because it only quitted to the lobby.
-     * If it quits to the lobby we execute the dispose above.
-     * 
+     * The player should not be removed from the db because it only quitted to
+     * the lobby. If it quits to the lobby we execute the dispose above.
+     *
      */
     public void disposeWithoutPlayer() {
         timer.cancel();
@@ -782,9 +800,9 @@ public class SessionOnlinePlayer implements Screen {
     }
 
     /**
-     * Change variable startGame to 1 if this method is called. 
-     * This will be checked in the render. For a change from 0 to 1.
-     * Updates the playerlist before launch.
+     * Change variable startGame to 1 if this method is called. This will be
+     * checked in the render. For a change from 0 to 1. Updates the playerlist
+     * before launch.
      */
     public void startGame() {
         startGame = 1;
@@ -792,19 +810,23 @@ public class SessionOnlinePlayer implements Screen {
         playerList = getPlayersOfSession(session);
         session.setPlayerList(playerList);
     }
-    
+
     /**
      * Method that adds a message to the GUI
+     *
      * @param message Message to add
      */
     public void chatMessage(String message) {
-        messages.add(message);
-        chatBox.setItems(messages.toArray());
+        outerTable.add(message).align(Align.left);
+        outerTable.row();
+        scroll.layout();
+        scroll.scrollTo(0, 120, 0, 0);
     }
 
     /**
-     * Create units for a single team based on how many units there should be created.
-     * 
+     * Create units for a single team based on how many units there should be
+     * created.
+     *
      * @param selectedunitcount amount of units to create
      * @param team selected
      */

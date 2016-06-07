@@ -17,16 +17,20 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.wotf.game.WotFGame;
 import com.wotf.game.classes.GameSettings;
 import com.wotf.game.classes.Player;
@@ -65,8 +69,8 @@ public class SessionOnlineHost implements Screen {
     private Timer timer;
     private SelectBox maxPlayerBox;
     private SelectBox unitbox;
-    private ArrayList<String> messages;
-    private List chatBox;
+    private Table outerTable;
+    private ScrollPane scroll;
 
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting Other
@@ -87,7 +91,6 @@ public class SessionOnlineHost implements Screen {
         addPlayerToDB();
         playerList = getPlayersOfSession(session);
         gameSettings.setIsLocal(false);
-        messages = new ArrayList<>();
     }
 
     /**
@@ -151,7 +154,6 @@ public class SessionOnlineHost implements Screen {
         skin = new Skin(Gdx.files.internal("uiskin.json"));
         teams = new List(skin);
         players = new List(skin);
-        chatBox = new List(skin);
 
         // Alle teams en labels hiervoor.
         Table teamstable = new Table();
@@ -164,15 +166,26 @@ public class SessionOnlineHost implements Screen {
         teamselecttable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 100, 100, 160, 160)));
         playerstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 125, 125, 160, 160)));
 
-        Table chatBoxTable = new Table();
-        chatBoxTable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 130, 130, 160, 160)));
-        chatBox.setItems(messages.toArray());
-        chatBoxTable.add(chatBox);
-        chatBoxTable.setWidth(500);
-        chatBoxTable.setHeight(300);
-        chatBoxTable.setPosition(500, 50);
-        stage.addActor(chatBoxTable);
-        
+        outerTable = new Table();
+        outerTable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 130, 130, 160, 160)));
+
+        scroll = new ScrollPane(outerTable);
+        outerTable.setSkin(skin);
+        scroll.setSize(500, 300);
+        scroll.setPosition(500, 50);
+        scroll.setScrollingDisabled(true, false);
+        scroll.setForceScroll(false, true);
+        scroll.setFlickScroll(true);
+        scroll.setOverscroll(false, false);
+        stage.addActor(scroll);
+
+        TextField chatMessageField = new TextField("", skin);
+        chatMessageField.setWidth(500);
+        chatMessageField.setHeight(40);
+        chatMessageField.setPosition(500, 5);
+        stage.setKeyboardFocus(chatMessageField);
+        stage.addActor(chatMessageField);
+
         TextButton sendMessage = new TextButton("Verstuur", skin);
         sendMessage.setColor(Color.BLACK);
         sendMessage.setWidth(200);
@@ -182,17 +195,26 @@ public class SessionOnlineHost implements Screen {
         sendMessage.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                //chatMessage("Testbericht");
-                String message = SessionOnlineHost.this.player.getName() + ": " + "testbericht";
+                if (chatMessageField.getText().equals("")) {
+                    // Username is empty, show dialog asking for the user to enter a username
+                    Dialog noUsernameDialog = new Dialog("ERROR", skin);
+                    noUsernameDialog.text("Message may not be empty.\nPlease enter a message.");
+                    noUsernameDialog.button("Ok");
+                    noUsernameDialog.show(stage);
+                    return;
+                }
+
+                String message = SessionOnlineHost.this.player.getName() + ": " + chatMessageField.getText();
 
                 try {
                     SessionOnlineHost.this.session.sendChatMessage(message);
+                    chatMessageField.setText("");
                 } catch (RemoteException ex) {
                     Gdx.app.log("SessionOnlineHost", ex.getMessage());
                 }
             }
         });
-        
+
         setHostLabel();
 
         setPlayerList(playerstable);
@@ -833,11 +855,15 @@ public class SessionOnlineHost implements Screen {
 
     /**
      * Method that adds a message to the GUI
+     *
      * @param message Message to add
      */
-    public void chatMessage(String message){
-        messages.add(message);
-        chatBox.setItems(messages.toArray());
+    public void chatMessage(String message) {
+        outerTable.add(message).align(Align.left);
+        outerTable.row();
+        scroll.layout();
+        scroll.scrollTo(0, 120, 0, 0);
+
     }
 
     /**
