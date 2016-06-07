@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
@@ -48,6 +49,16 @@ public class Username implements Screen {
         username.setWidth(300);
         username.setHeight(60);
         username.setPosition(500, 400);
+        stage.setKeyboardFocus(username);
+        username.selectAll();
+        
+        username.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                username.selectAll();
+            }
+        });
+
         stage.addActor(username);
 
         TextButton join = new TextButton("Join", skin); // Use the initialized skin
@@ -69,28 +80,29 @@ public class Username implements Screen {
                 game.setScreen(new MainMenu(game));
             }
         });
+        
         join.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 PlayerContext playerContext = new PlayerContext();
                 Player player = null;
 
-                if (username.getText() != null) {
+                if (!username.getText().equals("")) {
                     try {
-
                         player = new Player(InetAddress.getLocalHost().getHostAddress(), username.getText());
                         playerContext.insert(player);
                         player = playerContext.getLastAddedPlayer();
-
+                        
+                        game.setScreen(new LobbyGUI(game, player));
                     } catch (SQLException | UnknownHostException ex) {
                         Logger.getLogger(Username.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                }
-
-                try {
-                    game.setScreen(new LobbyGUI(game, player));
-                } catch (SQLException ex) {
-                    Logger.getLogger(Username.class.getName()).log(Level.SEVERE, null, ex);
+                } else {
+                    // Username is empty, show dialog asking for the user to enter a username
+                    Dialog noUsernameDialog = new Dialog("Username is empty.", skin);
+                    noUsernameDialog.text("Username may not be empty.\nPlease enter a username.");
+                    noUsernameDialog.button("Ok");
+                    noUsernameDialog.show(stage);
                 }
             }
         });
