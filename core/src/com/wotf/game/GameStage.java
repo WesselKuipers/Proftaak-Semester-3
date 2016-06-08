@@ -206,7 +206,7 @@ public class GameStage extends Stage {
         super.act();
         float delta = Gdx.graphics.getDeltaTime();
 
-        game.update(delta);
+        game.getTurnLogic().update(delta);
         guiStage.update();
 
         // if focusedActor is set to an actor, we want the camera to follow it
@@ -273,7 +273,7 @@ public class GameStage extends Stage {
                 // Debug key for killing current unit
                 case Keys.G:
                     game.getActiveTeam().getActiveUnit().decreaseHealth(100);
-                    game.endTurn();
+                    game.getTurnLogic().endTurn();
                     break;
                 case Keys.F4:
                     showDebug = !showDebug;

@@ -278,7 +278,7 @@ public class Unit extends Group implements Serializable {
 
             // if it's currently this unit's turn, manually call the endTurn() method
             if (((GameStage) this.getStage()).getGame().getActiveTeam().getActiveUnit().equals(this)) {
-                ((GameStage) this.getStage()).getGame().endTurn();
+                ((GameStage) this.getStage()).getGame().getTurnLogic().endTurn();
             }
         }
     }

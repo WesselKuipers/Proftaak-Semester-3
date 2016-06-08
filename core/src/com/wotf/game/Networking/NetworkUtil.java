@@ -173,7 +173,7 @@ public class NetworkUtil {
      * @param message
      * @param clientIP
      */
-    public void sendToClient(String message, String clientIP) {
+    private void sendToClient(String message, String clientIP) {
         try {
             socket.getOutputStream().write((message + System.lineSeparator()).getBytes());
         } catch (IOException ex) {
@@ -189,7 +189,7 @@ public class NetworkUtil {
      *
      * @param message Message to send.
      */
-    public void receiveMessage(String message) {
+    private void receiveMessage(String message) {
         //split message up into networkMessages by splitting by end of line (;).        
         String[] splitMessages = message.split(";");
 
@@ -207,7 +207,7 @@ public class NetworkUtil {
      * handle the logic behind the messages.
      * @param nMsg the network message being sent to the appropriate method
      */
-    public void commandLogic(NetworkMessage nMsg) {
+    private void commandLogic(NetworkMessage nMsg) {
         // the action can be checked based on the enum Command which can be retreived by nMsg.getCommand()
         // to retreive a parameter do nMsg.getParameter( parameterName).
         // will return null if specified parameter could not be found (message was created incorrect)
@@ -307,7 +307,7 @@ public class NetworkUtil {
     private void initGame(NetworkMessage nMsg) {
         try {
             scene.spawnUnits(unitPositions);
-            scene.getGame().beginTurn();
+            scene.getGame().getTurnLogic().beginTurn();
         } catch (InvalidParameterException ipe) {
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
@@ -334,7 +334,7 @@ public class NetworkUtil {
 
                 Vector2 windForce = new Vector2(windX, windY);
 
-                scene.getGame().beginTurnReceive(windForce);
+                scene.getGame().getTurnLogic().beginTurnReceive(windForce);
             }
         } catch (InvalidParameterException ipe) {
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
@@ -415,7 +415,7 @@ public class NetworkUtil {
     private void switchUnit(NetworkMessage nMsg) {
         try {
             scene.getGame().getActiveTeam().setNextActiveUnit();
-            scene.getGame().setActiveUnit(scene.getGame().getActiveTeam());
+            scene.getGame().getTurnLogic().setActiveUnit(scene.getGame().getActiveTeam());
         } catch (InvalidParameterException ipe) {
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
         }
@@ -468,7 +468,7 @@ public class NetworkUtil {
     private void endTurn(NetworkMessage nMsg) {
         try {
             if (scene.getGame().getPlayingPlayer().getId() != scene.getGame().getActiveTeam().getPlayer().getId()) {
-                scene.getGame().endTurnReceive();
+                scene.getGame().getTurnLogic().endTurnReceive();
             }
         } catch (InvalidParameterException ipe) {
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);

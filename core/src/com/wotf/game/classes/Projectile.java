@@ -205,7 +205,7 @@ public class Projectile extends Actor {
 
         // if projectile is out of bounds, remove it from the stage
         if (isProjectileOutOfBounds(gameMap)) {
-            ((GameStage) getStage()).getGame().endTurn();
+            ((GameStage) getStage()).getGame().getTurnLogic().endTurn();
             this.remove();
             isExploded = false;
             return;
@@ -254,7 +254,7 @@ public class Projectile extends Actor {
         System.out.println("Bullet collided at " + posX + " " + posY);
         //((GameStage) getStage()).setParticle(p);
         ((GameStage) getStage()).explode(posX, posY, blastRadius, damage, isCluster);
-        ((GameStage) getStage()).getGame().endTurn();
+        ((GameStage) getStage()).getGame().getTurnLogic().endTurn();
         this.remove();
         isExploded = false;
     }
