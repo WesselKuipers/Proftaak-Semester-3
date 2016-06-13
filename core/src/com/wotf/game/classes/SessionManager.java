@@ -5,8 +5,8 @@
  */
 package com.wotf.game.classes;
 
+import com.badlogic.gdx.Gdx;
 import com.wotf.gui.view.ISessionSettings;
-import com.wotf.gui.view.SessionOnlineHost;
 import com.wotf.gui.view.SessionOnlinePlayer;
 import fontyspublisher.IRemotePropertyListener;
 import java.beans.PropertyChangeEvent;
@@ -15,8 +15,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * To connect a client to a session there must be a SessionManager instance.
@@ -28,9 +26,9 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
 
     private Registry registry;
     private Session session;
-    private ISessionSettings regsettings;
+    private ISessionSettings regSettings;
     private GameSettings gamesettings;
-    private SessionOnlinePlayer GUI;
+    private SessionOnlinePlayer gui;
 
     /**
      * Private empty constructor for initializing UnicastRemoteObject.
@@ -45,13 +43,13 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
      * connect to the registry of the given session (host) 
      * 
      * @param session where the client will connect to
-     * @param GUI which will be shown for the client
+     * @param gui which will be shown for the client
      * @throws RemoteException 
      */
-    public SessionManager(Session session, SessionOnlinePlayer GUI) throws RemoteException {
+    public SessionManager(Session session, SessionOnlinePlayer gui) throws RemoteException {
         this();
         this.session = session;
-        this.GUI = GUI;
+        this.gui = gui;
         getSessionRegistry();
     }
 
@@ -68,11 +66,12 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
         // REGISTER AREA
         try {
             registry = LocateRegistry.getRegistry(session.getHost().getIp(), 5555);
-            regsettings = (ISessionSettings) registry.lookup("SessionSettings");
-            gamesettings = (GameSettings) regsettings.getGameSettings();
-            regsettings.subscribeRemoteListener(this, "sessionsettingsprop");
-            regsettings.subscribeRemoteListener(this, "cancelgameprop");
-            regsettings.subscribeRemoteListener(this, "startgameprop"); 
+            regSettings = (ISessionSettings) registry.lookup("SessionSettings");
+            gamesettings = (GameSettings) regSettings.getGameSettings();
+            regSettings.subscribeRemoteListener(this, "sessionsettingsprop");
+            regSettings.subscribeRemoteListener(this, "cancelgameprop");
+            regSettings.subscribeRemoteListener(this, "startgameprop"); 
+            regSettings.subscribeRemoteListener(this, "chatmessageprop"); 
             // Hou er rekening mee dat de inform van hieruit niet doorgevoerd wordt.
             // Dit is puur om de gamesettings te zetten. De Session klasse kan alleen de inform afgeven.
             session.setGameSettings(gamesettings);
@@ -81,8 +80,9 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
             System.out.println("Client: Cannot locate registry");
             System.out.println("Client: RemoteException: " + ex.getMessage());
             registry = null;
+            Gdx.app.log("SessionManager", ex.getMessage());
         } catch (NotBoundException ex) {
-            Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+            Gdx.app.log("SessionManager", ex.getMessage());
         }
     }
 
@@ -95,6 +95,19 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
     }
     
     /**
+     * Sends message to host which gets relayed to other players
+     * @param message Message to send
+     */
+    public void sendMessage(String message) {
+        try {
+            regSettings.sendChatMessage(message);
+            
+        } catch (RemoteException ex) {
+            Gdx.app.log("SessionManager", ex.getMessage());
+        }
+    }
+    
+    /**
      * Set the registry for a client back to null. This means the registry is removed.
      * Also unsubscribe from the properties it was subscribed to.
      * 
@@ -102,11 +115,12 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
     public void removeRegistry(){
         try {
             registry = null;
-            regsettings.unsubscribeRemoteListener(this, "sessionsettingsprop");
-            regsettings.unsubscribeRemoteListener(this, "cancelgameprop");
-            regsettings.unsubscribeRemoteListener(this, "startgameprop");     
+            regSettings.unsubscribeRemoteListener(this, "sessionsettingsprop");
+            regSettings.unsubscribeRemoteListener(this, "cancelgameprop");
+            regSettings.unsubscribeRemoteListener(this, "startgameprop");   
+            regSettings.unsubscribeRemoteListener(this, "chatmessageprop");  
         } catch (RemoteException ex) {
-            Logger.getLogger(SessionManager.class.getName()).log(Level.SEVERE, null, ex);
+            Gdx.app.log("SessionManager", ex.getMessage());
         }
     }
 
@@ -135,27 +149,32 @@ public class SessionManager extends UnicastRemoteObject implements IRemoteProper
             session.setGameSettings(gamesettings);
 
             // Update the teams
-            GUI.updateTeamList(session);
+            gui.updateTeamList(session);
 
             // Update the selected items SelectBoxes.
-            GUI.updateSelectedItems(session);
+            gui.updateSelectedItems(session);
 
             // Update the map in the image.
-            GUI.updateSelectedMap(session);
+            gui.updateSelectedMap(session);
         }
         if (evt.getPropertyName().equals("cancelgameprop")){
             // Clean the defaults for a player who leaves the session. Like delete him from a session
             // The default should not delete the player from the list of players because he is going back to the lobby.
-            GUI.disposeWithoutPlayer();
+            gui.disposeWithoutPlayer();
 
             // Go back to the LobbyGUI for a player.
             // This will set a value for a variable which will be checked constantly inside the render method.
-            GUI.backToLobby();
+            gui.backToLobby();
         }
         
-        if (evt.getPropertyName().equals("startgameprop")){
-            GUI.startGame();
+        if (evt.getPropertyName().equals("startgameprop")) {
+            gui.startGame();
         }
-    }
+        
+        if (evt.getPropertyName().equals("chatmessageprop")) {
+            // chat message received, add it to the gui
+            gui.chatMessage((String) evt.getNewValue());
+        }
 
+    }
 }

@@ -36,7 +36,7 @@ public class TeamTest {
          * @param name
          * @param color
          */
-        item = new Bazooka("Bazooka");
+        item = new Bazooka();
         gamesettings = new GameSettings();
         player = new Player("127.0.0.1", "Wessel");
         team = new Team("Alpha", Color.BLACK);

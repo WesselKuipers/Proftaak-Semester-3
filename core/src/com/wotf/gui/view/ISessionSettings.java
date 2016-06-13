@@ -7,7 +7,6 @@ package com.wotf.gui.view;
 
 import com.wotf.game.classes.GameSettings;
 import fontyspublisher.IRemotePublisherForListener;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 /**
@@ -16,4 +15,5 @@ import java.rmi.RemoteException;
  */
 public interface ISessionSettings extends IRemotePublisherForListener{
     GameSettings getGameSettings() throws RemoteException;
+    void sendChatMessage(String message) throws RemoteException;
 }

@@ -33,7 +33,7 @@ public class UnitTest {
     public void initItem() {
         team = new Team("Alpha", Color.BLUE);
         unit = new Unit("Unit1", 100, team, new Vector2(40, 80));
-        bazooka = new Bazooka("Bazooka");
+        bazooka = new Bazooka();
     }
 
     @Test

@@ -5,7 +5,10 @@
  */
 package com.wotf.game.classes;
 
+import com.badlogic.gdx.graphics.Color;
 import com.wotf.game.classes.TurnLogic.TurnState;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -16,11 +19,39 @@ import org.junit.Before;
  */
 public class TurnLogicTest {
 
+    private Game game;
+    private Player playerrens;
+    private Player playerdino;
+    private Team alpha;
+    private Team beta;
+    private GameSettings gamesetting;
     private TurnLogic turnlogic;
 
     @Before
     public void initTurnLogic() {
-        turnlogic = new TurnLogic(3);
+        // Make a new GameSettings object.
+        gamesetting = new GameSettings();
+        // Make 2 teams.
+        alpha = new Team("Alpha", Color.RED);
+        // Add a unit to both the teams.
+        // alpha.addUnit("AlphaUnit", 100);
+        beta = new Team("Beta", Color.GREEN);
+        // beta.addUnit("BetaUnit", 150);
+        // Add a team to the GameSettings.
+        gamesetting.addTeam(alpha);
+        gamesetting.addTeam(beta);
+        // Make a list of players.
+        List<Player> players = new ArrayList<>();
+        // Add a player to the list.
+        playerrens = new Player("127.0.0.1", "Rensje");
+        playerdino = new Player("2.2.2.2", "Dinotje");
+        players.add(playerrens);
+        players.add(playerdino);
+        // Finally initialize the Game class.
+        // The map is null because the map can't be initialized from the test classes.
+        // It looks like a Pixmap can't be made while in the tests.
+        game = new Game(gamesetting, null, players, playerrens, playerrens);
+        turnlogic = game.getTurnLogic();
     }
 
     @Test

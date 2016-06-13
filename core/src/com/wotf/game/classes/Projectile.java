@@ -206,7 +206,7 @@ public class Projectile extends Actor {
 
         // if projectile is out of bounds, remove it from the stage
         if (isProjectileOutOfBounds(gameMap)) {
-            ((GameStage) getStage()).getGame().endTurn();
+            ((GameStage) getStage()).getGame().getTurnLogic().endTurn();
             this.remove();
             isExploded = false;
             return;
@@ -232,7 +232,7 @@ public class Projectile extends Actor {
      */
     private void terrainCollision() {
         // Terrain and unit collision
-        if (((GameStage) getStage()).getGame().getPlayingPlayer().getId()== ((GameStage) getStage()).getGame().getActiveTeam().getPlayer().getId()&& 
+        if (((GameStage) getStage()).getGame().getPlayingPlayer().getId()== ((GameStage) getStage()).getGame().getActiveTeam().getPlayer().getId() && 
             ((GameStage) getStage()).getGame().getMap().isPixelSolid((int) getX(), (int) getY()) &&
                 isExploded == false) {
 
@@ -245,6 +245,8 @@ public class Projectile extends Actor {
             ((GameStage) getStage()).getNetworkingUtil().sendToHost( syncCollisionMsg );
             
             isExploded = true;
+            
+            terrainCollisionReceive((int) getX(), (int) getY());
         }
     }
     
@@ -253,7 +255,7 @@ public class Projectile extends Actor {
         System.out.println("Bullet collided at " + posX + " " + posY);
         //((GameStage) getStage()).setParticle(p);
         ((GameStage) getStage()).explode(posX, posY, blastRadius, damage, isCluster);
-        ((GameStage) getStage()).getGame().endTurn();
+        ((GameStage) getStage()).getGame().getTurnLogic().endTurn();
         this.remove();
         isExploded = false;
     }

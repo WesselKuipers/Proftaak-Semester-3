@@ -27,7 +27,6 @@ public class Team implements Serializable {
     private Player player;
     private transient List<Unit> units;
     private transient Map<Item, Integer> items; // The integer represents the ammo remaining
-    private int activeUnitIndex;
     private Unit activeUnit;
 
     /**
@@ -170,6 +169,7 @@ public class Team implements Serializable {
     }
 
     /**
+<<<<<<< HEAD
      * Begin turn for team If its the first time for the team and there's no
      * active unit set it to the first After that get next active unit
      */
@@ -223,6 +223,22 @@ public class Team implements Serializable {
      */
     public void setActiveUnit(Unit unit) {
         this.activeUnit = unit;
+    }
+    
+    /**
+     * At the end of a turn, check which units should be removed.
+     */
+    public void removeUnitsToBeRemoved() {
+        List<Unit> unitsToRemove = new ArrayList<>();
+        for (Unit unit : units) {
+            if (unit.getHealth() <= 0) {
+                unitsToRemove.add(unit);
+            }
+        }
+        
+        for (int i = 0; i < unitsToRemove.size(); i++) {
+            removeUnit(unitsToRemove.get(i));
+        }
     }
 
     /**
@@ -300,6 +316,6 @@ public class Team implements Serializable {
      */
     @Override
     public String toString() {
-        return getName() + " - " + getColorname();
+        return getName();
     }
 }

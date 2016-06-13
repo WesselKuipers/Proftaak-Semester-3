@@ -40,6 +40,7 @@ public class GameSettings implements Serializable {
     private boolean fallingDamage;
     private boolean suddenDeath;
     private boolean physics;
+    private boolean isLocal;
 
     /**
      * Main constructor for GameSettings Sets all variables to the default rules
@@ -66,11 +67,11 @@ public class GameSettings implements Serializable {
      * TODO!
      */
     private void fillWeapons() {
-        WEAPONS_ARMORY.add(new Bazooka("Bazooka"));
-        WEAPONS_ARMORY.add(new Nuke("Nuke"));
-        WEAPONS_ARMORY.add(new Grenade("Grenade"));
-        WEAPONS_ARMORY.add(new Clusterbomb("Clusterbomb"));
-        WEAPONS_ARMORY.add(new AirStrike("Airstrike"));
+        WEAPONS_ARMORY.add(new Bazooka());
+        WEAPONS_ARMORY.add(new Nuke());
+        WEAPONS_ARMORY.add(new Grenade());
+        WEAPONS_ARMORY.add(new Clusterbomb());
+        WEAPONS_ARMORY.add(new AirStrike());
     }
  
     /**
@@ -289,5 +290,13 @@ public class GameSettings implements Serializable {
      */
     public List<Team> getTeams() {
         return teams;
+    }
+    
+    public boolean getIsLocal() {
+        return isLocal;
+    }
+
+    public void setIsLocal(boolean isLocal) {
+        this.isLocal = isLocal;
     }
 }

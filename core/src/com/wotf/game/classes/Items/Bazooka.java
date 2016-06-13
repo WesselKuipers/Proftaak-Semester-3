@@ -18,113 +18,39 @@ import com.wotf.game.classes.Projectile;
  * @author chaos
  */
 public class Bazooka extends Item {
-    
-    private final float power = 10;
-    private final int radius = 30;
-    private final int damage = 30;
-    
-    public ParticleEffect p;
-    public String particleName = "effects/rocket_explosion.p";
-    
-    private Sprite bullet_sprite;
-    private Sprite weapon_sprite;
-    
-    private Projectile bullet;
 
     /**
      * {@inheritDoc}
      */
-    public Bazooka(String nm) {
-        super(nm);
-        p = new ParticleEffect();
-        p.load(Gdx.files.absolute(Pathfinder.getRelativePath() + particleName), Gdx.files.absolute(Pathfinder.getRelativePath() + "effects"));
-        
-        bullet_sprite = new Sprite(new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "BulletBill.png")));
-        weapon_sprite = new Sprite(new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "Bazooka.png")));
-        
-        this.bullet = new Projectile(bullet_sprite, p);
-        
-        super.InitItemChildSuper(weapon_sprite);
+
+    public Bazooka() {
+        super("Bazooka", 
+                10f,
+                30,
+                30,
+                new Sprite(new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "Bazooka.png"))),
+                new Sprite(new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "BulletBill.png"))),
+                Pathfinder.getRelativePath() + "effects/rocket_explosion.p"
+        );
     }
 
     /**
-     * trigger the activation method of the object
-     *
-     * @param position position from where it is fired
-     * @param mousePos pisition where it fires too
-     * @param Wind wind affection
-     * @param grav gravity affection
+     * {@inheritDoc}
      */
     @Override
     public void activate(Vector2 position, Vector2 mousePos, Vector2 Wind, double grav) {
         //spawn bullet and add to scene
-        Projectile bullet = this.bullet;
-        bullet.fire(position, mousePos, this.power, Wind, grav, this.radius, this.damage);
+        Projectile bullet = super.getBullet();
+        bullet.fire(position, mousePos, super.getPower(), Wind, grav, super.getBlastRadius(), super.getDamage());
         bullet.updateShot();
         ((GameStage) this.getStage()).addActor(bullet);
     }
-    
+
     /**
-     * @return particle affect
+     * {@inheritDoc}
      */
     @Override
-      public ParticleEffect getParticle() {
-        return p;
-    }
-      
- /**
-     * @return particle affect
-     */
-    @Override
-      public Texture getProjectileTexture() {
+    public Texture getProjectileTexture() {
         return new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "BulletBill.png"));
-    }
-      
-        /**
-     * @return stprite image of the weapon
-     */
-    @Override
-    public Sprite getProjectileSprite() {
-        return bullet_sprite;
-    }      
-      
-    /**
-     * @return stprite image of the weapon
-     */
-    @Override
-    public Sprite getWeaponSprite() {
-        return weapon_sprite;
-    }
-
-    /**
-     * @return gets the power of the item
-     */
-    @Override
-    public float getPower() {
-        return power;
-    }
-
-    /**
-     * @return gets the initial blastradius
-     */
-    @Override
-    public int getBlastRadius() {
-        return radius;
-    }
-
-    /**
-     * @return gets the bullet
-     */
-    @Override
-    public Projectile getBullet() {
-        return bullet;
-    }
-
-    /**
-     * @return gets the damage that this item can do
-     */
-    @Override
-    public int getDamage() {
-        return damage;
     }
 }

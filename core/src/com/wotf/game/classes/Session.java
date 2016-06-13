@@ -1,6 +1,7 @@
 package com.wotf.game.classes;
 
 import com.wotf.gui.view.ISessionSettings;
+import com.wotf.gui.view.SessionOnlineHost;
 import fontyspublisher.IRemotePropertyListener;
 import fontyspublisher.RemotePublisher;
 import java.rmi.NoSuchObjectException;
@@ -26,6 +27,7 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
     private transient RemotePublisher publisher;
     private String roomName;
     private int id;
+    private SessionOnlineHost hostGui;
 
     /**
      * Private empty constructor for initializing UnicastRemoteObject.
@@ -35,7 +37,6 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
     private Session() throws RemoteException {
     }
 
-    ;
     
     /**
      * Initializes a session using the information of the hosting player
@@ -50,10 +51,27 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
         this.host = host;
         this.players = new ArrayList<>();
         this.roomName = roomName;
+        
         publisher = new RemotePublisher();
         publisher.registerProperty("sessionsettingsprop");
         publisher.registerProperty("cancelgameprop");
         publisher.registerProperty("startgameprop");
+        publisher.registerProperty("chatmessageprop");
+    }
+    
+        /**
+     * Initializes a session using the information for local Session
+     *
+     * @param host the player who hosts the game
+     * @param roomName the name of the room which will be displayed in the lobby
+     * @param gameSettings gameSettings of Session
+     * @throws RemoteException
+     */
+    public Session(Player host, String roomName, GameSettings gameSettings) throws RemoteException {
+        this.gameSettings = gameSettings;
+        this.host = host;
+        this.players = new ArrayList<>();
+        this.roomName = roomName;
     }
 
     /**
@@ -66,6 +84,15 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
         this.host = host;
         this.players = new ArrayList<>();
         this.roomName = roomName;
+    }
+
+    /**
+     * Sets the host GUI in Session
+     * This normally only gets called from SessionOnlineHost
+     * @param hostGui GUI component to assign
+     */
+    public void setHostGui(SessionOnlineHost hostGui) {
+        this.hostGui = hostGui;
     }
 
     /**
@@ -196,9 +223,24 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
      * Starts the game for all the clients. Push message to all the listeners.
      * Set the variable to 1. Each SessionOnlinePlayer will continue to check if
      * this variable is changed.
+     * @throws java.rmi.RemoteException
      */
     public void startGame() throws RemoteException {
         publisher.inform("startgameprop", 0, 1);
+    }
+
+    /**
+     * Sends a message to all other players
+     * @param message Message to send
+     * @throws RemoteException Thrown when a connection error occurred
+     */
+    @Override
+    public void sendChatMessage(String message) throws RemoteException {
+        publisher.inform("chatmessageprop", null, message);
+
+        if (hostGui != null) {
+            hostGui.chatMessage(message);
+        }
     }
 
     /**
