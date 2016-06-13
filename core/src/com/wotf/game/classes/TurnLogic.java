@@ -224,12 +224,15 @@ public class TurnLogic {
             }
 
             gameStage.getNetworkingUtil().sendToHost(syncUnitsMsg);
+            
+            this.turn++;
 
             // Send end turn message
             NetworkMessage endTurnMsg = new NetworkMessage(Command.ENDTURN);
+            endTurnMsg.addParameter("turn", Integer.toString(this.turn));
             gameStage.getNetworkingUtil().sendToHost(endTurnMsg);
             
-            endTurnReceive();
+            endTurnReceive(this.turn);
         }
     }
     
@@ -238,10 +241,11 @@ public class TurnLogic {
      * active team and turn logic, After that select the new active team and set
      * the active index of the team to keyboard and camera focus. Last check
      * whether team and its units are still alive.
+     * @param turn
      */
-    public void endTurnReceive() {
+    public void endTurnReceive(int turn) {
         this.elapsedTime = 0;
-        this.turn++;
+        this.turn = turn;
         setState(TurnState.WITHDRAW);
         
         game.getActiveTeam().removeUnitsToBeRemoved();

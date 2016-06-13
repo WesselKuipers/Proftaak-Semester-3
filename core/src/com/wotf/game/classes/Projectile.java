@@ -253,10 +253,12 @@ public class Projectile extends Actor {
         // Projectile collided with terrain
         System.out.println("Bullet collided at " + posX + " " + posY);
         //((GameStage) getStage()).setParticle(p);
-        ((GameStage) getStage()).explode(posX, posY, blastRadius, damage, isCluster);
-        ((GameStage) getStage()).getGame().getTurnLogic().endTurn();
-        this.remove();
-        isExploded = false;
+        Gdx.app.postRunnable(() -> {
+            ((GameStage) getStage()).explode(posX, posY, blastRadius, damage, isCluster);
+            ((GameStage) getStage()).getGame().getTurnLogic().endTurn();
+            this.remove();
+            isExploded = false;
+        });
     }
 
     /**

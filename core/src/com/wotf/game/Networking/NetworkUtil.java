@@ -468,7 +468,11 @@ public class NetworkUtil {
     private void endTurn(NetworkMessage nMsg) {
         try {
             if (scene.getGame().getPlayingPlayer().getId() != scene.getGame().getActiveTeam().getPlayer().getId()) {
-                scene.getGame().getTurnLogic().endTurnReceive();
+                String turnStr = nMsg.getParameter("turn");
+
+                int turn = Integer.parseInt(turnStr);
+                
+                scene.getGame().getTurnLogic().endTurnReceive(turn);
             }
         } catch (InvalidParameterException ipe) {
             Gdx.app.log("networkingUtil", "An error occured while processing command", ipe);
