@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
+import com.extra.Pathfinder;
 import com.wotf.game.GameStage;
 import com.wotf.game.classes.Projectile;
 
@@ -25,9 +26,9 @@ public class AirStrike extends Item {
                 19f,
                 30,
                 33,
-                new Sprite(new Texture(Gdx.files.internal("remote.png"))),
-                new Sprite(new Texture(Gdx.files.internal("rocket.png"))),
-                "effects/rocket_explosion.p");
+                new Sprite(new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "remote.png"))),
+                new Sprite(new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "rocket.png"))),
+                Pathfinder.getRelativePath() + "effects/rocket_explosion.p");
     }
 
     /**
@@ -54,8 +55,8 @@ public class AirStrike extends Item {
      * {@inheritDoc}
      */
     @Override
-    public Texture getProjectileTexture() {
-        return new Texture(Gdx.files.internal("rocket.png"));
+      public Texture getProjectileTexture() {
+        return new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "rocket.png"));
     }
 
 }

@@ -8,8 +8,10 @@ jacoco {
 }
 
 dependencies {
-    testCompile "junit:junit:4.+"
+    testCompile "junit:junit:4.+"                                            
+    testCompile "com.badlogicgames.gdx:gdx-backend-lwjgl:1.9.2"
 }
+
 
 test {
     jacoco {

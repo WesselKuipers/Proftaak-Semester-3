@@ -5,6 +5,7 @@
  */
 package com.wotf.game.classes;
 
+import HeadlessRunner.GdxTestRunner;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import java.util.ArrayList;
@@ -12,11 +13,13 @@ import java.util.List;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.runner.RunWith;
 
 /**
  *
  * @author Remco
  */
+@RunWith(GdxTestRunner.class)
 public class GameTest {
 
     private Game game;
@@ -29,12 +32,12 @@ public class GameTest {
     @Before
     public void testGame() {
         // Make a new GameSettings object.
-        gamesetting = new GameSettings(true);
+        gamesetting = new GameSettings();
         // Make 2 teams.
-        alpha = new Team("Alpha", Color.RED, true);
+        alpha = new Team("Alpha", Color.RED);
         // Add a unit to both the teams.
         // alpha.addUnit("AlphaUnit", 100);
-        beta = new Team("Beta", Color.GREEN, true);
+        beta = new Team("Beta", Color.GREEN);
         // beta.addUnit("BetaUnit", 150);
         // Add a team to the GameSettings.
         gamesetting.addTeam(alpha);
@@ -127,13 +130,13 @@ public class GameTest {
     @Test
     public void testgetState() {
         // The value is not set yet so it will return false probably.
-        assertFalse(game.getTurnState());
+        assertNull(game.getTurnLogic().currentState);
     }
 
     @Test
     public void testEndTurn() {
         // Run the EndTurn method. After that run the getActiveTeam which should be different than the default Team 0.
-        game.endTurn();
+        game.getTurnLogic().endTurn();
         // Test if the ActiveTeam is 1 now.
         // Can't be tested because there is no stage with actors in the testclass.
         assertEquals(beta, game.getActiveTeam());
@@ -148,7 +151,7 @@ public class GameTest {
     @Test
     public void testTurnLogic() {
         // Get the current TurnLogic and test if it equals the team size.
-        TurnLogic turnlogic = new TurnLogic(game.getTeams().size());
+        TurnLogic turnlogic = new TurnLogic(game, game.getTeams().size());
         // Can't be tested because there is nothing to compare. 
         // There is no getteamsize or whatever.
         assertEquals(turnlogic.getTurn(), game.getTurnLogic().getTurn());

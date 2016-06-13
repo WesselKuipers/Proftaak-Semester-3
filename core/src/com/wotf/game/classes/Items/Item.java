@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.extra.Pathfinder;
 import com.wotf.game.GameStage;
 import com.wotf.game.classes.Projectile;
 import java.io.Serializable;
@@ -52,7 +53,7 @@ public abstract class Item extends Actor implements Serializable {
         this.weapon_sprite = weaponSprite;
 
         this.p = new ParticleEffect();
-        p.load(Gdx.files.internal(particleEffect), Gdx.files.internal("effects"));
+        p.load(Gdx.files.internal(particleEffect), Gdx.files.absolute(Pathfinder.getRelativePath() + "effects"));
 
         this.bullet = new Projectile(bullet_sprite, p);
         InitItemChildSuper(weapon_sprite);

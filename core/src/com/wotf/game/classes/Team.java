@@ -49,19 +49,6 @@ public class Team implements Serializable {
         units = new ArrayList<>();
     }
 
-    /**
-     * Constructor without any graphics Made for the unit testing.
-     */
-    public Team(String name, Color color, boolean any) {
-        items = null;
-
-        this.name = name;
-        this.color = color;
-
-        //Instantiating list of items
-        units = new ArrayList<>();
-    }
-
     public void intializeForClient() {
         items = new HashMap<>();
         for (Item i : WEAPONS_ARMORY) {
@@ -156,13 +143,6 @@ public class Team implements Serializable {
     }
 
     /**
-     * FOR TESTING. Use WITHOUT the boolean.
-     */
-    public void addUnit(String name, int health, Vector2 position, boolean any) {
-        units.add(new Unit(name, health, this, position, true));
-    }
-
-    /**
      * When unit is killed (health is zero or lower), remove the actor and unit
      * from team
      *
@@ -189,14 +169,34 @@ public class Team implements Serializable {
     }
 
     /**
-     * FOR TESTING. Use WITHOUT the boolean.
+<<<<<<< HEAD
+     * Begin turn for team If its the first time for the team and there's no
+     * active unit set it to the first After that get next active unit
      */
-    public void removeUnit(Unit unit, boolean any) {
-        if (unit != null && units.contains(unit)) {
-            units.remove(unit);
+    public void beginTurn() {
+        if (activeUnit == null) {
+            activeUnit = units.get(0);
+        } else {
+            setNextActiveUnit();
         }
     }
-    
+
+    /**
+     * end turn for team When unit has lower or equal than 0 health, remove the
+     * unit from the team
+     */
+    public void endTurn() {
+        List<Unit> unitsToRemove = new ArrayList<>();
+        for (Unit unit : units) {
+            if (unit.getHealth() <= 0) {
+                unitsToRemove.add(unit);
+            }
+        }
+        for (int i = 0; i < unitsToRemove.size(); i++) {
+            removeUnit(unitsToRemove.get(i));
+        }
+    }
+
     /**
      * Set the next active unit in the team
      */

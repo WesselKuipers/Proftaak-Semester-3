@@ -63,20 +63,6 @@ public class GameSettings implements Serializable {
     }
 
     /**
-     * Constructor without any graphics Made for the unit testing.
-     */
-    public GameSettings(boolean any) {
-        teams = new ArrayList<>();
-
-        maxTurns = 30;
-        maxTime = 30 * 60;
-        turnTime = 30;
-        withdrawTime = 3;
-        fallingDamage = true;
-        suddenDeath = true;
-    }
-
-    /**
      * Not dynamic list atm. will be replaced with user input in later itt.
      * TODO!
      */

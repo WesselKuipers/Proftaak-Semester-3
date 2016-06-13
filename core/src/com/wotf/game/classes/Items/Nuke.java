@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
+import com.extra.Pathfinder;
 import com.wotf.game.GameStage;
 import com.wotf.game.classes.Projectile;
 
@@ -25,9 +26,9 @@ public class Nuke extends Item {
                 10f,
                 80,
                 60,
-                new Sprite(new Texture(Gdx.files.internal("remote.png"))),
-                new Sprite(new Texture(Gdx.files.internal("nuclearbomb.png"))),
-                "effects/nuke_explosion.p"
+                new Sprite(new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "remote.png"))),
+                new Sprite(new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "nuclearbomb.png"))),
+                Pathfinder.getRelativePath() + "effects/nuke_explosion.p"
         );
     }
 
@@ -53,7 +54,7 @@ public class Nuke extends Item {
      * {@inheritDoc}
      */
     @Override
-    public Texture getProjectileTexture() {
-        return new Texture(Gdx.files.internal("nuclearbomb.png"));
+      public Texture getProjectileTexture() {
+        return new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "nuclearbomb.png"));
     }
 }

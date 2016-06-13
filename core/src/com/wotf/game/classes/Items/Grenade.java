@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
+import com.extra.Pathfinder;
 import com.wotf.game.GameStage;
 import com.wotf.game.classes.Projectile;
 
@@ -25,14 +26,14 @@ public class Grenade extends Item {
                 10f,
                 15,
                 25,
-                new Sprite(new Texture(Gdx.files.internal("grenade.png"))),
-                new Sprite(new Texture(Gdx.files.internal("grenade.png"))),
-                "effects/grenade_explosion.p"
+                new Sprite(new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "grenade.png"))),
+                new Sprite(new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "grenade.png"))),
+                Pathfinder.getRelativePath() + "effects/grenade_explosion.p"
         );
     }
 
     /**
-     *{@inheritDoc}
+     * {@inheritDoc}
      */
     @Override
     public void activate(Vector2 position, Vector2 mousePos, Vector2 Wind, double grav) {
@@ -42,13 +43,12 @@ public class Grenade extends Item {
         bullet.updateShot();
         ((GameStage) this.getStage()).addActor(bullet);
     }
-    
+
     /**
-     * {@inheritDoc}
+     * @return particle affect
      */
     @Override
-    public Texture getProjectileTexture(){
-         return new Texture(Gdx.files.internal("grenade.png"));
-     }
-
+    public Texture getProjectileTexture() {
+        return new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "grenade.png"));
+    }
 }

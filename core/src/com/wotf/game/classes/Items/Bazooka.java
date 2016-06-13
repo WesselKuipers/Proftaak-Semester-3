@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
+import com.extra.Pathfinder;
 import com.wotf.game.GameStage;
 import com.wotf.game.classes.Projectile;
 
@@ -21,14 +22,15 @@ public class Bazooka extends Item {
     /**
      * {@inheritDoc}
      */
+
     public Bazooka() {
         super("Bazooka", 
                 10f,
                 30,
                 30,
-                new Sprite(new Texture(Gdx.files.internal("Bazooka.png"))),
-                new Sprite(new Texture(Gdx.files.internal("BulletBill.png"))),
-                "effects/rocket_explosion.p"
+                new Sprite(new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "Bazooka.png"))),
+                new Sprite(new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "BulletBill.png"))),
+                Pathfinder.getRelativePath() + "effects/rocket_explosion.p"
         );
     }
 
@@ -49,6 +51,6 @@ public class Bazooka extends Item {
      */
     @Override
     public Texture getProjectileTexture() {
-        return new Texture(Gdx.files.internal("BulletBill.png"));
+        return new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "BulletBill.png"));
     }
 }

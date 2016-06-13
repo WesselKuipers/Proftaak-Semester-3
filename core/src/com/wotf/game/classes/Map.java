@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.extra.Pathfinder;
 import java.util.Random;
 
 /**
@@ -41,15 +42,6 @@ public class Map {
         
         windForce = new Vector2(0,0);
     }
-
-    /**
-     * Constructor without any graphics Made for the unit testing.
-     */
-    public Map() {
-        width = 1920;
-        height = 720;
-        landscapeTexture = null;
-    }
     
     /**
      * Attempts to read an image file and generates a terrain texture
@@ -60,7 +52,7 @@ public class Map {
      */
     private void initializeTerrainTexture(String filename) {
         // reads the image with this filename and stores it in a pixmap
-        Pixmap inPixmap = new Pixmap(Gdx.files.internal(filename));
+        Pixmap inPixmap = new Pixmap(Gdx.files.absolute(Pathfinder.getRelativePath() + "maps/" + filename));
         
         width = inPixmap.getWidth();
         height = inPixmap.getHeight();
