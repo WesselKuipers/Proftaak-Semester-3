@@ -19,6 +19,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
 import com.badlogic.gdx.graphics.GL20;
+import com.wotf.game.GameStage;
 import static org.mockito.Mockito.mock;
 
 public class GdxTestRunner extends BlockJUnit4ClassRunner implements ApplicationListener {
@@ -31,6 +32,7 @@ public class GdxTestRunner extends BlockJUnit4ClassRunner implements Application
 
         new HeadlessApplication(this, conf);
         Gdx.gl = mock(GL20.class);
+        //new GameStage(this, null);
     }
 
     @Override

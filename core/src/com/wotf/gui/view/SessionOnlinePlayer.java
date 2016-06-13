@@ -149,8 +149,8 @@ public class SessionOnlinePlayer implements Screen {
         mapslist = new ArrayList<>();
         FileHandle dirHandle = Gdx.files.internal("maps");
         for (FileHandle entry : dirHandle.list()) {
-            mapslist.add(entry.toString());
-            maptextures.add(new Texture(Gdx.files.internal(entry.toString())));
+            mapslist.add(entry.toString().substring(5));
+            maptextures.add(new Texture(Gdx.files.internal("maps/" + entry.toString().substring(5))));
         }
     }
 
@@ -502,7 +502,7 @@ public class SessionOnlinePlayer implements Screen {
      * @return
      */
     private void setMaps() {
-        map1 = new Image(new Texture(mapslist.get(session.getGameSettings().getMapIndex())));
+        map1 = new Image(new Texture("maps/" + mapslist.get(session.getGameSettings().getMapIndex())));
         map1.setPosition(20, 70);
         map1.setWidth(400);
         map1.setHeight(230);

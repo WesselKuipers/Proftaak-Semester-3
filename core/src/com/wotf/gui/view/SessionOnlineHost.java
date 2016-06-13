@@ -706,9 +706,9 @@ public class SessionOnlineHost implements Screen {
         ArrayList<String> mapslist = new ArrayList<>();
         FileHandle dirHandle = Gdx.files.internal("maps");
         for (FileHandle entry : dirHandle.list()) {
-            mapslist.add(entry.toString());
+            mapslist.add(entry.toString().substring(5));
         }
-        map1 = new Image(new Texture(mapslist.get(0)));
+        map1 = new Image(new Texture("maps/" + mapslist.get(0)));
         try {
             session.setGameSettings(gameSettings);
         } catch (RemoteException ex) {
@@ -731,7 +731,7 @@ public class SessionOnlineHost implements Screen {
                     session.setGameSettings(gameSettings);
 
                     mapstable.removeActor(map1);
-                    map1 = new Image(new Texture(mapslist.get(chooseMap.getSelectedIndex())));
+                    map1 = new Image(new Texture("maps/" + mapslist.get(chooseMap.getSelectedIndex())));
                     map1.setPosition(20, 70);
                     map1.setWidth(400);
                     map1.setHeight(230);
@@ -771,7 +771,7 @@ public class SessionOnlineHost implements Screen {
                 try {
                     timer.cancel();
 
-                    // Updating map before lauch
+                    // Updating map before launch
                     gameSettings.setMapName(chooseMap.getSelected().toString());
                     gameSettings.setMapIndex(chooseMap.getSelectedIndex());
                     session.setGameSettings(gameSettings);

@@ -342,7 +342,7 @@ public class SessionLocal implements Screen {
 
                 gameSettings.setIsLocal(true);
                 // Create the map
-                Map map = new Map(chooseMap.getSelected().toString());
+                Map map = new Map(chooseMap.getSelected().toString().substring(5));
 
                 try {
                     sessionLocal = new Session(defaultPlayer, "localHost", gameSettings);
