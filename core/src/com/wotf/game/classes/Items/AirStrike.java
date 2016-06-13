@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.extra.Pathfinder;
 import com.wotf.game.GameStage;
 import com.wotf.game.classes.Projectile;
 import java.util.Random;
@@ -28,7 +29,7 @@ public class AirStrike extends Item {
     public ParticleEffect p;
     public String particleName = "effects/rocket_explosion.p";
 
-    static Texture weaponTexture = new Texture(Gdx.files.internal("rocket.png"));
+    static Texture weaponTexture = new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "rocket.png"));
     private Sprite weapon_sprite;
 
     /**
@@ -37,9 +38,9 @@ public class AirStrike extends Item {
     public AirStrike(String nm) {
         super(nm);
         p = new ParticleEffect();
-        p.load(Gdx.files.internal(particleName), Gdx.files.internal("effects"));
+        p.load(Gdx.files.absolute(Pathfinder.getRelativePath() + particleName), Gdx.files.absolute(Pathfinder.getRelativePath() + "effects"));
 
-        weapon_sprite = new Sprite(new Texture(Gdx.files.internal("remote.png")));
+        weapon_sprite = new Sprite(new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "remote.png")));
 
         super.InitItemChildSuper(weapon_sprite);
     }
@@ -84,7 +85,7 @@ public class AirStrike extends Item {
      */
     @Override
       public Texture getProjectileTexture() {
-        return new Texture(Gdx.files.internal("rocket.png"));
+        return new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "rocket.png"));
     }
 
     /**

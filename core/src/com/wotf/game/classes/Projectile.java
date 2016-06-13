@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.extra.Pathfinder;
 import com.wotf.game.GameStage;
 import com.wotf.game.Networking.Command;
 import com.wotf.game.Networking.NetworkMessage;
@@ -55,7 +56,7 @@ public class Projectile extends Actor {
     public Projectile(Sprite sprite, ParticleEffect effect) {
         //graphics
         this.sprite = sprite;
-        sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
+        sprite = new Sprite(new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "BulletBill.png")));
         sprite.setOriginCenter();
         sprite.flip(true, false);
 

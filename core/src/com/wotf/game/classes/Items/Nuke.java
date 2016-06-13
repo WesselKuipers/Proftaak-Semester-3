@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
+import com.extra.Pathfinder;
 import com.wotf.game.GameStage;
 import com.wotf.game.classes.Projectile;
 import java.util.Random;
@@ -38,10 +39,10 @@ public class Nuke extends Item {
     public Nuke(String nm) {
         super(nm);
         p = new ParticleEffect();
-        p.load(Gdx.files.internal(particleName), Gdx.files.internal("effects"));
+        p.load(Gdx.files.absolute(Pathfinder.getRelativePath() + particleName), Gdx.files.absolute(Pathfinder.getRelativePath() + "effects"));
 
-        bullet_sprite = new Sprite(new Texture(Gdx.files.internal("nuclearbomb.png")));
-        weapon_sprite = new Sprite(new Texture(Gdx.files.internal("remote.png")));
+        bullet_sprite = new Sprite(new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "nuclearbomb.png")));
+        weapon_sprite = new Sprite(new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "remote.png")));
 
         this.bullet = new Projectile(bullet_sprite, p);
 
@@ -84,7 +85,7 @@ public class Nuke extends Item {
      */
     @Override
       public Texture getProjectileTexture() {
-        return new Texture(Gdx.files.internal("nuclearbomb.png"));
+        return new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "nuclearbomb.png"));
     }
     
     /**

@@ -5,23 +5,29 @@
  */
 package com.wotf.game.classes;
 
+import HeadlessRunner.GdxTestRunner;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import java.rmi.RemoteException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.runner.RunWith;
 
 /**
  *
  * @author Remco
  */
+@RunWith(GdxTestRunner.class)
 public class GameSettingsTest {
 
     private GameSettings dsettings;
 
     @Before
     public void initGameSettings() {
-        dsettings = new GameSettings(true);
+        dsettings = new GameSettings(); 
+        
     }
 
     @Test
@@ -57,17 +63,20 @@ public class GameSettingsTest {
     @Test
     public void testaddTeam() {
         // Add the teams with 2 different methods. And check if the size will be 2 after.
-        Team team = new Team("Betaar", Color.GREEN, true);
+        Team team = new Team("Betaar", Color.GREEN);
         dsettings.addTeam(team);
 
         assertEquals(1, dsettings.getTeams().size());
+        
+        dsettings.addTeam("Snatch", Color.BLACK);
+        assertEquals(2, dsettings.getTeams().size());
     }
 
     @Test
     public void testremoveTeam() {
         // Add a team to the gamesettings.
-        Team team = new Team("Betaar", Color.GREEN, true);
-        
+        Team team = new Team("Betaar", Color.GREEN);
+
         dsettings.addTeam(team);
         // Remove the team again to check this method.
         dsettings.removeTeam(team);
@@ -96,8 +105,8 @@ public class GameSettingsTest {
 
     @Test
     public void testgetMaxTime() {
-        // The default max time is set to 1800 check if this is true.
-        assertEquals(1800, dsettings.getMaxTime());
+        // The default max time is set to 3600 check if this is true.
+        assertEquals(3600, dsettings.getMaxTime());
     }
 
     @Test
@@ -121,8 +130,8 @@ public class GameSettingsTest {
 
     @Test
     public void testgetTurnTime() {
-        // The default turn time is set to 30 check if this is true.
-        assertEquals(30, dsettings.getTurnTime());
+        // The default turn time is set to 40 check if this is true.
+        assertEquals(40, dsettings.getTurnTime());
     }
 
     @Test
@@ -182,9 +191,9 @@ public class GameSettingsTest {
         // Test if the sudden death is false now.
         assertEquals(false, dsettings.isSuddenDeath());
     }
-    
+
     @Test
-    public void testgetandsetPhysics(){
+    public void testgetandsetPhysics() {
         // Set the physics to false and check if it is false now.
         // It starts at true.
         dsettings.setPhysics(false);

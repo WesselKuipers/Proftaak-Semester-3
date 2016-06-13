@@ -50,19 +50,6 @@ public class Team implements Serializable {
         units = new ArrayList<>();
     }
 
-    /**
-     * Constructor without any graphics Made for the unit testing.
-     */
-    public Team(String name, Color color, boolean any) {
-        items = null;
-
-        this.name = name;
-        this.color = color;
-
-        //Instantiating list of items
-        units = new ArrayList<>();
-    }
-
     public void intializeForClient() {
         items = new HashMap<>();
         for (Item i : WEAPONS_ARMORY) {
@@ -157,13 +144,6 @@ public class Team implements Serializable {
     }
 
     /**
-     * FOR TESTING. Use WITHOUT the boolean.
-     */
-    public void addUnit(String name, int health, Vector2 position, boolean any) {
-        units.add(new Unit(name, health, this, position, true));
-    }
-
-    /**
      * When unit is killed (health is zero or lower), remove the actor and unit
      * from team
      *
@@ -187,15 +167,6 @@ public class Team implements Serializable {
      */
     public void removeAllUnits() {
         units.clear();
-    }
-
-    /**
-     * FOR TESTING. Use WITHOUT the boolean.
-     */
-    public void removeUnit(Unit unit, boolean any) {
-        if (unit != null && units.contains(unit)) {
-            units.remove(unit);
-        }
     }
 
     /**
@@ -223,22 +194,6 @@ public class Team implements Serializable {
         }
         for (int i = 0; i < unitsToRemove.size(); i++) {
             removeUnit(unitsToRemove.get(i));
-        }
-    }
-
-    /**
-     * JUST FOR UNIT TESTING..
-     *
-     */
-    public void endTurn(boolean any) {
-        List<Unit> unitsToRemove = new ArrayList<>();
-        for (Unit unit : units) {
-            if (unit.getHealth() <= 0) {
-                unitsToRemove.add(unit);
-            }
-        }
-        for (int i = 0; i < unitsToRemove.size(); i++) {
-            removeUnit(unitsToRemove.get(i), true);
         }
     }
 

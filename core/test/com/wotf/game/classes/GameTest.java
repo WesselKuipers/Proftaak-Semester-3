@@ -29,12 +29,12 @@ public class GameTest {
     @Before
     public void testGame() {
         // Make a new GameSettings object.
-        gamesetting = new GameSettings(true);
+        gamesetting = new GameSettings();
         // Make 2 teams.
-        alpha = new Team("Alpha", Color.RED, true);
+        alpha = new Team("Alpha", Color.RED);
         // Add a unit to both the teams.
         // alpha.addUnit("AlphaUnit", 100);
-        beta = new Team("Beta", Color.GREEN, true);
+        beta = new Team("Beta", Color.GREEN);
         // beta.addUnit("BetaUnit", 150);
         // Add a team to the GameSettings.
         gamesetting.addTeam(alpha);
