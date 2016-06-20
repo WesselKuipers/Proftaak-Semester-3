@@ -258,6 +258,7 @@ public class GameStage extends Stage {
             case Keys.ENTER:
                 cam.zoom = 1;
                 break;
+            default: break;
         }
         
         // Only allow these controls for the current playing player

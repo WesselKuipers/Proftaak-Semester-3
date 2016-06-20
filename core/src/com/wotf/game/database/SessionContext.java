@@ -5,14 +5,13 @@
  */
 package com.wotf.game.database;
 
+import com.badlogic.gdx.Gdx;
 import com.wotf.game.classes.Session;
 import java.rmi.RemoteException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -135,7 +134,7 @@ public class SessionContext extends EntityContext<Session> {
                 session.getGameSettings().setMaxPlayersSession(record.getInt("MaxPlayersSession"));
                 session.setId(record.getInt("ID"));
             } catch (RemoteException ex) {
-                Logger.getLogger(SessionContext.class.getName()).log(Level.SEVERE, null, ex);
+                Gdx.app.log("RemoteException", ex.getMessage());
             }
         }
         return session;

@@ -107,51 +107,51 @@ public class LobbyGUI implements Screen {
         skin = new Skin(Gdx.files.internal("uiskin.json"));
         sessions = new List(skin);
         List players = new List(skin);
-        Table sessionstable = new Table();
-        Table playerstable = new Table();
+        Table sessionsTable = new Table();
+        Table playersTable = new Table();
 
-        sessionstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"))));
-        playerstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"))));
+        sessionsTable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"))));
+        playersTable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"))));
         Object[] playerlist = null;
         try {
             playerlist = new Object[playerContext.getAll().size()];
             int i = 0;
 
-            for (Player player : playerContext.getAll()) {
-                playerlist[i] = player.getName();
+            for (Player p : playerContext.getAll()) {
+                playerlist[i] = p.getName();
                 i++;
             }
         } catch (SQLException ex) {
-            Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
+            Gdx.app.log("SQL", ex.getMessage());
         }
 
-        Label wotflabel = new Label("War of the Figures", skin);
-        wotflabel.setPosition(Gdx.graphics.getWidth() / 2 - wotflabel.getWidth() / 2, 740);
-        stage.addActor(wotflabel);
+        Label wotfLabel = new Label("War of the Figures", skin);
+        wotfLabel.setPosition(Gdx.graphics.getWidth() / 2 - wotfLabel.getWidth() / 2, 740);
+        stage.addActor(wotfLabel);
 
         Label currentPlayer = new Label(player.getIp() + " " + player.getName(), skin);
         currentPlayer.setPosition(Gdx.graphics.getWidth() / 2 - currentPlayer.getWidth() / 2, 680);
         stage.addActor(currentPlayer);
 
         Label sessionslabel = new Label("Sessions", skin);
-        sessionstable.add(sessionslabel).padRight(20);
-        sessionstable.row();
+        sessionsTable.add(sessionslabel).padRight(20);
+        sessionsTable.row();
         sessions.setItems(lobby.getSessions().toArray());
-        sessionstable.add(sessions).minWidth(250).height(200);
-        sessionstable.setPosition(30, 260);
-        sessionstable.setWidth(300);
-        sessionstable.setHeight(400);
-        stage.addActor(sessionstable);
+        sessionsTable.add(sessions).minWidth(250).height(200);
+        sessionsTable.setPosition(30, 260);
+        sessionsTable.setWidth(300);
+        sessionsTable.setHeight(400);
+        stage.addActor(sessionsTable);
 
-        Label playerslabel = new Label("Players", skin);
-        playerstable.add(playerslabel).padRight(20);
-        playerstable.row();
+        Label playersLabel = new Label("Players", skin);
+        playersTable.add(playersLabel).padRight(20);
+        playersTable.row();
         players.setItems(playerlist);
-        playerstable.add(players).minWidth(250).height(200);
-        playerstable.setPosition(500, 260);
-        playerstable.setWidth(300);
-        playerstable.setHeight(400);
-        stage.addActor(playerstable);
+        playersTable.add(players).minWidth(250).height(200);
+        playersTable.setPosition(500, 260);
+        playersTable.setWidth(300);
+        playersTable.setHeight(400);
+        stage.addActor(playersTable);
 
         TextButton exit = new TextButton("Exit", skin); // Use the initialized skin
         exit.setColor(Color.BLACK);
@@ -201,20 +201,20 @@ public class LobbyGUI implements Screen {
                     }
                 } catch (RemoteException ex) {
                     pc.delete(player);
-                    Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
+                    Gdx.app.log("RemoteException", ex.getMessage());
                 } catch (SQLException ex) {
-                    Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
+                    Gdx.app.log("SQL", ex.getMessage());
                 }
             }
         });
 
-        TextButton makesession = new TextButton("Make Session", skin); // Use the initialized skin
-        makesession.setColor(Color.BLACK);
-        makesession.setWidth(300);
-        makesession.setHeight(60);
-        makesession.setPosition(350, 30);
-        stage.addActor(makesession);
-        makesession.addListener(new ClickListener() {
+        TextButton makeSession = new TextButton("Make Session", skin); // Use the initialized skin
+        makeSession.setColor(Color.BLACK);
+        makeSession.setWidth(300);
+        makeSession.setHeight(60);
+        makeSession.setPosition(350, 30);
+        stage.addActor(makeSession);
+        makeSession.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 SessionContext sc = new SessionContext();
@@ -228,9 +228,9 @@ public class LobbyGUI implements Screen {
                     game.setScreen(new SessionOnlineHost(game, session, player));
                 } catch (RemoteException ex) {
                     pc.delete(player);
-                    Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
+                    Gdx.app.log("RemoteException", ex.getMessage());
                 } catch (SQLException ex) {
-                    Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
+                    Gdx.app.log("SQL", ex.getMessage());
                 }
             }
         });
@@ -255,7 +255,7 @@ public class LobbyGUI implements Screen {
                     sessions.clear();
                     sessions.setItems(lobby.getSessions().toArray());
                 } catch (SQLException ex) {
-                    Logger.getLogger(LobbyGUI.class.getName()).log(Level.SEVERE, null, ex);
+                    Gdx.app.log("SQL", ex.getMessage());
                 }
             }
         });

@@ -120,7 +120,7 @@ public class SessionOnlinePlayer implements Screen {
             SessionPlayerContext sp = new SessionPlayerContext();
             return sp.getPlayersFromSession(session);
         } catch (SQLException ex) {
-            Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+            Gdx.app.log("SQL", ex.getMessage());
         }
         return null;
     }
@@ -560,7 +560,7 @@ public class SessionOnlinePlayer implements Screen {
                     SessionPlayerContext part = new SessionPlayerContext();
                     part.deletePlayerFromSession(player, session);
                 } catch (SQLException ex) {
-                    Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
+                    Gdx.app.log("SQL", ex.getMessage());
                 }
             }
         });
@@ -579,7 +579,7 @@ public class SessionOnlinePlayer implements Screen {
                     playerList = sc.getPlayersFromSession(session);
                     players.setItems(playerList.toArray());
                 } catch (SQLException ex) {
-                    Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
+                    Gdx.app.log("SQL", ex.getMessage());
                     timer.cancel();
                 }
             }
@@ -597,7 +597,7 @@ public class SessionOnlinePlayer implements Screen {
             try {
                 game.setScreen(new LobbyGUI(game, player));
             } catch (SQLException ex) {
-                Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
+                Gdx.app.log("SQL", ex.getMessage());
             }
         }
 

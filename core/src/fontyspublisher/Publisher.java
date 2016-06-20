@@ -5,6 +5,7 @@
  */
 package fontyspublisher;
 
+import com.badlogic.gdx.Gdx;
 import java.beans.PropertyChangeEvent;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -356,7 +357,7 @@ public class Publisher {
                 } catch (RemoteException ex) {
                     // No connection to remote property listener
                     unsubscribeListener(listener, null);
-                    Logger.getLogger(Publisher.class.getName()).log(Level.SEVERE, null, ex);
+                    Gdx.app.log("RemoteException", ex.getMessage());
                 }
             }
         }

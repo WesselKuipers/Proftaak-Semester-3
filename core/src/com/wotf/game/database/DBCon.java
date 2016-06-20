@@ -1,5 +1,6 @@
 package com.wotf.game.database;
 
+import com.badlogic.gdx.Gdx;
 import com.sun.rowset.CachedRowSetImpl;
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,8 +14,10 @@ public class DBCon {
 
     private static Connection connection;
 
-    // TODO: 6-3-2016 Refactor this so that the username and password are loaded from a file instead of being hard-coded
-    private static final String ConnectionPath = "jdbc:mysql://145.93.176.101:3306/school"; // example oracle string: "jdbc:oracle:thin:@localhost:1521:XE";
+    // This hsould be refactored so that the username and password are loaded from a file instead of being hard-coded
+    // not implemented because of syncing issues with version control
+    // for implementation: see 
+    private static final String ConnectionPath = "jdbc:mysql://145.93.176.101:3306/school";
     private static final String Username = "connect";
     private static final String Password = "admin";
 
@@ -27,7 +30,7 @@ public class DBCon {
         try {
             connection = DriverManager.getConnection(ConnectionPath, Username, Password);
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            Gdx.app.log("SQL", e.getMessage());
             return null;
         }
 
@@ -69,10 +72,11 @@ public class DBCon {
                 return result;
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }finally{
+            Gdx.app.log("SQL", e.getMessage());
+        } finally {
             closeQuietly(con, ps);
         }
+        
         // If we've reached this point, it means the query didn't succeed, return -1
         return -1;
     }
@@ -118,7 +122,7 @@ public class DBCon {
                 return rowset;
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            Gdx.app.log("SQL", e.getMessage());
         }finally{
             closeQuietly(con, ps, result);
         }
@@ -193,10 +197,11 @@ public class DBCon {
                 return result;
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }finally{
+            Gdx.app.log("SQL", e.getMessage());
+        } finally {
             closeQuietly(con, ps);
         }
+        
         // If we've reached this point, it means the query didn't succeed, return null
         return null;
     }
@@ -212,6 +217,7 @@ public class DBCon {
                     c.close();
                 } catch (Exception e) {
                     // log or ignore, we can't do anything about it really
+                    Gdx.app.log("SQL", e.getMessage());
                 }
             }
         }
