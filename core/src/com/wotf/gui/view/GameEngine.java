@@ -93,13 +93,11 @@ public class GameEngine implements Screen {
         viewport.apply();
 
         if(!isLocal){
-            // WARNING: THIS IS A TEMPORARY FIX. This makes the client sleep so it can receive all gamesettings sent by the host, else it will crash.
-            // TODO: Make the client wait until the settings are loaded from the host by the client?
             if (session.getHost().getId() != playingPlayer.getId()) {
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                    Gdx.app.log("SessionLocal", ex.getMessage());
                     Thread.currentThread().interrupt();
                 }
             }

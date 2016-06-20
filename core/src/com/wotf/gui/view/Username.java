@@ -93,7 +93,7 @@ public class Username implements Screen {
                         
                         game.setScreen(new LobbyGUI(game, player));
                     } catch (SQLException | UnknownHostException ex) {
-                        Logger.getLogger(Username.class.getName()).log(Level.SEVERE, null, ex);
+                        Gdx.app.log("SQL", ex.getMessage());
                     }
                 } else {
                     // Username is empty, show dialog asking for the user to enter a username

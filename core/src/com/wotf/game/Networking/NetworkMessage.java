@@ -6,6 +6,7 @@
 package com.wotf.game.Networking;
 
 import java.security.InvalidParameterException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
@@ -22,7 +23,7 @@ import java.util.Map.Entry;
 public class NetworkMessage {
     
     private Command cmd;
-    private LinkedHashMap<String, String> parameters;
+    private final HashMap<String, String> parameters;
     
     /**
      * Constructor to create a message action should be known when creating a message and CANNOT be altered.

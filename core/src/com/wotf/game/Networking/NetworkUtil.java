@@ -36,7 +36,7 @@ import java.util.List;
 public class NetworkUtil {
 
     private final Player host;
-    private final int port = 9021;
+    private static final int Port = 9021;
     private final GameStage scene;
     private Socket socket;
     private final List<Vector2> unitPositions;
@@ -95,7 +95,7 @@ public class NetworkUtil {
         serverSocketHint.acceptTimeout = 0;
 
         // Create the socket server using TCP protocol and listening on 9021
-        ServerSocket serverSocket = Gdx.net.newServerSocket(Net.Protocol.TCP, port, serverSocketHint);
+        ServerSocket serverSocket = Gdx.net.newServerSocket(Net.Protocol.TCP, Port, serverSocketHint);
 
         // Accept any incoming connections
         this.socket = serverSocket.accept(null);
@@ -105,7 +105,7 @@ public class NetworkUtil {
 
     private void initClientNetworkListener() {
         SocketHints socketHints = new SocketHints();
-        this.socket = Gdx.net.newClientSocket(Net.Protocol.TCP, host.getIp(), port, socketHints);
+        this.socket = Gdx.net.newClientSocket(Net.Protocol.TCP, host.getIp(), Port, socketHints);
         //if(!scene.getGame().getGameSettings().getIsLocal())
             messageListener(false);
     }

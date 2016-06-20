@@ -168,7 +168,6 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
      */
     public void removePlayer(Player p) {
         players.remove(p);
-        // TODO: logic for kicking players
     }
 
     /**
