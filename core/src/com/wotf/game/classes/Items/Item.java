@@ -135,7 +135,7 @@ public abstract class Item extends Actor implements Serializable {
      * initiate this object as an actor
      */
     public void initActor() {
-        ((GameStage) this.getStage()).addActor(this); //todo--> Add update sequence in gamestage
+        ((GameStage) this.getStage()).addActor(this);
     }
 
     /**

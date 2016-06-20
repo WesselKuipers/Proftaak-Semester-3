@@ -212,6 +212,7 @@ public class Team implements Serializable {
                 unitsToRemove.add(unit);
             }
         }
+        
         for (int i = 0; i < unitsToRemove.size(); i++) {
             removeUnit(unitsToRemove.get(i));
         }
@@ -230,6 +231,7 @@ public class Team implements Serializable {
             } else {
                 activeUnitIndex = 0;
             }
+            
             activeUnit = units.get(activeUnitIndex);
         } else {
             activeUnit = null;
@@ -299,10 +301,9 @@ public class Team implements Serializable {
     }
 
     /**
-     * TODO: Handle what happens when ammo is unlimited or out of ammo Increase
-     * the item amount for the selected item
+     * Decrease the item amount for the selected item
      *
-     * @param item selected
+     * @param item to decrease ammo of
      * @param amount to decrease
      */
     public void decreaseItemAmount(Item item, int amount) {
@@ -312,8 +313,7 @@ public class Team implements Serializable {
                 increaseItemAmount(item, (items.get(item) - 1));
             }
             if (items.get(item) == 0 || items.get(item) < 0) {
-                //TODO: handle what happens when unlimited ammo (-1) or out of ammo
-
+                // not implemented, do nothing
             }
         }
     }
@@ -321,13 +321,14 @@ public class Team implements Serializable {
     /**
      * Check if item contains an amount
      *
-     * @param item
-     * @return item
+     * @param item to check for
+     * @return amount of item with matching key
      */
     public int containsItemAmount(Item item) {
         if (items.containsKey(item)) {
             return items.get(item);
         }
+        
         return 0;
     }
 

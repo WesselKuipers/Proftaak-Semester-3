@@ -99,7 +99,7 @@ public class SessionOnlineHost implements Screen {
             SessionPlayerContext sp = new SessionPlayerContext();
             return sp.getPlayersFromSession(session);
         } catch (SQLException ex) {
-            Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+            Gdx.app.log("SQL", ex.getMessage());
         }
         
         return null;
@@ -350,7 +350,7 @@ public class SessionOnlineHost implements Screen {
                         btnTeamAlpha.setTouchable(Touchable.disabled);
                         btnTeamAlpha.setColor(Color.LIGHT_GRAY);
                     } catch (RemoteException ex) {
-                        Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+                        Gdx.app.log("RemoteException", ex.getMessage());
                     }
                 }
             }
@@ -406,7 +406,7 @@ public class SessionOnlineHost implements Screen {
                         tbAlpha.setTouchable(Touchable.enabled);
                         tbAlpha.setColor(Color.BLACK);*/
                     } catch (RemoteException ex) {
-                        Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+                        Gdx.app.log("RemoteException", ex.getMessage());
                     }
                 }
             }
@@ -458,7 +458,7 @@ public class SessionOnlineHost implements Screen {
                         btnTeamGamma.setTouchable(Touchable.disabled);
                         btnTeamGamma.setColor(Color.LIGHT_GRAY);
                     } catch (RemoteException ex) {
-                        Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+                        Gdx.app.log("RemoteException", ex.getMessage());
                     }
                 }
             }
@@ -518,7 +518,7 @@ public class SessionOnlineHost implements Screen {
                     gameSettings.setTurnTime(Integer.parseInt(turnTimeBox.getSelected().toString()));
                     session.setGameSettings(gameSettings);
                 } catch (RemoteException ex) {
-                    Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
+                    Gdx.app.log("RemoteException", ex.getMessage());
                 }
             }
         });
@@ -556,7 +556,7 @@ public class SessionOnlineHost implements Screen {
                     // Otherwise people will be able to connect to the session while over the max players value.
                     sc.update(session);
                 } catch (RemoteException ex) {
-                    Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
+                    Gdx.app.log("RemoteException", ex.getMessage());
                 }
             }
         });
@@ -600,7 +600,7 @@ public class SessionOnlineHost implements Screen {
                     gameSettings.setPhysics(Boolean.parseBoolean(physicsBox.getSelected().toString()));
                     session.setGameSettings(gameSettings);
                 } catch (RemoteException ex) {
-                    Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
+                    Gdx.app.log("RemoteException", ex.getMessage());
                 }
             }
         });
@@ -650,7 +650,7 @@ public class SessionOnlineHost implements Screen {
                     gameSettings.setMaxTime(Integer.parseInt(timerBox.getSelected().toString()));
                     session.setGameSettings(gameSettings);
                 } catch (RemoteException ex) {
-                    Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
+                    Gdx.app.log("RemoteException", ex.getMessage());
                 }
             }
         });
@@ -686,7 +686,7 @@ public class SessionOnlineHost implements Screen {
 
                     session.setGameSettings(gameSettings);
                 } catch (RemoteException ex) {
-                    Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
+                    Gdx.app.log("RemoteException", ex.getMessage());
                 }
             }
         });
@@ -716,7 +716,7 @@ public class SessionOnlineHost implements Screen {
         try {
             session.setGameSettings(gameSettings);
         } catch (RemoteException ex) {
-            Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+            Gdx.app.log("RemoteException", ex.getMessage());
         }
         
         map.setPosition(20, 70);
@@ -744,7 +744,7 @@ public class SessionOnlineHost implements Screen {
                     map.invalidate();
                     mapsTable.addActor(map);
                 } catch (RemoteException ex) {
-                    Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
+                    Gdx.app.log("RemoteException", ex.getMessage());
                 }
             }
         });
@@ -796,7 +796,7 @@ public class SessionOnlineHost implements Screen {
                     session.startGame();
                     game.setScreen(new GameEngine(game, session, player));
                 } catch (RemoteException ex) {
-                    Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+                    Gdx.app.log("RemoteException", ex.getMessage());
                 }
             }
         });
@@ -816,7 +816,7 @@ public class SessionOnlineHost implements Screen {
                     playerList = sc.getPlayersFromSession(session);
                     players.setItems(playerList.toArray());
                 } catch (SQLException ex) {
-                    Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
+                    Gdx.app.log("SQL", ex.getMessage());
                     timer.cancel();
                 }
             }
@@ -856,11 +856,11 @@ public class SessionOnlineHost implements Screen {
                     session = null;
                     game.setScreen(new LobbyGUI(game, player));
                 } catch (SQLException ex) {
-                    Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+                    Gdx.app.log("SQL", ex.getMessage());
                 } catch (NoSuchObjectException ex) {
-                    Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+                    Gdx.app.log("RemoteException", ex.getMessage());
                 } catch (RemoteException ex) {
-                    Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+                    Gdx.app.log("RemoteException", ex.getMessage());
                 }
             }
         });
@@ -988,9 +988,9 @@ public class SessionOnlineHost implements Screen {
             session.removeRegistry();
             session = null;
         } catch (NoSuchObjectException ex) {
-            Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+            Gdx.app.log("RemoteException", ex.getMessage());
         } catch (RemoteException ex) {
-            Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
+            Gdx.app.log("RemoteException", ex.getMessage());
         }
 
     }
