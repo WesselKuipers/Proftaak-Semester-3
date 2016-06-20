@@ -64,9 +64,10 @@ public class GameEngine implements Screen {
     }
     
     /**
-    * Constructor of GameEngine for ONLINE
-    * @param game Game that will be launched
-     * @param session
+     * Constructor of GameEngine for ONLINE
+     * @param game Game that will be launched
+     * @param session Session object associated with the game
+     * @param playingPlayer Player object representing the player of this client
     */
     public GameEngine(WotFGame game, Session session, Player playingPlayer) {
         this.game = game;

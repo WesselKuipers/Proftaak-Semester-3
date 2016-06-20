@@ -45,10 +45,17 @@ public class Player implements Serializable{
         this.name = name;
     }
 
+    /**
+     * @return The ID of the player
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * Sets the ID of the player
+     * @param id ID nr to set
+     */
     public void setId(int id) {
         this.id = id;
     }

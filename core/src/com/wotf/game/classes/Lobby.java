@@ -81,6 +81,9 @@ public class Lobby {
         sessions.remove(s);
     }
     
+    /**
+     * Removes all the sesssions from the internal list in the lobby
+     */
     public void removeAllSessions() {
         sessions.clear();
     }

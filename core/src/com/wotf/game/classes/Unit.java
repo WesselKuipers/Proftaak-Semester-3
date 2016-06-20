@@ -1,7 +1,6 @@
 package com.wotf.game.classes;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
@@ -9,14 +8,11 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import com.extra.Pathfinder;
 import com.wotf.game.classes.Items.Item;
 import com.wotf.game.GameStage;
-import com.wotf.game.GuiStage;
 import static com.wotf.game.classes.GameSettings.WEAPONS_ARMORY;
 import java.io.Serializable;
 
@@ -29,7 +25,7 @@ public class Unit extends Group implements Serializable {
     private Vector2 acceleration;
     private TextureRegion unitStand;
     private Vector2 velocity = new Vector2();
-    public  boolean moveRight;
+    private boolean moveRight;
     private int health;
     private String name;
     private Sprite sprite;
@@ -334,6 +330,9 @@ public class Unit extends Group implements Serializable {
         //sprite.setRotation(angle);
     }
 
+    /**
+     * Checks if the next position is solid based on velocity
+     */
     public void checkSolid() {
 
         if (velocity.y >= -2) {

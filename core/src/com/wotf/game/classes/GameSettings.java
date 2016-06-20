@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.wotf.game.classes;
 
 import com.badlogic.gdx.graphics.Color;
@@ -63,8 +58,7 @@ public class GameSettings implements Serializable {
     }
 
     /**
-     * Not dynamic list atm. will be replaced with user input in later itt.
-     * TODO!
+     * Not dynamic list atm. will be replaced with user input in later it.
      */
     private void fillWeapons() {
         WEAPONS_ARMORY.add(new Bazooka());
@@ -77,10 +71,10 @@ public class GameSettings implements Serializable {
     /**
      * Sets the index of the map with the settings
      *
-     * @param mapindex
+     * @param mapIndex index nr of the map to load
      */
-    public void setMapIndex(int mapindex) {
-        this.mapindex = mapindex;
+    public void setMapIndex(int mapIndex) {
+        this.mapindex = mapIndex;
     }
 
     /**
@@ -128,16 +122,28 @@ public class GameSettings implements Serializable {
         return physics;
     }
 
-    public void setMaxPlayersSession(int maxplayers) throws RemoteException {
-        this.maxPlayersSession = maxplayers;
+    /**
+     * Sets the maximum amount of players allowed in a session
+     * @param maxPlayers Max amount of players allowed
+     * @throws RemoteException thrown when there's a connection error
+     */
+    public void setMaxPlayersSession(int maxPlayers) throws RemoteException {
+        this.maxPlayersSession = maxPlayers;
     }
 
+    /**
+     * @return The maximum amount of players allowed in a session
+     */
     public int getMaxPlayersSession() {
         return maxPlayersSession;
     }
     
-    public void setMaxUnitCount(int maxunitcount){
-        this.maxunitCount = maxunitcount;
+    /**
+     * Sets the maximum amount of units allowed in a team
+     * @param maxUnitCount 
+     */
+    public void setMaxUnitCount(int maxUnitCount){
+        this.maxunitCount = maxUnitCount;
     }
     
     public int getMaxUnitCount(){
@@ -292,10 +298,16 @@ public class GameSettings implements Serializable {
         return teams;
     }
     
+    /**
+     * @return True if session is hosted locally
+     */
     public boolean getIsLocal() {
         return isLocal;
     }
 
+    /**
+     * @param isLocal Sets isLocal variable
+     */
     public void setIsLocal(boolean isLocal) {
         this.isLocal = isLocal;
     }

@@ -1,7 +1,6 @@
 package com.wotf.game.classes;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,7 +21,7 @@ public class Team implements Serializable {
 
     private String name;
     // This is used for RMI because the Color of GDX can't be serialized. But we need them both
-    private String colorname;
+    private String colorName;
     private transient Color color;
     private Player player;
     private transient List<Unit> units;
@@ -32,8 +31,8 @@ public class Team implements Serializable {
     /**
      * Constructor of Team, Initialize lists and set active unit index to zero.
      *
-     * @param name
-     * @param color
+     * @param name Name of the team
+     * @param color Colour of the team
      */
     public Team(String name, Color color) {
         items = new HashMap<>();
@@ -49,6 +48,9 @@ public class Team implements Serializable {
         units = new ArrayList<>();
     }
 
+    /**
+     * Helper method called when team wasn't initalized by this application
+     */
     public void intializeForClient() {
         items = new HashMap<>();
         for (Item i : WEAPONS_ARMORY) {
@@ -57,20 +59,36 @@ public class Team implements Serializable {
         units = new ArrayList<>();
     }
 
+    /**
+     * Sets the player associated with this team
+     * @param player Player to set
+     */
     public void setPlayer(Player player) {
         this.player = player;
     }
 
+    /**
+     * @return Returns the player associated with this team
+     */
     public Player getPlayer() {
         return player;
     }
 
-    public void setColorname(String colorname) {
-        this.colorname = colorname;
+    /**
+     * Sets the name of the colour associated with this team
+     * @param colorName Name of the colour to set
+     */
+    public void setColorname(String colorName) {
+        this.colorName = colorName;
     }
 
+    /**
+     * Returns the name of the colour associated with this team
+     * Used because Color for serialization
+     * @return Name of the colour of this team
+     */
     public String getColorname() {
-        return colorname;
+        return colorName;
     }
 
     /**
@@ -112,6 +130,9 @@ public class Team implements Serializable {
         return Collections.unmodifiableList(units);
     }
 
+    /**
+     * Instantiates units list
+     */
     public void makeUnitList() {
         //Instantiating list of items
         units = new ArrayList<>();
@@ -169,7 +190,6 @@ public class Team implements Serializable {
     }
 
     /**
-<<<<<<< HEAD
      * Begin turn for team If its the first time for the team and there's no
      * active unit set it to the first After that get next active unit
      */
@@ -219,7 +239,7 @@ public class Team implements Serializable {
     /**
      * Set active unit
      *
-     * @param unit unit
+     * @param unit unit to set as active
      */
     public void setActiveUnit(Unit unit) {
         this.activeUnit = unit;
@@ -312,7 +332,7 @@ public class Team implements Serializable {
     }
 
     /**
-     * @return string of name and color of team
+     * @return String representing the name and color of team
      */
     @Override
     public String toString() {

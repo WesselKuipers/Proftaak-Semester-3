@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.wotf.gui.view;
 
 import com.badlogic.gdx.Gdx;
@@ -47,34 +42,32 @@ import java.util.logging.Logger;
 
 /**
  * Screen that shows the sessions menu for a connected player
- *
- * @author Gebruiker
  */
 public class SessionOnlinePlayer implements Screen {
 
-    private List teams;
+    private final List teams;
     private List players;
     private final WotFGame game;
-    private Stage stage;
-    private Skin skin;
-    private ArrayList<Team> teamList;
-    private GameSettings gameSettings;
-    private Image map1;
+    private final Stage stage;
+    private final Skin skin;
+    private final java.util.List<Team> teamList;
+    private final GameSettings gameSettings;
+    private Image map;
     private Session session;
-    private SessionManager manager;
-    private ArrayList<String> mapslist;
-    private ArrayList<Player> playerList;
-    private SelectBox turntimebox;
-    private SelectBox physicsbox;
-    private SelectBox timerbox;
+    private final SessionManager manager;
+    private java.util.List<String> mapslist;
+    private java.util.List<Player> playerList;
+    private final SelectBox turnTimeBox;
+    private final SelectBox physicsbox;
+    private final SelectBox timerbox;
     private SelectBox chooseMap;
-    private SelectBox unitbox;
-    private Table mapstable;
-    private ArrayList<Texture> maptextures;
-    private Player player;
+    private SelectBox unitBox;
+    private Table mapsTable;
+    private final java.util.List<Texture> mapTextures;
+    private final Player player;
     private Timer timer;
     private SelectBox maxplayerbox;
-    private int switchscreencheck;
+    private int switchScreenCheck;
     private int startGame;
     private boolean updateUnit;
     private boolean refreshUnit;
@@ -91,7 +84,7 @@ public class SessionOnlinePlayer implements Screen {
      * @param session from host
      */
     public SessionOnlinePlayer(WotFGame game, Session session, Player player) throws RemoteException {
-        switchscreencheck = 0;
+        switchScreenCheck = 0;
         startGame = 0;
         this.player = player;
         this.game = game;
@@ -103,9 +96,9 @@ public class SessionOnlinePlayer implements Screen {
         skin = new Skin(Gdx.files.internal("uiskin.json"));
         teams = new List(skin);
         timerbox = new SelectBox(skin);
-        turntimebox = new SelectBox(skin);
+        turnTimeBox = new SelectBox(skin);
         physicsbox = new SelectBox(skin);
-        maptextures = new ArrayList<>();
+        mapTextures = new ArrayList<>();
         playerList = new ArrayList<>();
         setMapsList();
         // This manager will be used to connect to the registry of the host.
@@ -150,7 +143,7 @@ public class SessionOnlinePlayer implements Screen {
         FileHandle dirHandle = Gdx.files.internal("maps");
         for (FileHandle entry : dirHandle.list()) {
             mapslist.add(entry.toString().substring(5));
-            maptextures.add(new Texture(Gdx.files.internal("maps/" + entry.toString().substring(5))));
+            mapTextures.add(new Texture(Gdx.files.internal("maps/" + entry.toString().substring(5))));
         }
     }
 
@@ -192,12 +185,12 @@ public class SessionOnlinePlayer implements Screen {
 
         // Alle teams en labels hiervoor.
         Table teamstable = new Table();
-        mapstable = new Table();
+        mapsTable = new Table();
         Table settingstable = new Table();
         Table teamselecttable = new Table();
         Table playerstable = new Table();
         teamstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 130, 130, 160, 160)));
-        mapstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 220, 220, 160, 160)));
+        mapsTable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 220, 220, 160, 160)));
         teamselecttable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 100, 100, 160, 160)));
         playerstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 125, 125, 160, 160)));
 
@@ -221,7 +214,7 @@ public class SessionOnlinePlayer implements Screen {
         stage.setKeyboardFocus(chatMessageField);
         stage.addActor(chatMessageField);
 
-        TextButton sendMessage = new TextButton("Verstuur", skin);
+        TextButton sendMessage = new TextButton("Send", skin);
         sendMessage.setColor(Color.BLACK);
         sendMessage.setWidth(200);
         sendMessage.setHeight(60);
@@ -283,54 +276,53 @@ public class SessionOnlinePlayer implements Screen {
 
     /**
      * Sets the players from the DB to the GUI list.
-     *
-     * @param playerstable
+     * 
+     * @param playersTable Table that holds the list of players
      */
-    private void setPlayerList(Table playerstable) {
+    private void setPlayerList(Table playersTable) {
         players.setItems(playerList.toArray());
-        playerstable.add(players);
-        playerstable.setWidth(250);
-        playerstable.setHeight(320);
-        playerstable.setPosition(1020, 360);
-        stage.addActor(playerstable);
+        playersTable.add(players);
+        playersTable.setWidth(250);
+        playersTable.setHeight(320);
+        playersTable.setPosition(1020, 360);
+        stage.addActor(playersTable);
     }
 
     /**
      * Sets the teamslist to a table of teams. Adds new TextButtons for each
      * team.
      *
-     * @param teamstable
+     * @param teamstable Table that holds the list of teams
      */
-    private void addTeamsTable(Table teamselecttable) {
-        Label selectteamlabel = new Label("Team selection", skin);
-        teamselecttable.add(selectteamlabel).padBottom(15);
-        teamselecttable.row();
+    private void addTeamsTable(Table teamSelectTable) {
+        Label selectTeamLabel = new Label("Team selection", skin);
+        teamSelectTable.add(selectTeamLabel).padBottom(15);
+        teamSelectTable.row();
         TextButton teamalpha = new TextButton("Alpha", skin); // Use the initialized skin
         teamalpha.setName("Alpha");
         teamalpha.setColor(Color.BLUE);
 
-        teamselecttable.add(teamalpha).padBottom(10).width(150).height(50);
-        teamselecttable.row();
-        TextButton teambeta = new TextButton("Beta", skin); // Use the initialized skin
-        teambeta.setName("Beta");
-        teambeta.setColor(Color.CORAL);
+        teamSelectTable.add(teamalpha).padBottom(10).width(150).height(50);
+        teamSelectTable.row();
+        TextButton teamBeta = new TextButton("Beta", skin); // Use the initialized skin
+        teamBeta.setName("Beta");
+        teamBeta.setColor(Color.CORAL);
 
-        teamselecttable.add(teambeta).padBottom(10).width(150).height(50);
-        teamselecttable.row();
-        TextButton teamgamma = new TextButton("Gamma", skin); // Use the initialized skin
-        teamgamma.setName("Gamma");
-        teamgamma.setColor(Color.GREEN);
+        teamSelectTable.add(teamBeta).padBottom(10).width(150).height(50);
+        teamSelectTable.row();
+        TextButton teamGamma = new TextButton("Gamma", skin); // Use the initialized skin
+        teamGamma.setName("Gamma");
+        teamGamma.setColor(Color.GREEN);
 
-        teamselecttable.add(teamgamma).width(150).height(50);
-        teamselecttable.setWidth(200);
-        teamselecttable.setHeight(320);
-        teamselecttable.setPosition(500, 360);
-        stage.addActor(teamselecttable);
+        teamSelectTable.add(teamGamma).width(150).height(50);
+        teamSelectTable.setWidth(200);
+        teamSelectTable.setHeight(320);
+        teamSelectTable.setPosition(500, 360);
+        stage.addActor(teamSelectTable);
     }
 
     /**
      * Sets the title label to the name of the game.
-     *
      */
     private void setTitelLabel() {
         Label wotflabel = new Label("War of the Figures", skin);
@@ -341,45 +333,45 @@ public class SessionOnlinePlayer implements Screen {
     /**
      * Set the IP adress of the host. To the settingstable.
      *
-     * @param settingstable
+     * @param settingsTable Table that holds the list of players
      */
-    private void setIp(Table settingstable) {
-        Label iplabel = new Label("IP :", skin);
-        settingstable.add(iplabel).width(120);
-        Label ipvallabel = new Label(session.getHost().getIp(), skin);
-        settingstable.add(ipvallabel).width(180);
-        settingstable.row();
+    private void setIp(Table settingsTable) {
+        Label ipLabel = new Label("IP :", skin);
+        settingsTable.add(ipLabel).width(120);
+        Label ipValLabel = new Label(session.getHost().getIp(), skin);
+        settingsTable.add(ipValLabel).width(180);
+        settingsTable.row();
     }
 
     /**
      * Sets the turn times to the settingstable.
      *
-     * @param settingstable
+     * @param settingsTable Table that holds the list of players
      */
-    private void setTurnTimevals(Table settingstable) {
-        Object[] turntimevals = new Object[6];
-        turntimevals[0] = "10";
-        turntimevals[1] = "20";
-        turntimevals[2] = "30";
-        turntimevals[3] = "40";
-        turntimevals[4] = "50";
-        turntimevals[5] = "60";
-        Label turntimelabel = new Label("Turn Time :", skin);
-        settingstable.add(turntimelabel).width(120);
-        turntimebox.setItems(turntimevals);
+    private void setTurnTimevals(Table settingsTable) {
+        Object[] turnTimeVals = new Object[6];
+        turnTimeVals[0] = "10";
+        turnTimeVals[1] = "20";
+        turnTimeVals[2] = "30";
+        turnTimeVals[3] = "40";
+        turnTimeVals[4] = "50";
+        turnTimeVals[5] = "60";
+        Label turnTimeLabel = new Label("Turn Time :", skin);
+        settingsTable.add(turnTimeLabel).width(120);
+        turnTimeBox.setItems(turnTimeVals);
         String turntimestr = Integer.toString(session.getGameSettings().getTurnTime());
-        turntimebox.setSelected(turntimestr);
-        turntimebox.setTouchable(Touchable.disabled);
+        turnTimeBox.setSelected(turntimestr);
+        turnTimeBox.setTouchable(Touchable.disabled);
 
-        settingstable.add(turntimebox).width(180);
-        settingstable.row();
+        settingsTable.add(turnTimeBox).width(180);
+        settingsTable.row();
     }
 
     /**
      * Sets the max player selectbox to the current value. Also make initial
      * values. Add this to the gamesettings.
      *
-     * @param settingstable
+     * @param settingstable Table that holds the list of players
      */
     private void setMaxPlayervals(Table settingstable) {
         Label playerslabel = new Label("Players :", skin);
@@ -400,7 +392,7 @@ public class SessionOnlinePlayer implements Screen {
     /**
      * Sets the label for Speeds which isn't currently used.
      *
-     * @param settingstable
+     * @param settingstable Table that holds the list of players
      */
     private void setSpeedvals(Table settingstable) {
         Label speedslabel = new Label("Speeds :", skin);
@@ -414,7 +406,7 @@ public class SessionOnlinePlayer implements Screen {
      * Sets the selectbox with values true and false. Also add it to the
      * gamesettings.
      *
-     * @param settingstable
+     * @param settingstable Table that holds the list of players
      */
     private void setPhysicsvals(Table settingstable) {
         Object[] physicsvals = new Object[2];
@@ -435,48 +427,48 @@ public class SessionOnlinePlayer implements Screen {
      * Sets the weapon selectbox with values. Not added to the gamesettings yet.
      * It doesn't have a functional use.
      *
-     * @param settingstable
+     * @param settingsTable Table that holds the list of players
      */
-    private void setWeaponvals(Table settingstable) {
-        Object[] weaponsvals = new Object[3];
-        weaponsvals[0] = "All Weapons";
-        weaponsvals[1] = "Non-Explosive";
-        weaponsvals[2] = "Grenades Only";
-        Label weaponslabel = new Label("Weapons :", skin);
-        settingstable.add(weaponslabel).width(120);
-        SelectBox weaponsbox = new SelectBox(skin);
-        weaponsbox.setItems(weaponsvals);
-        weaponsbox.setTouchable(Touchable.disabled);
-        settingstable.add(weaponsbox).width(180);
-        settingstable.row();
+    private void setWeaponvals(Table settingsTable) {
+        Object[] weaponsVals = new Object[3];
+        weaponsVals[0] = "All Weapons";
+        weaponsVals[1] = "Non-Explosive";
+        weaponsVals[2] = "Grenades Only";
+        Label weaponsLabel = new Label("Weapons :", skin);
+        settingsTable.add(weaponsLabel).width(120);
+        SelectBox weaponsBox = new SelectBox(skin);
+        weaponsBox.setItems(weaponsVals);
+        weaponsBox.setTouchable(Touchable.disabled);
+        settingsTable.add(weaponsBox).width(180);
+        settingsTable.row();
     }
 
     /**
      * Sets the MaxTime selectbox with values. Adds the selected maxtime to the
      * gamesettings list.
      *
-     * @param settingstable
-     */
-    private void setTimervals(Table settingstable) {
+     * @param settingsTable Table that holds the list of players
+     */ 
+    private void setTimervals(Table settingsTable) {
         Object[] timervals = new Object[3];
         timervals[0] = "60";
         timervals[1] = "30";
         timervals[2] = "10";
         Label timerlabel = new Label("Timer :", skin);
-        settingstable.add(timerlabel).width(120);
+        settingsTable.add(timerlabel).width(120);
         timerbox.setItems(timervals);
         String timerstr = Integer.toString(session.getGameSettings().getMaxTime() / 60);
         timerbox.setSelected(timerstr);
         timerbox.setTouchable(Touchable.disabled);
-        settingstable.add(timerbox).width(180);
-        settingstable.row();
+        settingsTable.add(timerbox).width(180);
+        settingsTable.row();
     }
 
     /**
      * Sets the current units with values. Adds the selected units to the
      * gamesettings list.
      *
-     * @param settingstable
+     * @param settingstable Table that holds the list of players
      */
     private void setUnitvals(Table settingstable) {
         Object[] unitvals = new Object[4];
@@ -486,70 +478,70 @@ public class SessionOnlinePlayer implements Screen {
         unitvals[3] = "4";
         Label unitlabel = new Label("Units :", skin);
         settingstable.add(unitlabel).width(120);
-        unitbox = new SelectBox(skin);
-        unitbox.setItems(unitvals);
+        unitBox = new SelectBox(skin);
+        unitBox.setItems(unitvals);
         String unitstr = Integer.toString(session.getGameSettings().getMaxUnitCount());
-        unitbox.setSelected(unitstr);
-        unitbox.setTouchable(Touchable.disabled);
-        settingstable.add(unitbox).width(180);
+        unitBox.setSelected(unitstr);
+        unitBox.setTouchable(Touchable.disabled);
+        settingstable.add(unitBox).width(180);
     }
 
     /**
      * Sets the map to the current map. Get the map index from the list of maps
      * internal.
      *
-     * @param mapstable
-     * @return
+     * @param mapstable Table that holds the list of players
      */
     private void setMaps() {
-        map1 = new Image(new Texture("maps/" + mapslist.get(session.getGameSettings().getMapIndex())));
-        map1.setPosition(20, 70);
-        map1.setWidth(400);
-        map1.setHeight(230);
-        mapstable.addActor(map1);
+        map = new Image(new Texture("maps/" + mapslist.get(session.getGameSettings().getMapIndex())));
+        map.setPosition(20, 70);
+        map.setWidth(400);
+        map.setHeight(230);
+        mapsTable.addActor(map);
         chooseMap = new SelectBox(skin);
         chooseMap.setItems(mapslist.toArray());
         chooseMap.setSelected(session.getGameSettings().getMapName());
         chooseMap.setTouchable(Touchable.disabled);
         chooseMap.setWidth(400);
         chooseMap.setPosition(20, 20);
-        mapstable.addActor(chooseMap);
-        mapstable.setPosition(30, 360);
-        mapstable.setHeight(320);
-        mapstable.setWidth(440);
-        stage.addActor(mapstable);
+        mapsTable.addActor(chooseMap);
+        mapsTable.setPosition(30, 360);
+        mapsTable.setHeight(320);
+        mapsTable.setWidth(440);
+        stage.addActor(mapsTable);
     }
 
     /**
      * Sets the teamslist to a table of teams.
      *
-     * @param teamstable
+     * @param teamsTable Table that holds the list of players
      */
-    private void setTeamsToTable(Table teamstable) {
-        Label teamslabel = new Label("Teams", skin);
-        teamstable.setPosition(730, 360);
-        teamstable.add(teamslabel);
-        teamstable.row();
+    private void setTeamsToTable(Table teamsTable) {
+        Label teamsLabel = new Label("Teams", skin);
+        teamsTable.setPosition(730, 360);
+        teamsTable.add(teamsLabel);
+        teamsTable.row();
         teamList.clear();
         teamList.addAll(session.getGameSettings().getTeams());
+        
         // For the color of the boxes and if it is touchable.
-        for (Team teamv : teamList) {
-            TextButton teamtb = (TextButton) stage.getRoot().findActor(teamv.getName());
-            teamtb.setTouchable(Touchable.disabled);
-            teamtb.setColor(Color.LIGHT_GRAY);
+        for (Team teamV : teamList) {
+            TextButton teamTb = (TextButton) stage.getRoot().findActor(teamV.getName());
+            teamTb.setTouchable(Touchable.disabled);
+            teamTb.setColor(Color.LIGHT_GRAY);
         }
+        
         teams.setItems(teamList.toArray());
-        teamstable.add(teams).width(200);
-        teamstable.setWidth(260);
-        teamstable.setHeight(320);
-        stage.addActor(teamstable);
+        teamsTable.add(teams).width(200);
+        teamsTable.setWidth(260);
+        teamsTable.setHeight(320);
+        stage.addActor(teamsTable);
     }
 
     /**
      * When clicked the client exits the session, cancels the timer to refresh
      * the players, removes the registry it is connected to, remove the player
      * from the current session from db, sets the screen back to the lobby.
-     *
      */
     private void exitGame() {
         TextButton exit = new TextButton("Exit", skin); // Use the initialized skin
@@ -576,7 +568,6 @@ public class SessionOnlinePlayer implements Screen {
 
     /**
      * Refresh the players in the session each 7 seconds. From the DB
-     *
      */
     private void refreshPlayers() {
         SessionPlayerContext sc = new SessionPlayerContext();
@@ -602,7 +593,7 @@ public class SessionOnlinePlayer implements Screen {
      */
     @Override
     public void render(float delta) {
-        if (switchscreencheck != 0) {
+        if (switchScreenCheck != 0) {
             try {
                 game.setScreen(new LobbyGUI(game, player));
             } catch (SQLException ex) {
@@ -615,20 +606,22 @@ public class SessionOnlinePlayer implements Screen {
         }
 
         if (updateUnit) {
-            int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
+            int selectedUnitCount = Integer.parseInt(unitBox.getSelected().toString());
             for (Team teamv : session.getGameSettings().getTeams()) {
-                addUnitsSingleTeam(selectedunitcount, teamv);
+                addUnitsSingleTeam(selectedUnitCount, teamv);
             }
             updateUnit = false;
         }
 
         if (refreshUnit) {
-            int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
+            int selectedUnitCount = Integer.parseInt(unitBox.getSelected().toString());
+            
             // For each team in the list remove all the units first and remove it from the gamesettings.
             for (Team teamv : session.getGameSettings().getTeams()) {
                 teamv.removeAllUnits();
+                
                 // The new units to the team. The name of the unit is the teamname + the number of the variable 'i'.
-                for (int i = 0; i < selectedunitcount; i++) {
+                for (int i = 0; i < selectedUnitCount; i++) {
                     teamv.addUnit(teamv.getName() + Integer.toString(i), 100);
                 }
             }
@@ -720,8 +713,8 @@ public class SessionOnlinePlayer implements Screen {
         if (session.getGameSettings().getTeams() != null) {
             // Set all the teambuttons to touchable first again.
             for (Team teamv : teamList) {
-                TextButton teamtb = (TextButton) stage.getRoot().findActor(teamv.getName());
-                teamtb.setColor(Color.valueOf(teamv.getColorname()));
+                TextButton teamTb = (TextButton) stage.getRoot().findActor(teamv.getName());
+                teamTb.setColor(Color.valueOf(teamv.getColorname()));
             }
 
             teamList.clear();
@@ -744,26 +737,26 @@ public class SessionOnlinePlayer implements Screen {
     /**
      * Updates the Selectboxes for the client to the actual state on the host.
      *
-     * @param managersession a copy of the host session object.
+     * @param managerSession a copy of the host session object.
      */
-    public void updateSelectedItems(Session managersession) {
-        if (managersession.getGameSettings() != null) {
+    public void updateSelectedItems(Session managerSession) {
+        if (managerSession.getGameSettings() != null) {
             // MaxTime selected
 
-            String maxtime = Integer.toString(managersession.getGameSettings().getMaxTime() / 60);
+            String maxtime = Integer.toString(managerSession.getGameSettings().getMaxTime() / 60);
             timerbox.setSelected(maxtime);
             // TurnTime selected
-            String turntime = Integer.toString(managersession.getGameSettings().getTurnTime());
-            turntimebox.setSelected(turntime);
+            String turntime = Integer.toString(managerSession.getGameSettings().getTurnTime());
+            turnTimeBox.setSelected(turntime);
             // Physics selected
-            String physics = Boolean.toString(managersession.getGameSettings().getPhysics());
+            String physics = Boolean.toString(managerSession.getGameSettings().getPhysics());
             physicsbox.setSelected(physics);
             // Maxplayers selected
-            String maxplayers = Integer.toString(managersession.getGameSettings().getMaxPlayersSession());
+            String maxplayers = Integer.toString(managerSession.getGameSettings().getMaxPlayersSession());
             maxplayerbox.setSelected(maxplayers);
             // MaxUnitCount selected
-            String maxunitcount = Integer.toString(managersession.getGameSettings().getMaxUnitCount());
-            unitbox.setSelected(maxunitcount);
+            String maxunitcount = Integer.toString(managerSession.getGameSettings().getMaxUnitCount());
+            unitBox.setSelected(maxunitcount);
             refreshUnit = true;
         }
     }
@@ -772,19 +765,19 @@ public class SessionOnlinePlayer implements Screen {
      * Updates the Selectbox for the map and changes the image of the map to the
      * Currently selected map.
      *
-     * @param managersession a copy of the host session object.
+     * @param managerSession a copy of the host session object.
      */
-    public void updateSelectedMap(Session managersession) {
-        if (managersession.getGameSettings() != null) {
-            chooseMap.setSelected(managersession.getGameSettings().getMapName());
-            mapstable.removeActor(map1);
-            Texture mapname = maptextures.get(managersession.getGameSettings().getMapIndex());
-            map1 = new Image(mapname);
-            map1.setPosition(20, 70);
-            map1.setWidth(400);
-            map1.setHeight(230);
-            map1.invalidate();
-            mapstable.addActor(map1);
+    public void updateSelectedMap(Session managerSession) {
+        if (managerSession.getGameSettings() != null) {
+            chooseMap.setSelected(managerSession.getGameSettings().getMapName());
+            mapsTable.removeActor(map);
+            Texture mapName = mapTextures.get(managerSession.getGameSettings().getMapIndex());
+            map = new Image(mapName);
+            map.setPosition(20, 70);
+            map.setWidth(400);
+            map.setHeight(230);
+            map.invalidate();
+            mapsTable.addActor(map);
         }
     }
 
@@ -796,7 +789,7 @@ public class SessionOnlinePlayer implements Screen {
      */
     public void backToLobby() {
         // Solution could be to change a variable which will be checked and then change screen.
-        switchscreencheck = 1;
+        switchScreenCheck = 1;
     }
 
     /**
@@ -827,12 +820,12 @@ public class SessionOnlinePlayer implements Screen {
      * Create units for a single team based on how many units there should be
      * created.
      *
-     * @param selectedunitcount amount of units to create
-     * @param team selected
+     * @param selectedUnitCount amount of units to create
+     * @param team team to add units to
      */
-    public void addUnitsSingleTeam(int selectedunitcount, Team team) {
+    public void addUnitsSingleTeam(int selectedUnitCount, Team team) {
         // The new units to the team. The name of the unit is the teamname + the number of the variable 'i'.
-        for (int i = 0; i < selectedunitcount; i++) {
+        for (int i = 0; i < selectedUnitCount; i++) {
             team.addUnit(team.getName() + Integer.toString(i), 100);
         }
     }
