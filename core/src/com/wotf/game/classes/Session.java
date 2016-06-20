@@ -75,22 +75,6 @@ public class Session extends UnicastRemoteObject implements ISessionSettings {
     }
 
     /**
-     * Initializes a session using the information for local Session
-     *
-     * @param host the player who hosts the game
-     * @param roomName the name of the room which will be displayed in the lobby
-     * @param any
-     * @throws RemoteException thrown when there is a connnection error
-     */
-    public Session(Player host, String roomName, boolean any) throws RemoteException {
-        this();
-        this.gameSettings = new GameSettings();
-        this.host = host;
-        this.players = new ArrayList<>();
-        this.roomName = roomName;
-    }
-
-    /**
      * Sets the host GUI in Session
      * This normally only gets called from SessionOnlineHost
      * @param hostGui GUI component to assign

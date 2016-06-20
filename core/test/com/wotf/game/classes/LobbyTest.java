@@ -31,11 +31,11 @@ public class LobbyTest {
         // Add the player
         p = new Player("127.0.0.1", "Playeryo");
         // Add the session
-        s = new Session(p, "room", true);
+        s = new Session(p, "room");
         // Add another player
         w = new Player("111.21.0.1", "HansDino");
         // Add another session
-        ses = new Session(w, "room2", true);
+        ses = new Session(w, "room2");
         
     }
 

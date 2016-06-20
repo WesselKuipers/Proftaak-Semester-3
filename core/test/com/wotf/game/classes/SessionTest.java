@@ -27,7 +27,7 @@ public class SessionTest {
     @Before
     public void initSession() throws RemoteException {
         host = new Player("127.0.0.1", "DinoHost");
-        session = new Session(host, "ROOM", true);
+        session = new Session(host, "ROOM");
         playerRemco = new Player("127.0.0.1", "RemcoPlayer");
         session.addPlayer(playerRemco);
     }
@@ -38,6 +38,14 @@ public class SessionTest {
         assertNotNull("The before class is not working properly", session);
     }
 
+    @Test
+    public void testInitLocalSession() throws RemoteException{
+        Player host = new Player("127.0.0.1", "DinoHost");
+        GameSettings gs = new GameSettings();
+        Session sessionlocal = new Session(host, "ROOM", gs);
+        assertNotNull("The local session couldn't be initialized", sessionlocal);
+    }
+    
     @Test
     public void testgetHost() {
         // Test if the hostname equals the expected name.

@@ -276,4 +276,12 @@ public class Projectile extends Actor {
                 || this.getX() + this.getWidth() < 0
                 || this.getY() + this.getHeight() < 0;
     }
+    
+    /**
+     * Gets the position after firing. This will be used for testing purpose
+     * 
+     */
+    public Vector2 getPosition(){
+        return position;
+    }
 }

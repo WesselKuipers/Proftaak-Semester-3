@@ -8,8 +8,10 @@ package com.wotf.game.classes;
 import HeadlessRunner.GdxTestRunner;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
+import com.extra.Pathfinder;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -25,21 +27,6 @@ public class ProjectileTest {
     private Projectile projectile;
     private Sprite sprite;
 
-    /*@BeforeClass
-    public static void initGdx() {
-        Gdx.app = mock(Application.class);
-
-        HeadlessNativesLoader.load();
-        MockGraphics mockGraphics = new MockGraphics();
-        Gdx.graphics = mockGraphics;
-        HeadlessNet headlessNet = new HeadlessNet();
-        Gdx.net = headlessNet;
-        HeadlessFiles headlessFiles = new HeadlessFiles();
-        Gdx.files = headlessFiles;
-        Gdx.gl = mock(GL20.class);
-        HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
-        new HeadlessApplication(new WotFGame(), config);
-    }*/
     @Before
     public void initProjectile() {
         /**
@@ -47,11 +34,10 @@ public class ProjectileTest {
          *
          * @param sprite
          */
-        //sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
-        //System.out.println(sprite.getHeight());
-        //projectile = new Projectile(sprite, ?);
+        sprite = new Sprite(new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "BulletBill.png")));
+        ParticleEffect pe = new ParticleEffect();
+        projectile = new Projectile(sprite, pe);
     }
-
 
     @Test
     public void testInit() {
@@ -61,21 +47,20 @@ public class ProjectileTest {
 
     @Test
     public void testFire() {
-        sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
         /**
          * Function that handles the shooting of the bullet with physics.
          *
          * @param unitPos Start position from which the bullet is fired from.
          */
-        Vector2 unitpos = new Vector2();
+        Vector2 unitpos = new Vector2(20, 20);
         /**
          * @param mousePos position where the mouse was clicked.
          */
-        Vector2 mousepos = new Vector2();
+        Vector2 mousepos = new Vector2(20, 20);
         /**
          * @param wind Vector2 wind physics.
          */
-        Vector2 windspeed = new Vector2();
+        Vector2 windspeed = new Vector2(5, 5);
         /**
          * @param gravity Pulling force towards the ground.
          */
@@ -88,41 +73,19 @@ public class ProjectileTest {
          * @param blastRadius Impact radius of the bullet on the terrain.
          */
         int blastradius = 40;
+        /**
+         * @param damage The damage of the projectile
+         */
+        int damage = 20;
 
+        projectile.getPosition();
         // Can't be tested because it has no getter for the values this method changed.
-    }
+        projectile.fire(unitpos, mousepos, force, windspeed, gravity, blastradius, damage);
 
-    @Test
-    public void testsetAngle() {
-        /**
-         * Calculate and set the angle by 2 vectors.
-         *
-         * @param startPos first x,y position.
-         */
-        Vector2 startpos = new Vector2(20, 60);
-        /**
-         * @param destPos second x, y position.
-         */
-        Vector2 destpos = new Vector2(140, 80);
-        // 9.462322184
-        // This should be the result, can't be tested. Sprite in the method which means a crash.
-        // Also there is no getter.
+        // We can't test much but we can test if it moved it's position.
+        // It is made to continuesly check for impact with the map. This is very hard to test.
+        // 
+        assertNotNull(projectile.getPosition());
 
     }
-
-    @Test
-    public void testsetVelocity() {
-        /**
-         * Calculate the velocity in x and y coordinates by angle.
-         *
-         * @param force Force towards direction.
-         */
-        float force = 20;
-        //projectile.setVelocity(force);
-    }
-
-    /* @Test
-    public void testupdateShot(){
-
-    }*/
 }
