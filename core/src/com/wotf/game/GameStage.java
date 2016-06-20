@@ -447,8 +447,8 @@ public class GameStage extends Stage {
      * @param x X-position of the explosion
      * @param y Y-position of the explosion (0 = bottom)
      * @param radius Length of the radius in pixels
-     * @param damage Amount of damage the explosion does should it collide with
-     * a Unit
+     * @param damage Amount of damage the explosion does should it collide with a Unit
+     * @param cluster Determines whether or not the explosion is a cluster explosion
      */
     public void explode(int x, int y, int radius, int damage, boolean cluster) {
         // calls radius destruction method in game map
@@ -473,6 +473,11 @@ public class GameStage extends Stage {
         //game.endTurn();
     }
 
+    /**
+     * Spawns a cluster of projectiles
+     * @param x x-coordinate of start position
+     * @param y y-coordinate of start position
+     */
     private void fireCluster(int x, int y) {
         Sprite partSprite = new Sprite(new Texture(Gdx.files.internal("part.png")));
 

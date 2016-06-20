@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.wotf.gui.view;
 
 import com.badlogic.gdx.Gdx;
@@ -26,8 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @author Dino Spong
+ * Screen that allows the user to set their username
  */
 public class Username implements Screen {
 
@@ -35,6 +29,10 @@ public class Username implements Screen {
     private Stage stage;
     private Skin skin;
 
+    /**
+     * Constructor to initialize the game object
+     * @param game Game object to apply this screen to
+     */
     public Username(WotFGame game) {
         this.game = game;
     }

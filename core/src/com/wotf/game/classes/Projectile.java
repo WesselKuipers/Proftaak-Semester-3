@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.wotf.game.classes;
 
 import com.badlogic.gdx.Gdx;
@@ -20,7 +15,8 @@ import com.wotf.game.Networking.NetworkMessage;
 /**
  *
  * @author Jip Boesenkool
- * @Date 29-03-'16 Class which holds all the data and functionality to display
+ * @Date 29-03-'16
+ * Class which holds all the data and functionality to display
  * an bullet and update the logic.
  */
 public class Projectile extends Actor {
@@ -37,7 +33,14 @@ public class Projectile extends Actor {
     private Vector2 position;
 
     //visual effects
+    /**
+     * Particle effect associated with this projectile
+     */
     public ParticleEffect p;
+    
+    /**
+     * Determines whether or not this projectile is a cluster
+     */
     public boolean isCluster = false;
  
     //projectile information
@@ -51,7 +54,7 @@ public class Projectile extends Actor {
      * Projectile constructor to initialize visual appearence of the bullet.
      * 
      * @param sprite Bullet sprite
-     * @param ParticleEffect effect of the particle explosion
+     * @param effect effect of the particle explosion
      */
     public Projectile(Sprite sprite, ParticleEffect effect) {
         //graphics
