@@ -5,21 +5,27 @@
  */
 package com.wotf.game.classes;
 
+import HeadlessRunner.GdxTestRunner;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.wotf.game.classes.Items.Bazooka;
+import com.wotf.game.classes.Items.Item;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.runner.RunWith;
 
 /**
  *
  * @author Remco
  */
+@RunWith(GdxTestRunner.class)
 public class TeamTest {
 
     private Team team;
     private GameSettings gamesettings;
     private Player player;
+    private Item item;
 
     @Before
     public void initTeam() {
@@ -30,12 +36,13 @@ public class TeamTest {
          * @param name
          * @param color
          */
-        gamesettings = new GameSettings(true);
+        item = new Bazooka();
+        gamesettings = new GameSettings();
         player = new Player("127.0.0.1", "Wessel");
-        team = new Team("Alpha", Color.BLACK, true);
+        team = new Team("Alpha", Color.BLACK);
         //team.addPlayer(player);
-        team.addUnit("AlphaUnit", 50, new Vector2(40, 80), true);
-        team.addUnit("AlphaUnit2", 80, new Vector2(90, 80), true);
+        team.addUnit("AlphaUnit", 50);
+        team.addUnit("AlphaUnit2", 80);
         gamesettings.addTeam(team);
     }
 
@@ -115,7 +122,7 @@ public class TeamTest {
     @Test
     public void testmakeUnitList() {
         // Make new list because there already are units for 'team'.
-        Team team2 = new Team("Gamza", Color.BLACK, true);
+        Team team2 = new Team("Gamza", Color.BLACK);
         // Test if the list indeed is null before.
         // It will only be if a team sends a list which does have a unit list as transient
         assertNull(team2.getUnits());
@@ -133,7 +140,7 @@ public class TeamTest {
          */
         // The name of the unit which is added to the team.
         String unitname = "AlphaUnit";
-        team.setActiveUnit(new Unit("AlphaUnit", 100, team, new Vector2(20, 20), true));
+        team.setActiveUnit(new Unit("AlphaUnit", 100, team, new Vector2(20, 20)));
         assertEquals(unitname, team.getActiveUnit().getName());
     }
 
@@ -148,24 +155,53 @@ public class TeamTest {
         assertEquals(unitname, team.getUnit(0).getName());
     }
 
+    /**
+     * Cannot be tested it uses a GameStage.
+     */
+//    @Test
+//    public void testremoveUnit() {
+//        /**
+//         * When unit is killed (health is zero or lower), remove the actor and
+//         * unit from team
+//         *
+//         * @param unit to be removed
+//         */
+//        // Get a unit.
+//        Unit unit = team.getUnit(0);
+//        // Remove the taken unit.
+//        team.removeUnit(unit);
+//        // Test if the list size is 0 now.
+//        //assertEquals(1, team.getUnits().size());
+//    }
+
+    /**
+     * Can't be tested thoroughly because it is created seperately for a client.
+     * 
+     */
     @Test
-    public void testremoveUnit() {
-        /**
-         * When unit is killed (health is zero or lower), remove the actor and
-         * unit from team
-         *
-         * @param unit to be removed
-         */
-        // Get a unit.
-        Unit unit = team.getUnit(0);
-        // Remove the taken unit.
-        team.removeUnit(unit, true);
-        // Test if the list size is 0 now.
-        //assertEquals(1, team.getUnits().size());
+    public void testInitializeForClient(){
+        team.intializeForClient();
     }
     
     @Test
-    public void testremoveAllUnits(){
+    public void testContainsKey() {
+        // Tests if the list contains this item.
+        assertNotNull(team.containsKey(item));
+    }
+
+    @Test
+    public void testContainsItemAmount() {
+        // I just added this item 2 times.
+        team.increaseItemAmount(item, 2);
+        assertEquals(2, team.containsItemAmount(item));
+        // Test if I can also remove it 2 times.
+        // This function is bugged. Doesn't work properly.
+        team.decreaseItemAmount(item, 2);
+        assertEquals(0, team.containsItemAmount(item));
+    }
+
+    @Test
+    public void testremoveAllUnits() {
         // Removes all the units from a team. It starts with 2.
         team.removeAllUnits();
         // The size should be 0 now.
@@ -196,18 +232,18 @@ public class TeamTest {
          * the unit from the team
          */
         // Add a unit with 0 hp. And check the size.
-        team.addUnit("AlphaUnit3", 0, new Vector2(20, 20), true);
+        team.addUnit("AlphaUnit3", 0);
         assertEquals(3, team.getUnits().size());
         // End the turn and see if the unit with 0 hp is removed.
-        team.endTurn(true);
+        team.endTurn();
         assertEquals(2, team.getUnits().size());
     }
-    
+
     @Test
-    public void testbeginTurn(){
-        Team team2 = new Team("Kolor", Color.GRAY, true);
-        team2.addUnit("UInit1", 22, new Vector2(20,20), true);
-        team2.addUnit("UInit2", 44, new Vector2(30,20), true);
+    public void testbeginTurn() {
+        Team team2 = new Team("Kolor", Color.GRAY);
+        team2.addUnit("UInit1", 22);
+        team2.addUnit("UInit2", 44);
         // Begin the turn
         team2.beginTurn();
         // Now the unit with index 0 is set. AlphaUnit is the first one added. And first one served.

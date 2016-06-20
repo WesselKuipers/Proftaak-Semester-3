@@ -5,6 +5,8 @@
  */
 package com.wotf.game.classes;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -43,6 +45,13 @@ public class LobbyTest {
         assertNotNull("The before class is not working properly", lobby);
     }
 
+    @Test
+    public void testgetServerIP() throws UnknownHostException{
+        // Test the ServerIP. 
+        // Check if the IP of the localhost is the same as the set IP for the lobby.
+        assertEquals(InetAddress.getLocalHost().toString(), lobby.getServerIp());
+    }
+    
     @Test
     public void testAddSession() throws RemoteException {
         // Add the session to the lobby.

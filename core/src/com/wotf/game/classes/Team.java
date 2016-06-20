@@ -27,7 +27,6 @@ public class Team implements Serializable {
     private Player player;
     private transient List<Unit> units;
     private transient Map<Item, Integer> items; // The integer represents the ammo remaining
-    private int activeUnitIndex;
     private Unit activeUnit;
 
     /**
@@ -42,19 +41,6 @@ public class Team implements Serializable {
             items.put(i, 99);
         }
         //items.put(WEAPONS_ARMORY.get(0), 99);
-
-        this.name = name;
-        this.color = color;
-
-        //Instantiating list of items
-        units = new ArrayList<>();
-    }
-
-    /**
-     * Constructor without any graphics Made for the unit testing.
-     */
-    public Team(String name, Color color, boolean any) {
-        items = null;
 
         this.name = name;
         this.color = color;
@@ -157,13 +143,6 @@ public class Team implements Serializable {
     }
 
     /**
-     * FOR TESTING. Use WITHOUT the boolean.
-     */
-    public void addUnit(String name, int health, Vector2 position, boolean any) {
-        units.add(new Unit(name, health, this, position, true));
-    }
-
-    /**
      * When unit is killed (health is zero or lower), remove the actor and unit
      * from team
      *
@@ -190,15 +169,7 @@ public class Team implements Serializable {
     }
 
     /**
-     * FOR TESTING. Use WITHOUT the boolean.
-     */
-    public void removeUnit(Unit unit, boolean any) {
-        if (unit != null && units.contains(unit)) {
-            units.remove(unit);
-        }
-    }
-
-    /**
+<<<<<<< HEAD
      * Begin turn for team If its the first time for the team and there's no
      * active unit set it to the first After that get next active unit
      */
@@ -223,22 +194,6 @@ public class Team implements Serializable {
         }
         for (int i = 0; i < unitsToRemove.size(); i++) {
             removeUnit(unitsToRemove.get(i));
-        }
-    }
-
-    /**
-     * JUST FOR UNIT TESTING..
-     *
-     */
-    public void endTurn(boolean any) {
-        List<Unit> unitsToRemove = new ArrayList<>();
-        for (Unit unit : units) {
-            if (unit.getHealth() <= 0) {
-                unitsToRemove.add(unit);
-            }
-        }
-        for (int i = 0; i < unitsToRemove.size(); i++) {
-            removeUnit(unitsToRemove.get(i), true);
         }
     }
 
@@ -268,6 +223,22 @@ public class Team implements Serializable {
      */
     public void setActiveUnit(Unit unit) {
         this.activeUnit = unit;
+    }
+    
+    /**
+     * At the end of a turn, check which units should be removed.
+     */
+    public void removeUnitsToBeRemoved() {
+        List<Unit> unitsToRemove = new ArrayList<>();
+        for (Unit unit : units) {
+            if (unit.getHealth() <= 0) {
+                unitsToRemove.add(unit);
+            }
+        }
+        
+        for (int i = 0; i < unitsToRemove.size(); i++) {
+            removeUnit(unitsToRemove.get(i));
+        }
     }
 
     /**
@@ -345,6 +316,6 @@ public class Team implements Serializable {
      */
     @Override
     public String toString() {
-        return getName() + " - " + getColorname();
+        return getName();
     }
 }

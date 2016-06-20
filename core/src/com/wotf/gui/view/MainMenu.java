@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.extra.Pathfinder;
 import com.wotf.game.WotFGame;
 
 /**
@@ -75,7 +76,7 @@ public class MainMenu implements Screen {
         // Pak het JSON bestand uit de assets folder. Hier staan alle skins in.
         skin = new Skin(Gdx.files.internal("uiskin.json"));
 
-        Image banner = new Image(new Texture(Gdx.files.internal("banner.png")));
+        Image banner = new Image(new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "banner.png")));
         banner.setPosition(Gdx.graphics.getWidth() / 2 - banner.getWidth() / 2, 335);
         stage.addActor(banner);
         

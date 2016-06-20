@@ -122,12 +122,12 @@ public class SessionTest {
         assertEquals(22, session.getId());
     }
 
-    @Test
+   /* @Test
     public void testgetGameSettings() throws RemoteException{
         GameSettings gmSettings = new GameSettings(true);
         // Set a different gamesetting object and test if the exact same object returns..
         session.setGameSettings(gmSettings);
         // Check if the gamesettings are set right.
         assertEquals(gmSettings, session.getGameSettings());
-    }
+    }*/
 }

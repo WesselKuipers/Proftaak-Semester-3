@@ -5,25 +5,41 @@
  */
 package com.wotf.game.classes;
 
+import HeadlessRunner.GdxTestRunner;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
-import java.io.File;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.runner.RunWith;
 
 /**
  *
  * @author Remco
  */
+@RunWith(GdxTestRunner.class)
 public class ProjectileTest {
 
     private Projectile projectile;
     private Sprite sprite;
 
+    /*@BeforeClass
+    public static void initGdx() {
+        Gdx.app = mock(Application.class);
+
+        HeadlessNativesLoader.load();
+        MockGraphics mockGraphics = new MockGraphics();
+        Gdx.graphics = mockGraphics;
+        HeadlessNet headlessNet = new HeadlessNet();
+        Gdx.net = headlessNet;
+        HeadlessFiles headlessFiles = new HeadlessFiles();
+        Gdx.files = headlessFiles;
+        Gdx.gl = mock(GL20.class);
+        HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
+        new HeadlessApplication(new WotFGame(), config);
+    }*/
     @Before
     public void initProjectile() {
         /**
@@ -31,10 +47,11 @@ public class ProjectileTest {
          *
          * @param sprite
          */
-
-        sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
+        //sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
+        //System.out.println(sprite.getHeight());
         //projectile = new Projectile(sprite, ?);
     }
+
 
     @Test
     public void testInit() {
@@ -44,6 +61,7 @@ public class ProjectileTest {
 
     @Test
     public void testFire() {
+        sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
         /**
          * Function that handles the shooting of the bullet with physics.
          *

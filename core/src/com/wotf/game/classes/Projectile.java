@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.extra.Pathfinder;
 import com.wotf.game.GameStage;
 import com.wotf.game.Networking.Command;
 import com.wotf.game.Networking.NetworkMessage;
@@ -55,7 +56,7 @@ public class Projectile extends Actor {
     public Projectile(Sprite sprite, ParticleEffect effect) {
         //graphics
         this.sprite = sprite;
-        sprite = new Sprite(new Texture(Gdx.files.internal("BulletBill.png")));
+        sprite = new Sprite(new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "BulletBill.png")));
         sprite.setOriginCenter();
         sprite.flip(true, false);
 
@@ -205,7 +206,7 @@ public class Projectile extends Actor {
 
         // if projectile is out of bounds, remove it from the stage
         if (isProjectileOutOfBounds(gameMap)) {
-            ((GameStage) getStage()).getGame().endTurn();
+            ((GameStage) getStage()).getGame().getTurnLogic().endTurn();
             this.remove();
             isExploded = false;
             return;
@@ -231,7 +232,7 @@ public class Projectile extends Actor {
      */
     private void terrainCollision() {
         // Terrain and unit collision
-        if (((GameStage) getStage()).getGame().getPlayingPlayer().getId()== ((GameStage) getStage()).getGame().getActiveTeam().getPlayer().getId()&& 
+        if (((GameStage) getStage()).getGame().getPlayingPlayer().getId()== ((GameStage) getStage()).getGame().getActiveTeam().getPlayer().getId() && 
             ((GameStage) getStage()).getGame().getMap().isPixelSolid((int) getX(), (int) getY()) &&
                 isExploded == false) {
 
@@ -244,6 +245,8 @@ public class Projectile extends Actor {
             ((GameStage) getStage()).getNetworkingUtil().sendToHost( syncCollisionMsg );
             
             isExploded = true;
+            
+            terrainCollisionReceive((int) getX(), (int) getY());
         }
     }
     
@@ -251,10 +254,12 @@ public class Projectile extends Actor {
         // Projectile collided with terrain
         System.out.println("Bullet collided at " + posX + " " + posY);
         //((GameStage) getStage()).setParticle(p);
-        ((GameStage) getStage()).explode(posX, posY, blastRadius, damage, isCluster);
-        ((GameStage) getStage()).getGame().endTurn();
-        this.remove();
-        isExploded = false;
+        Gdx.app.postRunnable(() -> {
+            ((GameStage) getStage()).explode(posX, posY, blastRadius, damage, isCluster);
+            ((GameStage) getStage()).getGame().getTurnLogic().endTurn();
+            this.remove();
+            isExploded = false;
+        });
     }
 
     /**

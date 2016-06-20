@@ -17,16 +17,20 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.wotf.game.WotFGame;
 import com.wotf.game.classes.GameSettings;
 import com.wotf.game.classes.Player;
@@ -63,8 +67,10 @@ public class SessionOnlineHost implements Screen {
     private Session session;
     private Player player;
     private Timer timer;
-    private SelectBox maxplayerbox;
+    private SelectBox maxPlayerBox;
     private SelectBox unitbox;
+    private Table outerTable;
+    private ScrollPane scroll;
 
     /**
      * Constructor of SessionLocal, initializes teamList and gameSetting Other
@@ -78,11 +84,13 @@ public class SessionOnlineHost implements Screen {
         this.game = game;
         this.session = session;
         this.player = player;
+        session.setHostGui(this);
         gameSettings = new GameSettings();
         teamList = new ArrayList<>();
         playerList = new ArrayList<>();
         addPlayerToDB();
         playerList = getPlayersOfSession(session);
+        gameSettings.setIsLocal(false);
     }
 
     /**
@@ -157,6 +165,55 @@ public class SessionOnlineHost implements Screen {
         mapstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 220, 220, 160, 160)));
         teamselecttable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 100, 100, 160, 160)));
         playerstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 125, 125, 160, 160)));
+
+        outerTable = new Table();
+        outerTable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 130, 130, 160, 160)));
+
+        scroll = new ScrollPane(outerTable);
+        outerTable.setSkin(skin);
+        scroll.setSize(500, 300);
+        scroll.setPosition(500, 50);
+        scroll.setScrollingDisabled(true, false);
+        scroll.setForceScroll(false, true);
+        scroll.setFlickScroll(true);
+        scroll.setOverscroll(false, false);
+        stage.addActor(scroll);
+
+        TextField chatMessageField = new TextField("", skin);
+        chatMessageField.setWidth(500);
+        chatMessageField.setHeight(40);
+        chatMessageField.setPosition(500, 5);
+        stage.setKeyboardFocus(chatMessageField);
+        stage.addActor(chatMessageField);
+
+        TextButton sendMessage = new TextButton("Verstuur", skin);
+        sendMessage.setColor(Color.BLACK);
+        sendMessage.setWidth(200);
+        sendMessage.setHeight(60);
+        sendMessage.setPosition(1010, 120);
+        stage.addActor(sendMessage);
+        sendMessage.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (chatMessageField.getText().equals("")) {
+                    // Username is empty, show dialog asking for the user to enter a username
+                    Dialog noUsernameDialog = new Dialog("ERROR", skin);
+                    noUsernameDialog.text("Message may not be empty.\nPlease enter a message.");
+                    noUsernameDialog.button("Ok");
+                    noUsernameDialog.show(stage);
+                    return;
+                }
+
+                String message = SessionOnlineHost.this.player.getName() + ": " + chatMessageField.getText();
+
+                try {
+                    SessionOnlineHost.this.session.sendChatMessage(message);
+                    chatMessageField.setText("");
+                } catch (RemoteException ex) {
+                    Gdx.app.log("SessionOnlineHost", ex.getMessage());
+                }
+            }
+        });
 
         setHostLabel();
 
@@ -488,16 +545,16 @@ public class SessionOnlineHost implements Screen {
         maxplayervals[1] = "3";
         maxplayervals[2] = "4";
         maxplayervals[3] = "5";
-        maxplayerbox = new SelectBox(skin);
-        maxplayerbox.setItems(maxplayervals);
-        maxplayerbox.setSelected(Integer.toString(session.getGameSettings().getMaxPlayersSession()));
-        maxplayerbox.addListener(new ChangeListener() {
+        maxPlayerBox = new SelectBox(skin);
+        maxPlayerBox.setItems(maxplayervals);
+        maxPlayerBox.setSelected(Integer.toString(session.getGameSettings().getMaxPlayersSession()));
+        maxPlayerBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeListener.ChangeEvent event, Actor actor) {
                 try {
                     SessionContext sc = new SessionContext();
                     // Send a new property because this is sending a session object instead of a gamesettings object
-                    gameSettings.setMaxPlayersSession(Integer.valueOf(maxplayerbox.getSelected().toString()));
+                    gameSettings.setMaxPlayersSession(Integer.valueOf(maxPlayerBox.getSelected().toString()));
                     session.setGameSettings(gameSettings);
                     // Update this session's max players value.
                     // Otherwise people will be able to connect to the session while over the max players value.
@@ -507,7 +564,7 @@ public class SessionOnlineHost implements Screen {
                 }
             }
         });
-        settingstable.add(maxplayerbox).width(180);
+        settingstable.add(maxPlayerBox).width(180);
         settingstable.row();
     }
 
@@ -649,9 +706,9 @@ public class SessionOnlineHost implements Screen {
         ArrayList<String> mapslist = new ArrayList<>();
         FileHandle dirHandle = Gdx.files.internal("maps");
         for (FileHandle entry : dirHandle.list()) {
-            mapslist.add(entry.toString());
+            mapslist.add(entry.toString().substring(5));
         }
-        map1 = new Image(new Texture(mapslist.get(0)));
+        map1 = new Image(new Texture("maps/" + mapslist.get(0)));
         try {
             session.setGameSettings(gameSettings);
         } catch (RemoteException ex) {
@@ -674,7 +731,7 @@ public class SessionOnlineHost implements Screen {
                     session.setGameSettings(gameSettings);
 
                     mapstable.removeActor(map1);
-                    map1 = new Image(new Texture(mapslist.get(chooseMap.getSelectedIndex())));
+                    map1 = new Image(new Texture("maps/" + mapslist.get(chooseMap.getSelectedIndex())));
                     map1.setPosition(20, 70);
                     map1.setWidth(400);
                     map1.setHeight(230);
@@ -704,9 +761,9 @@ public class SessionOnlineHost implements Screen {
     private void startGame(SelectBox chooseMap) {
         TextButton start = new TextButton("Start", skin); // Use the initialized skin
         start.setColor(Color.BLACK);
-        start.setWidth(300);
+        start.setWidth(200);
         start.setHeight(60);
-        start.setPosition(590, 180);
+        start.setPosition(1010, 190);
         stage.addActor(start);
         start.addListener(new ClickListener() {
             @Override
@@ -714,7 +771,7 @@ public class SessionOnlineHost implements Screen {
                 try {
                     timer.cancel();
 
-                    // Updating map before lauch
+                    // Updating map before launch
                     gameSettings.setMapName(chooseMap.getSelected().toString());
                     gameSettings.setMapIndex(chooseMap.getSelectedIndex());
                     session.setGameSettings(gameSettings);
@@ -764,9 +821,9 @@ public class SessionOnlineHost implements Screen {
     private void exitGame() {
         TextButton exit = new TextButton("Exit", skin); // Use the initialized skin
         exit.setColor(Color.BLACK);
-        exit.setWidth(300);
+        exit.setWidth(200);
         exit.setHeight(60);
-        exit.setPosition(590, 110);
+        exit.setPosition(1010, 50);
         stage.addActor(exit);
         exit.addListener(new ClickListener() {
             @Override
@@ -794,6 +851,19 @@ public class SessionOnlineHost implements Screen {
                 }
             }
         });
+    }
+
+    /**
+     * Method that adds a message to the GUI
+     *
+     * @param message Message to add
+     */
+    public void chatMessage(String message) {
+        outerTable.add(message).align(Align.left);
+        outerTable.row();
+        scroll.layout();
+        scroll.scrollTo(0, 120, 0, 0);
+
     }
 
     /**

@@ -5,6 +5,7 @@
  */
 package com.wotf.game.classes;
 
+import HeadlessRunner.GdxTestRunner;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,18 +14,20 @@ import com.badlogic.gdx.math.Vector2;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.runner.RunWith;
 
 /**
  *
  * @author Remco
  */
+@RunWith(GdxTestRunner.class)
 public class MapTest {
 
     private Map map;
 
     @Before
     public void initMap() {
-        map = new Map();
+        map = new Map("alpha.png");
     }
 
     @Test
@@ -81,37 +84,70 @@ public class MapTest {
     }
 
     @Test
-    public void testsetandgetWind(){
+    public void testsetandgetWind() {
         //  Sets the windforce as a vector 2.
-        Vector2 vec = new Vector2(20,20);
+        Vector2 vec = new Vector2(20, 20);
         map.setWind(vec);
         // Test if the wind is the same as the set wind of the map.
         assertEquals(vec, map.getWind());
     }
-    
+
     @Test
     public void testgetLandscapeTexture() {
         // The map has a width of 1920
         // Test for the width of the landscapetexture. This has to be 1920 as well.
-        // assertEquals(1920, map.getLandscapeTexture().getWidth());
-        
-        // For the case of testing it is a graphics object and it should be null for now.
-        assertNull(map.getLandscapeTexture());
+        assertEquals(1920, map.getLandscapeTexture().getWidth());
     }
 
     @Test
     public void testgetBackgroundTexture() {
-        // Background textures are not implemented. So it should be null.
-        assertNull(map.getBackgroundTexture());
+        // Background textures are also 1920. It should be 0 because it is a pixmap and it will be repeated.
+        assertEquals(0, map.getBackgroundTexture().getWidth());
     }
 
+    @Test
+    public void testDestroyRadius() {
+        int counterbefore = 0;
+        int counterafter = 0;
+        // Keep in mind the terrain size.
+        boolean[][] terrainbefore = map.getTerrain();
+        for (int i = 0; i < terrainbefore.length; i++) {
+            if (terrainbefore[i][0] == true) {
+                counterbefore++;
+            }
+        }
+        // The location of impact:(50,15)
+        // The radius of impact:20
+        map.destroyRadius(50, 15, 20);
+        // Get the map texture again and see if there's less booleans set to true now.
+        boolean[][] terrainafter = map.getTerrain();
+        for (int i = 0; i < terrainafter.length; i++) {
+            if (terrainafter[i][0] == true) {
+                counterafter++;
+            }
+        }
+
+        if (counterafter >= counterbefore) {
+            fail("Nothing has been hit or there is something wrong in the method.");
+        }
+    }
+
+    @Test
+    public void testPixelSolid(){
+        // There has not been shot here, so it should be solid.
+        assertTrue(map.isPixelSolid(10, 10));
+        // Test it if there IS shot on this spot.
+        map.destroyRadius(10, 10, 20);
+        assertFalse(map.isPixelSolid(10, 10));
+    }
+    
     @Test
     public void testgetBounds() {
         // Test if the given rectangle has the width set to 1920. 
         // This is the width of the Stones.png image file.
         Rectangle testrect = new Rectangle(0, 0, 1920, 720);
         // Test if the rectangles are the same. 
-        assertEquals(testrect, map.getBounds());
+        assertEquals(testrect, map.getBounds()); 
     }
 
     @Test
@@ -134,4 +170,5 @@ public class MapTest {
         }
 
     }
+
 }

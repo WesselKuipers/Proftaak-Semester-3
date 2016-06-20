@@ -5,11 +5,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.wotf.game.GameStage;
 import com.wotf.game.GuiStage;
@@ -18,7 +14,6 @@ import com.wotf.game.classes.GameSettings;
 import com.wotf.game.classes.Map;
 import com.wotf.game.classes.Player;
 import com.wotf.game.classes.Team;
-import java.util.ArrayList;
 import java.util.List;
 import com.wotf.game.WotFGame;
 import com.wotf.game.classes.Session;
@@ -39,6 +34,7 @@ public class GameEngine implements Screen {
     private Session session;
     private Map map;
     private Player playingPlayer;
+    private boolean isLocal;
 
     /**
      * Constructor of GameEngine
@@ -49,20 +45,26 @@ public class GameEngine implements Screen {
     }
 
     /**
-    * Constructor of GameEngine
+    * Constructor of GameEngine for LOCAL
     * @param game Game that will be launched
     * @param gameSettings Settings associated with this game
-     * @param map
+    * @param map Map for the game
+    * @param session for local
+    * @param player for local
     */
-    public GameEngine(WotFGame game, GameSettings gameSettings, Map map) {
+    public GameEngine(WotFGame game, GameSettings gameSettings, Map map, Session session, Player player) {
         this.game = game;
         this.gameSettings = gameSettings;
         this.map = map;
         this.skin = new Skin(Gdx.files.internal("uiskin.json"));
+        this.isLocal = true;
+        this.session = session;
+        this.playingPlayer = player;
+        this.isLocal = true;
     }
     
     /**
-    * Constructor of GameEngine
+    * Constructor of GameEngine for ONLINE
     * @param game Game that will be launched
      * @param session
     */
@@ -73,6 +75,7 @@ public class GameEngine implements Screen {
         this.playingPlayer = playingPlayer;
         this.map = new Map(session.getGameSettings().getMapName());
         this.skin = new Skin(Gdx.files.internal("uiskin.json"));
+        this.isLocal = false;
     }
 
     /**
@@ -87,18 +90,20 @@ public class GameEngine implements Screen {
         viewport.setWorldSize(map.getWidth(), map.getHeight());
         viewport.getCamera().position.set(viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2, 0);
         viewport.apply();
-        
-        // WARNING: THIS IS A TEMPORARY FIX. This makes the client sleep so it can receive all gamesettings sent by the host, else it will crash.
-        // TODO: Make the client wait until the settings are loaded from the host by the client?
-        if (session.getHost().getId() != playingPlayer.getId()) {
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
-                Thread.currentThread().interrupt();
+
+        if(!isLocal){
+            // WARNING: THIS IS A TEMPORARY FIX. This makes the client sleep so it can receive all gamesettings sent by the host, else it will crash.
+            // TODO: Make the client wait until the settings are loaded from the host by the client?
+            if (session.getHost().getId() != playingPlayer.getId()) {
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                    Thread.currentThread().interrupt();
+                }
             }
         }
-        
+
         // Initializes game object using game settings
         Game gameclass = new Game(gameSettings, map, session.getPlayers(), playingPlayer, session.getHost());
 

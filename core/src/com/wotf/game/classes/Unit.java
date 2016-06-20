@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
+import com.extra.Pathfinder;
 import com.wotf.game.classes.Items.Item;
 import com.wotf.game.GameStage;
 import com.wotf.game.GuiStage;
@@ -52,7 +53,7 @@ public class Unit extends Group implements Serializable {
         font = new BitmapFont();
         moveRight = true;
 
-        Texture spriteSheet = new Texture(Gdx.files.internal("unit.png"));
+        Texture spriteSheet = new Texture(Gdx.files.absolute(Pathfinder.getRelativePath() + "unit.png"));
 
         font.setColor(team.getColor());
 
@@ -80,18 +81,6 @@ public class Unit extends Group implements Serializable {
         this(name, health, team);
         this.position = position;
         this.velocity = new Vector2(0, 0);
-    }
-
-    /**
-     * Constructor without any graphics Made for the unit testing.
-     */
-    public Unit(String name, int health, Team team, Vector2 position, boolean any) {
-        this.name = name;
-        this.health = health;
-        this.team = team;
-        this.position = position;
-        this.sprite = null;
-        this.moveRight = true;
     }
 
     /**
@@ -278,7 +267,7 @@ public class Unit extends Group implements Serializable {
 
             // if it's currently this unit's turn, manually call the endTurn() method
             if (((GameStage) this.getStage()).getGame().getActiveTeam().getActiveUnit().equals(this)) {
-                ((GameStage) this.getStage()).getGame().endTurn();
+                ((GameStage) this.getStage()).getGame().getTurnLogic().endTurn();
             }
         }
     }
