@@ -5,6 +5,7 @@
  */
 package com.wotf.game.classes;
 
+import HeadlessRunner.GdxTestRunner;
 import com.badlogic.gdx.graphics.Color;
 import com.wotf.game.classes.TurnLogic.TurnState;
 import java.util.ArrayList;
@@ -12,11 +13,13 @@ import java.util.List;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.runner.RunWith;
 
 /**
  *
  * @author Remco
  */
+@RunWith(GdxTestRunner.class)
 public class TurnLogicTest {
 
     private Game game;
@@ -33,10 +36,10 @@ public class TurnLogicTest {
         gamesetting = new GameSettings();
         // Make 2 teams.
         alpha = new Team("Alpha", Color.RED);
+        alpha.addUnit("Alphasunit", 0);
         // Add a unit to both the teams.
-        // alpha.addUnit("AlphaUnit", 100);
         beta = new Team("Beta", Color.GREEN);
-        // beta.addUnit("BetaUnit", 150);
+        beta.addUnit("Betasunit", 0);
         // Add a team to the GameSettings.
         gamesetting.addTeam(alpha);
         gamesetting.addTeam(beta);
@@ -80,8 +83,8 @@ public class TurnLogicTest {
 
     @Test
     public void testgetTotalTeams() {
-        // The total teams is set on 3 in the constructor
-        assertEquals(3, turnlogic.getTotalTeams());
+        // The total teams is set on 2 in the constructor
+        assertEquals(2, turnlogic.getTotalTeams());
     }
 
     @Test
@@ -143,6 +146,21 @@ public class TurnLogicTest {
         turnlogic.endTurn();
         turnlogic.endTurn();
         assertEquals(2, turnlogic.getActiveTeamIndex());
+    }
+
+    /**
+     * At the moment this fails. 
+     * At the moment it tries to remove from the gamestage as well. 
+     * This can't be tested without a gamestage.
+     * 
+     */
+    @Test
+    public void testEndTurnReceive() {
+        // Test if the added unit with 0 hp, is removed from the team.
+        // After this, the team should be removed as well, because there are no units left.
+        turnlogic.endTurnReceive(2);
+        // The Alpha and Beta both have 2 units with 0 hp. They should be cleaned.
+        assertEquals(0, turnlogic.getTotalTeams());
     }
 
 }

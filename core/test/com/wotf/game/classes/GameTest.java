@@ -35,9 +35,11 @@ public class GameTest {
         gamesetting = new GameSettings();
         // Make 2 teams.
         alpha = new Team("Alpha", Color.RED);
+        alpha.addUnit("junit", 50);
         // Add a unit to both the teams.
         // alpha.addUnit("AlphaUnit", 100);
         beta = new Team("Beta", Color.GREEN);
+        beta.addUnit("jbetaunit", 50);
         // beta.addUnit("BetaUnit", 150);
         // Add a team to the GameSettings.
         gamesetting.addTeam(alpha);
@@ -126,13 +128,16 @@ public class GameTest {
         // Get the active map. In this example it is null.
         assertNull(game.getMap());
     }
-    
+
     @Test
     public void testgetState() {
-        // The value is not set yet so it will return false probably.
-        assertNull(game.getTurnLogic().currentState);
+        // The value is set to playing because the game just started.
+        assertEquals(TurnLogic.TurnState.PLAYING, game.getTurnLogic().currentState);
     }
 
+    /**
+    * Won't work yet because there is a GameStage involved in this method. 
+    * This will return a NullPointerException.
     @Test
     public void testEndTurn() {
         // Run the EndTurn method. After that run the getActiveTeam which should be different than the default Team 0.
@@ -140,7 +145,7 @@ public class GameTest {
         // Test if the ActiveTeam is 1 now.
         // Can't be tested because there is no stage with actors in the testclass.
         assertEquals(beta, game.getActiveTeam());
-    }
+    }*/
 
     @Test
     public void testgetGameSettings() {
@@ -155,5 +160,64 @@ public class GameTest {
         // Can't be tested because there is nothing to compare. 
         // There is no getteamsize or whatever.
         assertEquals(turnlogic.getTurn(), game.getTurnLogic().getTurn());
+    }
+
+    @Test
+    public void testTeamsToBeRemovedRemoveOne() {
+        // Make a dummy team. This team has 0 units.
+        // This should be removed after the removeTeamsToBeRemoved function.
+        Team gamza = new Team("Gamza", Color.BLACK);
+
+        GameSettings gs = new GameSettings();
+        gs.addTeam(alpha);
+        gs.addTeam(beta);
+        gs.addTeam(gamza);
+
+        List<Player> players = new ArrayList<>();
+        // Add a player to the list.
+        playerrens = new Player("127.0.0.1", "Rensje");
+        playerdino = new Player("2.2.2.2", "Dinotje");
+        players.add(playerrens);
+        players.add(playerdino);
+
+        Game gametest = new Game(gs, null, players, playerrens, playerrens);
+
+        // Test if there actually are 3 teams registered with the game now.
+        assertEquals(3, gametest.getTeams().size());
+        // Check if the size is 2 after the removeTeamsToBeRemoved. 
+        // Because team gamza has no units assigned, it can(should) be removed.
+        gametest.removeTeamsToBeRemoved();
+        // Check if the size is 2 now.
+        assertEquals(2, gametest.getTeams().size());
+    }
+
+    @Test
+    public void testTeamsToBeRemovedRemoveNone() {
+        // Make a dummy team. This team has 0 units.
+        // This should be removed after the removeTeamsToBeRemoved function.
+        Team gamza = new Team("Gamza", Color.BLACK);
+        gamza.addUnit("gamzaunit", 50);
+
+        GameSettings gs = new GameSettings();
+        gs.addTeam(alpha);
+        gs.addTeam(beta);
+        gs.addTeam(gamza);
+
+        List<Player> players = new ArrayList<>();
+        // Add a player to the list.
+        playerrens = new Player("127.0.0.1", "Rensje");
+        playerdino = new Player("2.2.2.2", "Dinotje");
+        players.add(playerrens);
+        players.add(playerdino);
+
+        Game gametest = new Game(gs, null, players, playerrens, playerrens);
+
+        // Test if there actually are 3 teams registered with the game now.
+        assertEquals(3, gametest.getTeams().size());
+        // Check if the size is still 3 after the removeTeamsToBeRemoved. 
+        // Because team gamza has one unit assigned
+        gametest.removeTeamsToBeRemoved();
+        // Check if the size is still 3 now.
+        assertEquals(3, gametest.getTeams().size());
     }
 }

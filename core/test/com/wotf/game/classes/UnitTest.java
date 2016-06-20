@@ -206,4 +206,10 @@ public class UnitTest {
          */
         assertEquals("Bazooka", unit.getWeapon().getName());
     }
+    
+//    @Test
+//    public void testgetFrame(){
+//        // Changes the units facing direction if not facing the direction it should face.
+//        // unit.getFrame(1);
+//    }
 }
