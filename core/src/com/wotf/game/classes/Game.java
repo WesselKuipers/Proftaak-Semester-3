@@ -137,6 +137,10 @@ public class Game {
         return turnLogic;
     }
     
+    /**
+     * Removes teams from the game when they have no units left
+     * Sets the game over state if a winning condition is found
+     */
     public void removeTeamsToBeRemoved() {
         List<Team> teamsToRemove = new ArrayList<>();
         

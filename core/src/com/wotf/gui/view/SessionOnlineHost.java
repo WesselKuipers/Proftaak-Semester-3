@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.wotf.gui.view;
 
 import com.badlogic.gdx.Gdx;
@@ -50,8 +45,6 @@ import java.util.logging.Logger;
 
 /**
  * Screen that shows the sessions menu for a host
- *
- * @author Gebruiker
  */
 public class SessionOnlineHost implements Screen {
 
@@ -60,15 +53,15 @@ public class SessionOnlineHost implements Screen {
     private final WotFGame game;
     private Stage stage;
     private Skin skin;
-    private final ArrayList<Team> teamList;
-    private ArrayList<Player> playerList;
+    private final java.util.List<Team> teamList;
+    private java.util.List<Player> playerList;
     private final GameSettings gameSettings;
-    private Image map1;
+    private Image map;
     private Session session;
-    private Player player;
+    private final Player player;
     private Timer timer;
     private SelectBox maxPlayerBox;
-    private SelectBox unitbox;
+    private SelectBox unitBox;
     private Table outerTable;
     private ScrollPane scroll;
 
@@ -77,8 +70,10 @@ public class SessionOnlineHost implements Screen {
      * important points: - adds the host to the local playerlist - gets the list
      * of players from the DB and adds it to the local playerlist.
      *
-     * @param game
-     * @param session
+     * @param game Game object associated with this session
+     * @param session Session object for this session
+     * @param player The player who is the host of this session
+     * @throws java.rmi.RemoteException Thrown when a connection error occurs
      */
     public SessionOnlineHost(WotFGame game, Session session, Player player) throws RemoteException {
         this.game = game;
@@ -88,7 +83,7 @@ public class SessionOnlineHost implements Screen {
         gameSettings = new GameSettings();
         teamList = new ArrayList<>();
         playerList = new ArrayList<>();
-        addPlayerToDB();
+        addPlayerToDb();
         playerList = getPlayersOfSession(session);
         gameSettings.setIsLocal(false);
     }
@@ -96,24 +91,24 @@ public class SessionOnlineHost implements Screen {
     /**
      * Gets all the players in a session from the DB.
      *
-     * @param session current
+     * @param session current session
      * @return list of players from the DB
      */
-    public ArrayList<Player> getPlayersOfSession(Session session) {
+    public java.util.List<Player> getPlayersOfSession(Session session) {
         try {
             SessionPlayerContext sp = new SessionPlayerContext();
             return sp.getPlayersFromSession(session);
         } catch (SQLException ex) {
             Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
         return null;
     }
 
     /**
      * Adds a player to the session in the DB.
-     *
      */
-    public void addPlayerToDB() {
+    public void addPlayerToDb() {
         SessionPlayerContext sp = new SessionPlayerContext();
         sp.insert(player, session);
     }
@@ -144,7 +139,6 @@ public class SessionOnlineHost implements Screen {
     /**
      * The Screen for the host. The host can select new values from selectboxes
      * and fire events for adding a Team.
-     *
      */
     @Override
     public void show() {
@@ -156,15 +150,15 @@ public class SessionOnlineHost implements Screen {
         players = new List(skin);
 
         // Alle teams en labels hiervoor.
-        Table teamstable = new Table();
-        Table mapstable = new Table();
-        Table settingstable = new Table();
-        Table teamselecttable = new Table();
-        Table playerstable = new Table();
-        teamstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 130, 130, 160, 160)));
-        mapstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 220, 220, 160, 160)));
-        teamselecttable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 100, 100, 160, 160)));
-        playerstable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 125, 125, 160, 160)));
+        Table teamsTable = new Table();
+        Table mapsTable = new Table();
+        Table settingsTable = new Table();
+        Table teamSelectable = new Table();
+        Table playersTable = new Table();
+        teamsTable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 130, 130, 160, 160)));
+        mapsTable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 220, 220, 160, 160)));
+        teamSelectable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 100, 100, 160, 160)));
+        playersTable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 125, 125, 160, 160)));
 
         outerTable = new Table();
         outerTable.setBackground(new NinePatchDrawable(getNinePatch(("GUI/tblbg.png"), 130, 130, 160, 160)));
@@ -186,7 +180,7 @@ public class SessionOnlineHost implements Screen {
         stage.setKeyboardFocus(chatMessageField);
         stage.addActor(chatMessageField);
 
-        TextButton sendMessage = new TextButton("Verstuur", skin);
+        TextButton sendMessage = new TextButton("Send", skin);
         sendMessage.setColor(Color.BLACK);
         sendMessage.setWidth(200);
         sendMessage.setHeight(60);
@@ -217,42 +211,42 @@ public class SessionOnlineHost implements Screen {
 
         setHostLabel();
 
-        setPlayerList(playerstable);
+        setPlayerList(playersTable);
 
-        teamSelectionLabel(teamselecttable);
+        teamSelectionLabel(teamSelectable);
         // 
         // Teams adding
-        addAlpha(teamselecttable);
-        addBeta(teamselecttable);
-        addGamma(teamselecttable);
+        addAlpha(teamSelectable);
+        addBeta(teamSelectable);
+        addGamma(teamSelectable);
         //
         //
         setTitleLabel();
 
-        setIp(settingstable);
+        setIp(settingsTable);
 
-        setTurnTimevals(settingstable);
+        setTurnTimevals(settingsTable);
 
-        setMaxPlayersvals(settingstable);
+        setMaxPlayersvals(settingsTable);
 
-        setSpeedsvals(settingstable);
+        setSpeedsvals(settingsTable);
 
-        setPhysicsvals(settingstable);
+        setPhysicsvals(settingsTable);
 
-        setWeaponvals(settingstable);
+        setWeaponvals(settingsTable);
 
-        setTimervals(settingstable);
+        setTimervals(settingsTable);
 
-        setUnitsvals(settingstable);
+        setUnitsvals(settingsTable);
 
-        settingstable.setWidth(300);
-        settingstable.setHeight(200);
-        settingstable.setPosition(30, 110);
-        stage.addActor(settingstable);
+        settingsTable.setWidth(300);
+        settingsTable.setHeight(200);
+        settingsTable.setPosition(30, 110);
+        stage.addActor(settingsTable);
 
-        SelectBox chooseMap = setMaps(mapstable);
+        SelectBox chooseMap = setMaps(mapsTable);
 
-        setTeamsToTable(teamstable);
+        setTeamsToTable(teamsTable);
 
         startGame(chooseMap);
 
@@ -265,15 +259,15 @@ public class SessionOnlineHost implements Screen {
     /**
      * Sets the players from the DB to the GUI list.
      *
-     * @param playerstable
+     * @param playersTable Table that holds the list of players
      */
-    private void setPlayerList(Table playerstable) {
+    private void setPlayerList(Table playersTable) {
         players.setItems(playerList.toArray());
-        playerstable.add(players);
-        playerstable.setWidth(250);
-        playerstable.setHeight(320);
-        playerstable.setPosition(1020, 360);
-        stage.addActor(playerstable);
+        playersTable.add(players);
+        playersTable.setWidth(250);
+        playersTable.setHeight(320);
+        playersTable.setPosition(1020, 360);
+        stage.addActor(playersTable);
     }
 
     /**
@@ -282,79 +276,79 @@ public class SessionOnlineHost implements Screen {
      *
      */
     private void setHostLabel() {
-        Label hostlabel = new Label(session.getHost().getIp() + " " + session.getHost().getName(), skin);
-        hostlabel.setPosition(30, 30);
-        stage.addActor(hostlabel);
+        Label hostLabel = new Label(session.getHost().getIp() + " " + session.getHost().getName(), skin);
+        hostLabel.setPosition(30, 30);
+        stage.addActor(hostLabel);
     }
 
     /**
      * Sets the teamslist to a table of teams.
      *
-     * @param teamstable
+     * @param teamsTable Table that holds the list of players
      */
-    private void setTeamsToTable(Table teamstable) {
+    private void setTeamsToTable(Table teamsTable) {
         Label teamslabel = new Label("Teams", skin);
-        teamstable.setPosition(730, 360);
-        teamstable.add(teamslabel);
-        teamstable.row();
-        teamstable.add(teams).width(200);
-        teamstable.setWidth(260);
-        teamstable.setHeight(320);
-        stage.addActor(teamstable);
+        teamsTable.setPosition(730, 360);
+        teamsTable.add(teamslabel);
+        teamsTable.row();
+        teamsTable.add(teams).width(200);
+        teamsTable.setWidth(260);
+        teamsTable.setHeight(320);
+        stage.addActor(teamsTable);
     }
 
     /**
      * Set the label for teamselection.
      *
-     * @param teamselecttable
+     * @param teamSelectTable Table that holds the list of players
      */
-    private void teamSelectionLabel(Table teamselecttable) {
-        Label selectteamlabel = new Label("Team selection", skin);
-        teamselecttable.add(selectteamlabel).padBottom(15);
-        teamselecttable.row();
+    private void teamSelectionLabel(Table teamSelectTable) {
+        Label selectTeamLabel = new Label("Team selection", skin);
+        teamSelectTable.add(selectTeamLabel).padBottom(15);
+        teamSelectTable.row();
     }
 
     /**
      * Adds team alpha
      *
-     * @param teamselecttable
+     * @param teamSelectTable Table that holds the list of players
      */
-    private void addAlpha(Table teamselecttable) {
-        TextButton btnteamalpha = new TextButton("Alpha", skin); // Use the initialized skin
-        btnteamalpha.setName("Alpha");
-        btnteamalpha.setColor(Color.BLUE);
-        btnteamalpha.addListener(new ClickListener() {
+    private void addAlpha(Table teamSelectTable) {
+        TextButton btnTeamAlpha = new TextButton("Alpha", skin); // Use the initialized skin
+        btnTeamAlpha.setName("Alpha");
+        btnTeamAlpha.setColor(Color.BLUE);
+        btnTeamAlpha.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if (players.getSelected() != null) {
                     try {
-                        Team teamalpha = new Team("Alpha", Color.BLUE);
-                        teamalpha.setColorname(teamalpha.getColor().toString());
-                        Player selectedplayer = (Player) players.getSelected();
-                        int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
+                        Team teamAlpha = new Team("Alpha", Color.BLUE);
+                        teamAlpha.setColorname(teamAlpha.getColor().toString());
+                        Player selectedPlayer = (Player) players.getSelected();
+                        int selectedUnitCount = Integer.parseInt(unitBox.getSelected().toString());
 
-                        ArrayList<Team> teamlistcopy = new ArrayList<>(teamList);
-                        for (Team fteam : teamlistcopy) {
-                            if (fteam.getPlayer().getName().equals(selectedplayer.getName())) {
-                                fteam.setPlayer(null);
+                        java.util.List<Team> teamListCopy = new ArrayList<>(teamList);
+                        for (Team fTeam : teamListCopy) {
+                            if (fTeam.getPlayer().getName().equals(selectedPlayer.getName())) {
+                                fTeam.setPlayer(null);
 
-                                TextButton teamtb = (TextButton) stage.getRoot().findActor(fteam.getName());
+                                TextButton teamtb = (TextButton) stage.getRoot().findActor(fTeam.getName());
                                 teamtb.setTouchable(Touchable.enabled);
-                                teamtb.setColor(fteam.getColor());
+                                teamtb.setColor(fTeam.getColor());
 
-                                teamList.remove(fteam);
-                                gameSettings.removeTeam(fteam);
+                                teamList.remove(fTeam);
+                                gameSettings.removeTeam(fTeam);
                             }
                         }
 
-                        teamalpha.setPlayer(selectedplayer);
+                        teamAlpha.setPlayer(selectedPlayer);
 
-                        addUnitsSingleTeam(selectedunitcount, teamalpha);
+                        addUnitsSingleTeam(selectedUnitCount, teamAlpha);
 
                         session.setGameSettings(gameSettings);
 
-                        btnteamalpha.setTouchable(Touchable.disabled);
-                        btnteamalpha.setColor(Color.LIGHT_GRAY);
+                        btnTeamAlpha.setTouchable(Touchable.disabled);
+                        btnTeamAlpha.setColor(Color.LIGHT_GRAY);
                     } catch (RemoteException ex) {
                         Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -362,51 +356,51 @@ public class SessionOnlineHost implements Screen {
             }
         });
 
-        teamselecttable.add(btnteamalpha).padBottom(10).width(150).height(50);
-        teamselecttable.row();
+        teamSelectTable.add(btnTeamAlpha).padBottom(10).width(150).height(50);
+        teamSelectTable.row();
     }
 
     /**
      * Adds team beta.
      *
-     * @param teamselecttable
+     * @param teamSelectTable Table that holds the list of players
      */
-    private void addBeta(Table teamselecttable) {
-        TextButton btnteambeta = new TextButton("Beta", skin); // Use the initialized skin
-        btnteambeta.setName("Beta");
-        btnteambeta.setColor(Color.CORAL);
-        btnteambeta.addListener(new ClickListener() {
+    private void addBeta(Table teamSelectTable) {
+        TextButton btnTeamBeta = new TextButton("Beta", skin); // Use the initialized skin
+        btnTeamBeta.setName("Beta");
+        btnTeamBeta.setColor(Color.CORAL);
+        btnTeamBeta.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if (players.getSelected() != null) {
                     try {
-                        Team teambeta = new Team("Beta", Color.CORAL);
-                        teambeta.setColorname(teambeta.getColor().toString());
-                        Player selectedplayer = (Player) players.getSelected();
-                        int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
+                        Team teamBeta = new Team("Beta", Color.CORAL);
+                        teamBeta.setColorname(teamBeta.getColor().toString());
+                        Player selectedPlayer = (Player) players.getSelected();
+                        int selectedUnitCount = Integer.parseInt(unitBox.getSelected().toString());
 
-                        ArrayList<Team> teamlistcopy = new ArrayList<>(teamList);
-                        for (Team fteam : teamlistcopy) {
-                            if (fteam.getPlayer().getName().equals(selectedplayer.getName())) {
-                                fteam.setPlayer(null);
+                        java.util.List<Team> teamListCopy = new ArrayList<>(teamList);
+                        for (Team fTeam : teamListCopy) {
+                            if (fTeam.getPlayer().getName().equals(selectedPlayer.getName())) {
+                                fTeam.setPlayer(null);
 
-                                TextButton teamtb = (TextButton) stage.getRoot().findActor(fteam.getName());
+                                TextButton teamtb = (TextButton) stage.getRoot().findActor(fTeam.getName());
                                 teamtb.setTouchable(Touchable.enabled);
-                                teamtb.setColor(fteam.getColor());
+                                teamtb.setColor(fTeam.getColor());
 
-                                teamList.remove(fteam);
-                                gameSettings.removeTeam(fteam);
+                                teamList.remove(fTeam);
+                                gameSettings.removeTeam(fTeam);
                             }
                         }
 
-                        teambeta.setPlayer(selectedplayer);
+                        teamBeta.setPlayer(selectedPlayer);
 
-                        addUnitsSingleTeam(selectedunitcount, teambeta);
+                        addUnitsSingleTeam(selectedUnitCount, teamBeta);
 
                         session.setGameSettings(gameSettings);
 
-                        btnteambeta.setTouchable(Touchable.disabled);
-                        btnteambeta.setColor(Color.LIGHT_GRAY);
+                        btnTeamBeta.setTouchable(Touchable.disabled);
+                        btnTeamBeta.setColor(Color.LIGHT_GRAY);
 
                         /*TextButton tbAlpha = (TextButton) stage.getRoot().findActor("Alpha");
                         tbAlpha.setTouchable(Touchable.enabled);
@@ -417,67 +411,68 @@ public class SessionOnlineHost implements Screen {
                 }
             }
         });
-        teamselecttable.add(btnteambeta).padBottom(10).width(150).height(50);
-        teamselecttable.row();
+        
+        teamSelectTable.add(btnTeamBeta).padBottom(10).width(150).height(50);
+        teamSelectTable.row();
     }
 
     /**
      * Adds team Gamma.
      *
-     * @param teamselecttable
+     * @param teamSelectTable Table that holds the list of players
      */
-    private void addGamma(Table teamselecttable) {
-        TextButton btnteamgamma = new TextButton("Gamma", skin); // Use the initialized skin
-        btnteamgamma.setName("Gamma");
-        btnteamgamma.setColor(Color.GREEN);
-        btnteamgamma.addListener(new ClickListener() {
+    private void addGamma(Table teamSelectTable) {
+        TextButton btnTeamGamma = new TextButton("Gamma", skin); // Use the initialized skin
+        btnTeamGamma.setName("Gamma");
+        btnTeamGamma.setColor(Color.GREEN);
+        btnTeamGamma.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if (players.getSelected() != null) {
                     try {
-                        Team teamgamma = new Team("Gamma", Color.GREEN);
-                        teamgamma.setColorname(teamgamma.getColor().toString());
+                        Team teamGamma = new Team("Gamma", Color.GREEN);
+                        teamGamma.setColorname(teamGamma.getColor().toString());
                         Player selectedplayer = (Player) players.getSelected();
-                        int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
+                        int selectedunitcount = Integer.parseInt(unitBox.getSelected().toString());
 
-                        ArrayList<Team> teamlistcopy = new ArrayList<>(teamList);
-                        for (Team fteam : teamlistcopy) {
-                            if (fteam.getPlayer().getName().equals(selectedplayer.getName())) {
-                                fteam.setPlayer(null);
+                        java.util.List<Team> teamlistcopy = new ArrayList<>(teamList);
+                        for (Team fTeam : teamlistcopy) {
+                            if (fTeam.getPlayer().getName().equals(selectedplayer.getName())) {
+                                fTeam.setPlayer(null);
 
-                                TextButton teamtb = (TextButton) stage.getRoot().findActor(fteam.getName());
-                                teamtb.setTouchable(Touchable.enabled);
-                                teamtb.setColor(fteam.getColor());
+                                TextButton teamTb = (TextButton) stage.getRoot().findActor(fTeam.getName());
+                                teamTb.setTouchable(Touchable.enabled);
+                                teamTb.setColor(fTeam.getColor());
 
-                                teamList.remove(fteam);
-                                gameSettings.removeTeam(fteam);
+                                teamList.remove(fTeam);
+                                gameSettings.removeTeam(fTeam);
                             }
                         }
 
-                        teamgamma.setPlayer(selectedplayer);
+                        teamGamma.setPlayer(selectedplayer);
 
-                        addUnitsSingleTeam(selectedunitcount, teamgamma);
+                        addUnitsSingleTeam(selectedunitcount, teamGamma);
 
                         session.setGameSettings(gameSettings);
 
-                        btnteamgamma.setTouchable(Touchable.disabled);
-                        btnteamgamma.setColor(Color.LIGHT_GRAY);
+                        btnTeamGamma.setTouchable(Touchable.disabled);
+                        btnTeamGamma.setColor(Color.LIGHT_GRAY);
                     } catch (RemoteException ex) {
                         Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             }
         });
-        teamselecttable.add(btnteamgamma).width(150).height(50);
-        teamselecttable.setWidth(200);
-        teamselecttable.setHeight(320);
-        teamselecttable.setPosition(500, 360);
-        stage.addActor(teamselecttable);
+        
+        teamSelectTable.add(btnTeamGamma).width(150).height(50);
+        teamSelectTable.setWidth(200);
+        teamSelectTable.setHeight(320);
+        teamSelectTable.setPosition(500, 360);
+        stage.addActor(teamSelectTable);
     }
 
     /**
      * Sets the title label to the name of the game.
-     *
      */
     private void setTitleLabel() {
         Label wotflabel = new Label("War of the Figures", skin);
@@ -488,65 +483,66 @@ public class SessionOnlineHost implements Screen {
     /**
      * Set the IP adress of the host. To the settingstable.
      *
-     * @param settingstable
+     * @param settingsTable Table that holds the list of players
      */
-    private void setIp(Table settingstable) {
-        Label iplabel = new Label("IP :", skin);
-        settingstable.add(iplabel).width(120);
-        Label ipvallabel = new Label(session.getHost().getIp(), skin);
-        settingstable.add(ipvallabel).width(180);
-        settingstable.row();
+    private void setIp(Table settingsTable) {
+        Label ipLabel = new Label("IP :", skin);
+        settingsTable.add(ipLabel).width(120);
+        Label ipValLabel = new Label(session.getHost().getIp(), skin);
+        settingsTable.add(ipValLabel).width(180);
+        settingsTable.row();
     }
 
     /**
      * Sets the turn times to the settingstable.
      *
-     * @param settingstable
+     * @param settingsTable Table that holds the list of players
      */
-    private void setTurnTimevals(Table settingstable) {
-        Object[] turntimevals = new Object[6];
-        turntimevals[0] = "10";
-        turntimevals[1] = "20";
-        turntimevals[2] = "30";
-        turntimevals[3] = "40";
-        turntimevals[4] = "50";
-        turntimevals[5] = "60";
+    private void setTurnTimevals(Table settingsTable) {
+        Object[] turnTimeVals = new Object[6];
+        turnTimeVals[0] = "10";
+        turnTimeVals[1] = "20";
+        turnTimeVals[2] = "30";
+        turnTimeVals[3] = "40";
+        turnTimeVals[4] = "50";
+        turnTimeVals[5] = "60";
         Label turntimelabel = new Label("Turn Time :", skin);
-        settingstable.add(turntimelabel).width(120);
-        SelectBox turntimebox = new SelectBox(skin);
-        turntimebox.setItems(turntimevals);
-        turntimebox.setSelectedIndex(3);
-        turntimebox.addListener(new ChangeListener() {
+        settingsTable.add(turntimelabel).width(120);
+        SelectBox turnTimeBox = new SelectBox(skin);
+        turnTimeBox.setItems(turnTimeVals);
+        turnTimeBox.setSelectedIndex(3);
+        turnTimeBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 try {
-                    gameSettings.setTurnTime(Integer.parseInt(turntimebox.getSelected().toString()));
+                    gameSettings.setTurnTime(Integer.parseInt(turnTimeBox.getSelected().toString()));
                     session.setGameSettings(gameSettings);
                 } catch (RemoteException ex) {
                     Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
-        settingstable.add(turntimebox).width(180);
-        settingstable.row();
+        
+        settingsTable.add(turnTimeBox).width(180);
+        settingsTable.row();
     }
 
     /**
      * Sets the max player selectbox to the current value. Also make initial
      * values. Add this to the gamesettings.
      *
-     * @param settingstable
+     * @param settingsTable Table that holds the list of players
      */
-    private void setMaxPlayersvals(Table settingstable) {
-        Label playerslabel = new Label("Players :", skin);
-        settingstable.add(playerslabel).width(120);
-        Object[] maxplayervals = new Object[4];
-        maxplayervals[0] = "2";
-        maxplayervals[1] = "3";
-        maxplayervals[2] = "4";
-        maxplayervals[3] = "5";
+    private void setMaxPlayersvals(Table settingsTable) {
+        Label playersLabel = new Label("Players :", skin);
+        settingsTable.add(playersLabel).width(120);
+        Object[] maxPlayerVals = new Object[4];
+        maxPlayerVals[0] = "2";
+        maxPlayerVals[1] = "3";
+        maxPlayerVals[2] = "4";
+        maxPlayerVals[3] = "5";
         maxPlayerBox = new SelectBox(skin);
-        maxPlayerBox.setItems(maxplayervals);
+        maxPlayerBox.setItems(maxPlayerVals);
         maxPlayerBox.setSelected(Integer.toString(session.getGameSettings().getMaxPlayersSession()));
         maxPlayerBox.addListener(new ChangeListener() {
             @Override
@@ -564,125 +560,129 @@ public class SessionOnlineHost implements Screen {
                 }
             }
         });
-        settingstable.add(maxPlayerBox).width(180);
-        settingstable.row();
+        
+        settingsTable.add(maxPlayerBox).width(180);
+        settingsTable.row();
     }
 
     /**
      * Sets the label for Speeds which isn't currently used.
      *
-     * @param settingstable
+     * @param settingsTable Table that holds the list of players
      */
-    private void setSpeedsvals(Table settingstable) {
-        Label speedslabel = new Label("Speeds :", skin);
-        settingstable.add(speedslabel).width(120);
-        Label speedsvallabel = new Label("Marathon", skin);
-        settingstable.add(speedsvallabel).width(180);
-        settingstable.row();
+    private void setSpeedsvals(Table settingsTable) {
+        Label speedsLabel = new Label("Speeds :", skin);
+        settingsTable.add(speedsLabel).width(120);
+        Label speedsValLabel = new Label("Marathon", skin);
+        settingsTable.add(speedsValLabel).width(180);
+        settingsTable.row();
     }
 
     /**
      * Sets the selectbox with values true and false. Also add it to the
      * gamesettings.
      *
-     * @param settingstable
+     * @param settingsTable Table that holds the list of players
      */
-    private void setPhysicsvals(Table settingstable) {
-        Object[] physicsvals = new Object[2];
-        physicsvals[0] = "true";
-        physicsvals[1] = "false";
+    private void setPhysicsvals(Table settingsTable) {
+        Object[] physicsVals = new Object[2];
+        physicsVals[0] = "true";
+        physicsVals[1] = "false";
         Label physicslabel = new Label("Physics :", skin);
-        settingstable.add(physicslabel).width(120);
-        SelectBox physicsbox = new SelectBox(skin);
-        physicsbox.setItems(physicsvals);
-        physicsbox.addListener(new ChangeListener() {
+        settingsTable.add(physicslabel).width(120);
+        SelectBox physicsBox = new SelectBox(skin);
+        physicsBox.setItems(physicsVals);
+        
+        physicsBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 try {
-                    gameSettings.setPhysics(Boolean.parseBoolean(physicsbox.getSelected().toString()));
+                    gameSettings.setPhysics(Boolean.parseBoolean(physicsBox.getSelected().toString()));
                     session.setGameSettings(gameSettings);
                 } catch (RemoteException ex) {
                     Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
-        settingstable.add(physicsbox).width(180);
-        settingstable.row();
+        
+        settingsTable.add(physicsBox).width(180);
+        settingsTable.row();
     }
 
     /**
      * Sets the weapon selectbox with values. Not added to the gamesettings yet.
      * It doesn't have a functional use.
      *
-     * @param settingstable
+     * @param settingsTable Table that holds the list of players
      */
-    private void setWeaponvals(Table settingstable) {
-        Object[] weaponsvals = new Object[3];
-        weaponsvals[0] = "All Weapons";
-        weaponsvals[1] = "Non-Explosive";
-        weaponsvals[2] = "Grenades Only";
-        Label weaponslabel = new Label("Weapons :", skin);
-        settingstable.add(weaponslabel).width(120);
-        SelectBox weaponsbox = new SelectBox(skin);
-        weaponsbox.setItems(weaponsvals);
-        settingstable.add(weaponsbox).width(180);
-        settingstable.row();
+    private void setWeaponvals(Table settingsTable) {
+        Object[] weaponsVals = new Object[3];
+        weaponsVals[0] = "All Weapons";
+        weaponsVals[1] = "Non-Explosive";
+        weaponsVals[2] = "Grenades Only";
+        Label weaponsLabel = new Label("Weapons :", skin);
+        settingsTable.add(weaponsLabel).width(120);
+        SelectBox weaponsBox = new SelectBox(skin);
+        weaponsBox.setItems(weaponsVals);
+        settingsTable.add(weaponsBox).width(180);
+        settingsTable.row();
     }
 
     /**
      * Sets the MaxTime selectbox with values. Adds the selected maxtime to the
      * gamesettings list. If it is changed inform it to the clients.
      *
-     * @param settingstable
+     * @param settingsTable Table that holds the list of players
      */
-    private void setTimervals(Table settingstable) {
-        Object[] timervals = new Object[3];
-        timervals[0] = "60";
-        timervals[1] = "30";
-        timervals[2] = "10";
-        Label timerlabel = new Label("Timer :", skin);
-        settingstable.add(timerlabel).width(120);
-        SelectBox timerbox = new SelectBox(skin);
-        timerbox.setItems(timervals);
-        timerbox.addListener(new ChangeListener() {
+    private void setTimervals(Table settingsTable) {
+        Object[] timerVals = new Object[3];
+        timerVals[0] = "60";
+        timerVals[1] = "30";
+        timerVals[2] = "10";
+        Label timerLabel = new Label("Timer :", skin);
+        settingsTable.add(timerLabel).width(120);
+        SelectBox timerBox = new SelectBox(skin);
+        timerBox.setItems(timerVals);
+        timerBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 try {
-                    gameSettings.setMaxTime(Integer.parseInt(timerbox.getSelected().toString()));
+                    gameSettings.setMaxTime(Integer.parseInt(timerBox.getSelected().toString()));
                     session.setGameSettings(gameSettings);
                 } catch (RemoteException ex) {
                     Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
-        settingstable.add(timerbox).width(180);
-        settingstable.row();
+        
+        settingsTable.add(timerBox).width(180);
+        settingsTable.row();
     }
 
     /**
      * Sets the current units with values. Adds the selected units to the
      * gamesettings list. If it is changed inform the clients.
      *
-     * @param settingstable
+     * @param settingsTable Table that holds the list of players
      */
-    private void setUnitsvals(Table settingstable) {
-        Object[] unitvals = new Object[4];
-        unitvals[0] = "1";
-        unitvals[1] = "2";
-        unitvals[2] = "3";
-        unitvals[3] = "4";
-        Label unitlabel = new Label("Units :", skin);
-        settingstable.add(unitlabel).width(120);
-        unitbox = new SelectBox(skin);
-        unitbox.setItems(unitvals);
-        unitbox.addListener(new ChangeListener() {
+    private void setUnitsvals(Table settingsTable) {
+        Object[] unitVals = new Object[4];
+        unitVals[0] = "1";
+        unitVals[1] = "2";
+        unitVals[2] = "3";
+        unitVals[3] = "4";
+        Label unitLabel = new Label("Units :", skin);
+        settingsTable.add(unitLabel).width(120);
+        unitBox = new SelectBox(skin);
+        unitBox.setItems(unitVals);
+        unitBox.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 try {
-                    int selectedunitcount = Integer.parseInt(unitbox.getSelected().toString());
-                    gameSettings.setMaxUnitCount(selectedunitcount);
+                    int selectedUnitCount = Integer.parseInt(unitBox.getSelected().toString());
+                    gameSettings.setMaxUnitCount(selectedUnitCount);
                     // For each team in the list remove all the units first and remove it from the gamesettings.
-                    refreshUnitsForTeam(selectedunitcount);
+                    refreshUnitsForTeam(selectedUnitCount);
 
                     session.setGameSettings(gameSettings);
                 } catch (RemoteException ex) {
@@ -690,7 +690,8 @@ public class SessionOnlineHost implements Screen {
                 }
             }
         });
-        settingstable.add(unitbox).width(180);
+        
+        settingsTable.add(unitBox).width(180);
 
     }
 
@@ -699,29 +700,34 @@ public class SessionOnlineHost implements Screen {
      * Adds the selected map to the gamesettings list. If it is changed inform
      * the clients.
      *
-     * @param mapstable
-     * @return
+     * @param mapsTable Table that holds the list of maps
+     * @return SelectBox control containing the selected map
      */
-    private SelectBox setMaps(Table mapstable) {
-        ArrayList<String> mapslist = new ArrayList<>();
+    private SelectBox setMaps(Table mapsTable) {
+        java.util.List<String> mapslist = new ArrayList<>();
         FileHandle dirHandle = Gdx.files.internal("maps");
+        
         for (FileHandle entry : dirHandle.list()) {
             mapslist.add(entry.toString().substring(5));
         }
-        map1 = new Image(new Texture("maps/" + mapslist.get(0)));
+        
+        map = new Image(new Texture("maps/" + mapslist.get(0)));
+        
         try {
             session.setGameSettings(gameSettings);
         } catch (RemoteException ex) {
             Logger.getLogger(SessionOnlineHost.class.getName()).log(Level.SEVERE, null, ex);
         }
-        map1.setPosition(20, 70);
-        map1.setWidth(400);
-        map1.setHeight(230);
-        mapstable.addActor(map1);
+        
+        map.setPosition(20, 70);
+        map.setWidth(400);
+        map.setHeight(230);
+        mapsTable.addActor(map);
         SelectBox chooseMap = new SelectBox(skin);
         chooseMap.setItems(mapslist.toArray());
         gameSettings.setMapIndex(chooseMap.getSelectedIndex());
         gameSettings.setMapName(chooseMap.getSelected().toString());
+        
         chooseMap.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -730,25 +736,27 @@ public class SessionOnlineHost implements Screen {
                     gameSettings.setMapIndex(chooseMap.getSelectedIndex());
                     session.setGameSettings(gameSettings);
 
-                    mapstable.removeActor(map1);
-                    map1 = new Image(new Texture("maps/" + mapslist.get(chooseMap.getSelectedIndex())));
-                    map1.setPosition(20, 70);
-                    map1.setWidth(400);
-                    map1.setHeight(230);
-                    map1.invalidate();
-                    mapstable.addActor(map1);
+                    mapsTable.removeActor(map);
+                    map = new Image(new Texture("maps/" + mapslist.get(chooseMap.getSelectedIndex())));
+                    map.setPosition(20, 70);
+                    map.setWidth(400);
+                    map.setHeight(230);
+                    map.invalidate();
+                    mapsTable.addActor(map);
                 } catch (RemoteException ex) {
                     Logger.getLogger(SessionOnlinePlayer.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
+        
         chooseMap.setWidth(400);
         chooseMap.setPosition(20, 20);
-        mapstable.addActor(chooseMap);
-        mapstable.setPosition(30, 360);
-        mapstable.setHeight(320);
-        mapstable.setWidth(440);
-        stage.addActor(mapstable);
+        mapsTable.addActor(chooseMap);
+        mapsTable.setPosition(30, 360);
+        mapsTable.setHeight(320);
+        mapsTable.setWidth(440);
+        stage.addActor(mapsTable);
+        
         return chooseMap;
     }
 
@@ -756,7 +764,7 @@ public class SessionOnlineHost implements Screen {
      * Starts the game with the current gamesettings. Inform the clients to
      * start the game. The teamsize must be at least 2.
      *
-     * @param chooseMap
+     * @param chooseMap Control containing the selected map
      */
     private void startGame(SelectBox chooseMap) {
         TextButton start = new TextButton("Start", skin); // Use the initialized skin
@@ -765,6 +773,7 @@ public class SessionOnlineHost implements Screen {
         start.setHeight(60);
         start.setPosition(1010, 190);
         stage.addActor(start);
+        
         start.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -794,12 +803,12 @@ public class SessionOnlineHost implements Screen {
     }
 
     /**
-     * Refresh the players in the session each 7 seconds. From the DB
-     *
+     * Refreshes the players in the session each 7 seconds. From the DB
      */
     private void refreshPlayers() {
         SessionPlayerContext sc = new SessionPlayerContext();
         timer = new Timer("PlayerRefresh");
+        
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -816,7 +825,6 @@ public class SessionOnlineHost implements Screen {
 
     /**
      * Cancels the game and inform the clients to exit the session.
-     *
      */
     private void exitGame() {
         TextButton exit = new TextButton("Exit", skin); // Use the initialized skin
@@ -832,14 +840,19 @@ public class SessionOnlineHost implements Screen {
                 SessionPlayerContext part = new SessionPlayerContext();
                 try {
                     timer.cancel();
+                    
                     // Make the clients know the session is stopping. Push an update.
                     session.cancelSessionForClients();
+                    
                     // If it gets to here remove the session from the DB.
                     session.removeRegistry();
+                    
                     // Remove the session_participant from the db.
                     part.deleteSessionAndPlayers(session);
+                    
                     // Remove the session from the db.
                     sc.delete(session);
+                    
                     session = null;
                     game.setScreen(new LobbyGUI(game, player));
                 } catch (SQLException ex) {
@@ -869,32 +882,33 @@ public class SessionOnlineHost implements Screen {
     /**
      * Make new units for each team.
      *
-     * @param selectedunitcount
+     * @param selectedUnitCount Amount of units to add to teams
      */
-    public void refreshUnitsForTeam(int selectedunitcount) {
+    public void refreshUnitsForTeam(int selectedUnitCount) {
         // For each team in the list remove all the units first and remove it from the gamesettings.
-        for (Team teamv : teamList) {
-            gameSettings.removeTeam(teamv);
-            teamv.removeAllUnits();
+        for (Team teamV : teamList) {
+            gameSettings.removeTeam(teamV);
+            teamV.removeAllUnits();
             // The new units to the team. The name of the unit is the teamname + the number of the variable 'i'.
-            for (int i = 0; i < selectedunitcount; i++) {
-                teamv.addUnit(teamv.getName() + Integer.toString(i), 100);
+            for (int i = 0; i < selectedUnitCount; i++) {
+                teamV.addUnit(teamV.getName() + Integer.toString(i), 100);
             }
-            gameSettings.addTeam(teamv);
+            gameSettings.addTeam(teamV);
         }
     }
 
     /**
      * Make units for selected team.
      *
-     * @param selectedunitcount
-     * @param team
+     * @param selectedUnitCount Amount of units to add
+     * @param team Team to add units to
      */
-    public void addUnitsSingleTeam(int selectedunitcount, Team team) {
+    public void addUnitsSingleTeam(int selectedUnitCount, Team team) {
         // The new units to the team. The name of the unit is the teamname + the number of the variable 'i'.
-        for (int i = 0; i < selectedunitcount; i++) {
+        for (int i = 0; i < selectedUnitCount; i++) {
             team.addUnit(team.getName() + Integer.toString(i), 100);
         }
+        
         teamList.add(team);
         gameSettings.addTeam(team);
         teams.setItems(teamList.toArray());

@@ -20,15 +20,22 @@ public abstract class Item extends Actor implements Serializable {
     private final int radius;
     private final int damage;
 
+    /**
+     * Particle effect associated with this item
+     */
     public ParticleEffect p;
+    
+    /**
+     * Name of the particle effect associated wtih this item
+     */
     public String particleName;
 
-    private Sprite bullet_sprite;
-    private Sprite weapon_sprite;
+    private final Sprite bulletSprite;
+    private final Sprite weaponSprite;
 
-    private Projectile bullet;
+    private final Projectile bullet;
 
-    private String name;
+    private final String name;
 
     /**
      * Main constructor of Item used to initialize all necessary fields
@@ -39,27 +46,24 @@ public abstract class Item extends Actor implements Serializable {
      * @param damage Damage the item inflicts
      * @param weaponSprite Sprite of the weapon of the item
      * @param bulletSprite Sprite of the bullet/projectile of the item
-     * @param pe particle effect that is started with the event trigger
-     * 'explosion'
-     * @param bullet projectile that will be fired as bullet and triggers event
-     * on impact/activation
+     * @param particleEffect particle effect that is started with the event trigger 'explosion'
      */
     public Item(String nm, float pw, int rad, int damage, Sprite weaponSprite, Sprite bulletSprite, String particleEffect) {
         this.name = nm;
         this.power = pw;
         this.radius = rad;
         this.damage = damage;
-        this.bullet_sprite = bulletSprite;
-        this.weapon_sprite = weaponSprite;
+        this.bulletSprite = bulletSprite;
+        this.weaponSprite = weaponSprite;
 
         this.p = new ParticleEffect();
         p.load(Gdx.files.internal(particleEffect), Gdx.files.absolute(Pathfinder.getRelativePath() + "effects"));
 
-        this.bullet = new Projectile(bullet_sprite, p);
-        InitItemChildSuper(weapon_sprite);
+        this.bullet = new Projectile(bulletSprite, p);
+        initItemChildSuper(weaponSprite);
     }
 
-    public void InitItemChildSuper(Sprite weaponSprite) {
+    private void initItemChildSuper(Sprite weaponSprite) {
         this.setBounds(getX(), getY(), weaponSprite.getWidth(), weaponSprite.getHeight());
         this.setWidth(weaponSprite.getWidth());
         this.setHeight(weaponSprite.getHeight());
@@ -74,14 +78,14 @@ public abstract class Item extends Actor implements Serializable {
      * @return sprite image of the projectile/bullet
      */
     public Sprite getProjectileSprite() {
-        return this.bullet_sprite;
+        return this.bulletSprite;
     }
 
     /**
      * @return stprite image of the weapon
      */
     public Sprite getWeaponSprite() {
-        return this.weapon_sprite;
+        return this.weaponSprite;
     }
 
     /**

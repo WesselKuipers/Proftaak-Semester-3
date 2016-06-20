@@ -201,15 +201,19 @@ public class DBCon {
         return null;
     }
     
+    /**
+     * Closes the active connections with the database
+     * @param closeables List of connections
+     */
     public static void closeQuietly(AutoCloseable ... closeables) {
-    for (AutoCloseable c : closeables) {
-        if (c != null) {
-            try {
-                c.close();
-            } catch (Exception e) {
-                // log or ignore, we can't do anything about it really
+        for (AutoCloseable c : closeables) {
+            if (c != null) {
+                try {
+                    c.close();
+                } catch (Exception e) {
+                    // log or ignore, we can't do anything about it really
+                }
             }
         }
     }
-}
 }

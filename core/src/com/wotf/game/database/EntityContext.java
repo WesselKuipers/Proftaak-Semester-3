@@ -1,18 +1,19 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.wotf.game.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- *
- * @author Dino Spong
+ * Abstract class used for classes that derive from a database table
+ * @param <T> Type of object derviced from database
  */
 public abstract class EntityContext<T>
 {
+    /**
+     * Attempts to derive an object from a DB record
+     * @param record record to derive object from
+     * @return returns object of type <T>
+     * @throws SQLException Thrown when the record is invalid
+     */
     protected abstract T getEntityFromRecord(ResultSet record) throws SQLException;
 }
