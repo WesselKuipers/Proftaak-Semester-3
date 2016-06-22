@@ -221,10 +221,10 @@ public final class GuiStage extends Stage {
         
         // weapon selector update mechanism
         int indexWeapon = 0;
-        
-        if (game.getTurnLogic().getState() != TurnLogic.TurnState.WITHDRAW) {
-            indexWeapon = WEAPONS_ARMORY.indexOf(game.getActiveTeam().getActiveUnit().getWeapon());
-        }
+//        
+//        if (game.getTurnLogic().getState() != TurnLogic.TurnState.WITHDRAW) {
+//            indexWeapon = WEAPONS_ARMORY.indexOf(game.getActiveTeam().getActiveUnit().getWeapon());
+//        }
         
         updateSelectedWeaponHotbar(indexWeapon);
         
