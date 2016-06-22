@@ -17,7 +17,7 @@ public class DBCon {
     // This hsould be refactored so that the username and password are loaded from a file instead of being hard-coded
     // not implemented because of syncing issues with version control
     // for implementation: see 
-    private static final String ConnectionPath = "jdbc:mysql://145.93.176.101:3306/school";
+    private static final String ConnectionPath = "jdbc:mysql://145.93.176.224:3306/school";
     private static final String Username = "connect";
     private static final String Password = "admin";
 
