@@ -28,8 +28,6 @@ import com.wotf.game.database.PlayerContext;
 import com.wotf.game.database.SessionContext;
 import com.wotf.game.database.SessionPlayerContext;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Screen that shows the lobby GUI
@@ -40,6 +38,7 @@ public class LobbyGUI implements Screen {
     private Stage stage;
     private Skin skin;
     private List sessions;
+    private List players;
     private ArrayList<Session> sessionlist;
     private final Lobby lobby;
     private Player player;
@@ -106,7 +105,7 @@ public class LobbyGUI implements Screen {
         Gdx.input.setInputProcessor(stage);// Make the stage consume events
         skin = new Skin(Gdx.files.internal("uiskin.json"));
         sessions = new List(skin);
-        List players = new List(skin);
+        players = new List(skin);
         Table sessionsTable = new Table();
         Table playersTable = new Table();
 
@@ -246,9 +245,13 @@ public class LobbyGUI implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 try {
                     // RELOADING ALL NEW SESSIONS
-                    lobby.removeAllSessions();
+                    lobby.removeAllSessions();            
                     // Getting session out of database and sets it in lobby
                     for (Session session : sessionContext.getAll()) {
+                        for (Player sesplayer : sesplayContext.getPlayersFromSession(session)) {
+                            // Get all the players of this session and put them in the list of players
+                            session.addPlayer(sesplayer);
+                        }
                         lobby.addSession(session);
                     }
                     
@@ -257,6 +260,22 @@ public class LobbyGUI implements Screen {
                 } catch (SQLException ex) {
                     Gdx.app.log("SQL", ex.getMessage());
                 }
+                
+                 try {
+                    players.clear();
+                    Object[] playerlist = null;
+                    playerlist = new Object[playerContext.getAll().size()];
+                    int i = 0;
+
+                    for (Player p : playerContext.getAll()) {
+                        playerlist[i] = p.getName();
+                        i++;
+                    }
+                    players.setItems(playerlist);
+                    } catch (SQLException ex) {
+                    Gdx.app.log("SQL", ex.getMessage());
+                    }
+                    
             }
         });
     }
